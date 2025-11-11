@@ -1,0 +1,177 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.*;
+
+
+/*
+ *
+ * HOW TO CONNECT TO SQL:
+ * below you will see 3 attributes called DB_URL, USER, and PASSWORD. Change the password to your local version assuming
+ * URL and USER are the same as mine.
+ * NOTE 1: Table should have been made in MYSQL to make this work. So create the database first in MYSQL before connecting
+ * NOTE 2: JDBC is needed to connect Java to MYSQL Tutorial for VSCODE -> (https://www.youtube.com/watch?v=MtME-ERufu0)
+ * 
+ * 
+ * HOW TO CONNECT YOUR MVC TO THIS CONTROLLER:
+ * This class will be the main controller of the DB Application
+ * I have already made sample Controllers for you guys to use, and they are already connected to this main controller.
+ * Please implement your MVC seperately of the Main Controller and Viewer as it is only meant to connect the record together.
+ * If you wish to use another controller to connect your MVC from my sample,
+ * go to the actionPerformed method in the very button, and add the code that will show the viewer of your records in your respective case. 
+ * Also uncomment the setVisible before you show your own viewer -> ( appDBViewer.setVisible(false))
+ * NOTE: Add a back button on your viewer so that it will go back to the MainDBViewer.
+ * 
+ * 
+ * HOW TO USE CARD VIEWER
+ *
+ * In your viewer class, create a viewer class with a constructor that accepts **JPanel cardPanel**,
+ * Afterwards, extend your class to JFrame and add the class itself as a parameter to the cardPanel JPanel with the appropriate link
+ * EX:
+ * 
+ * public class FeedbackRecordViewer extends JPanel{ <- Extends JPanel
+ * 
+ *      public FeedbackRecordViewer(JPanel cardPanel){ <- Add JPanel parameter
+ *
+ *
+ *
+ *          cardPanel.add(this, MainDBViewer.FEEDBACK_LINK); <- Add Class directly to cardPanel, and use the appropriate link
+ *
+ *       }
+ *
+ *  }
+ * 
+ * Afterwards, in your controller, add the cardPanel when creating the object instance of your viewer.
+ * EX:
+ * view = new FeedbackRecordViewer(cardPanel);
+ * 
+ * If both are implemented properly, when you run the program and click the button, it should now open your JPanel
+ * 
+ * NOTE: Add a back button on your JPanel that will return the Panel back to main via an ActionListener on your own controller
+ * 
+ * 
+ */
+
+
+// This class connects to the database and connects to the other controllers in the project
+public class MainDBController implements ActionListener{
+
+    // NOTE: To make the connection work, please change your password to your own password
+
+    // Attributes define SQL table connection
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/hiddengemsdb";
+    private static final String USER = "root";
+    private static final String PASSWORD = "SQLPass12345Ql"; // Change password to your own local one
+
+    private static Connection conn = null; 
+
+    // DB App Viewer
+    private MainDBViewer appDBViewer;
+
+    // Report Controllers
+    public UserRecordController userRecord;
+    public TravelRecordController travelRecord;
+    public FeedbackRecordController feedbackRecord;
+    public BookingRecordController bookingRecord;
+
+
+
+    // Constructor
+    public MainDBController(){
+
+        // Creates the GUI Viewer and references itself
+        appDBViewer = new MainDBViewer(this);
+
+        appDBViewer.setActionListener(this);
+
+        // Initialize record controllers and pass conn and MainDBController to them
+        userRecord = new UserRecordController(conn, this, appDBViewer.getCardPanel());
+        travelRecord = new TravelRecordController(conn, this, appDBViewer.getCardPanel());
+        feedbackRecord = new FeedbackRecordController(conn, this, appDBViewer.getCardPanel());
+        bookingRecord = new BookingRecordController(conn, this, appDBViewer.getCardPanel());
+
+
+
+        // Performs the connection to the SQL database
+        connectDB();
+
+
+
+
+    }
+
+
+    // Method performs the connection to the SQL Database via DriverManager
+    public static void connectDB(){
+
+        // Try-catch block to determine if connection was succesful or not(Display message if unsuccessful)
+        try{
+            
+            conn = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+            System.out.printf("Connection to %s database is successful \n", DB_URL);
+
+
+        } catch(SQLException e){
+
+            System.out.printf("Error in connecting database occured \n");
+
+        }
+
+    }
+
+
+    // Method provides what the buttons will do when pressed.
+    // NOTE: Add your implementation here to connect your MVC inside of your case block
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        
+        String command = e.getActionCommand(); //Get String equivalent of the action command
+
+
+        //Switch statement to check the command and do the corresponding action
+        switch(command){
+
+            case "Quit":
+
+                System.exit(0); //Closes program
+                break;
+
+            case "User Record":
+
+                // Display checking if button works (Remove once you implemented your MVC)
+                System.out.println("User Record Button was pressed");
+
+                //appDBViewer.showPanel(MainDBViewer.USER_LINK);
+
+                break;
+
+            case "Travel Record":
+
+                // Display checking if button works (Remove once you implemented your MVC)
+                System.out.println("Travel Record Button was pressed");
+
+                //appDBViewer.showPanel(MainDBViewer.TRAVEL_LINK);
+
+                break;
+
+            case "Feedback Record":
+
+                // Display checking if button works (Remove once you implemented your MVC)
+                System.out.println("Feedback Record Button was pressed");
+
+                appDBViewer.showPanel(MainDBViewer.FEEDBACK_LINK);
+
+                break;
+
+            case "Booking Record":
+
+                 // Display checking if button works (Remove once you implemented your MVC)
+                System.out.println("Booking Record Button was pressed");
+
+                //appDBViewer.showPanel(MainDBViewer.BOOKING_LINK);
+
+
+        }
+
+    }
+    
+}
