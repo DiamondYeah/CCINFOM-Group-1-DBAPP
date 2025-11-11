@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -11,9 +12,21 @@ import java.awt.event.ActionListener;
 // This class serves as the main hub to display the starting screen of the DB App
 public class MainDBViewer extends JFrame{
 
+    // Serves as the links of the different Panels in the Card Layout (Reference the constant on showCard())
+    public static final String MAIN_LINK = "Main";
+    public static final String USER_LINK = "UserRecord";
+    public static final String TRAVEL_LINK = "TravelRecord";
+    public static final String FEEDBACK_LINK = "FeedbackRecord";
+    public static final String BOOKING_LINK = "BookingRecord";
+    public static final String BACK_LINK = "Back";
+
 
     //Main Layout that combines everything
     private JPanel mainPanel;
+
+    // Card Panel to store all other panels and show their view when pressing a button
+    private CardLayout cardLayout; // Allows a user to show different panels with a given String/Link
+    private JPanel cardPanel;
 
     //Panels to add diff components to mainPanel
     private JPanel panelNorth;
@@ -54,6 +67,13 @@ public class MainDBViewer extends JFrame{
     }
 
 
+    // Getter Methods
+    public JPanel getCardPanel(){
+
+        return cardPanel;
+
+    }
+
     // Action Listener Methods
 
     // Add an action listener to provide button interactivity (CONNECTED TO MainDBController)
@@ -72,12 +92,17 @@ public class MainDBViewer extends JFrame{
     //Initializes the base components for the program
     private void initialization(){
 
+        // Create card layout
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
+
         // Create the 2 panels that will add components in
         panelCenter = new JPanel(new BorderLayout(25, 25)); // Add Buttons
         panelNorth = new JPanel(new FlowLayout()); // Add Title
 
-        //Create the menu panel and add both the title and names into it.
+        // Create the menu panel and add both the title and names into it.
         mainPanel = new JPanel(new BorderLayout());
+
 
         // Create JLabel and add components
         titleLabel = new JLabel("Hidden Gems");
@@ -94,8 +119,12 @@ public class MainDBViewer extends JFrame{
         mainPanel.add(panelCenter, BorderLayout.CENTER);
 
 
+        // Add mainPanel to cardLink
+        cardPanel.add(mainPanel, MAIN_LINK);
+
+
         // Add Mainpanel to JFrame in the Center
-        this.add(mainPanel, BorderLayout.CENTER);
+        this.add(cardPanel, BorderLayout.CENTER);
 
 
     }
@@ -171,6 +200,44 @@ public class MainDBViewer extends JFrame{
         panelCenter.add(leftButtonPanel, BorderLayout.WEST);
         panelCenter.add(rightButtonPanel, BorderLayout.EAST);
         panelCenter.add(quitButtonWrapper, BorderLayout.SOUTH);
+
+    }
+
+
+    // Method shows panels via Card Layout
+    public void showPanel(String link){
+
+
+        // Switch statement determines which panel to open based on link provided in parameter
+        switch(link){
+
+
+            case USER_LINK:
+
+                cardLayout.show(cardPanel, USER_LINK);
+                break;
+
+            case TRAVEL_LINK:
+
+                cardLayout.show(cardPanel, TRAVEL_LINK);
+                break;
+
+            case FEEDBACK_LINK:
+
+                cardLayout.show(cardPanel, FEEDBACK_LINK);
+                break;
+
+            case BOOKING_LINK:
+
+                cardLayout.show(cardPanel, BOOKING_LINK);
+                break;
+
+            case BACK_LINK:
+
+                cardLayout.show(cardPanel, MAIN_LINK);
+
+            
+        }
 
     }
 

@@ -4,11 +4,13 @@ import java.sql.*;
 
 
 /*
+ *
  * HOW TO CONNECT TO SQL:
  * below you will see 3 attributes called DB_URL, USER, and PASSWORD. Change the password to your local version assuming
  * URL and USER are the same as mine.
  * NOTE 1: Table should have been made in MYSQL to make this work. So create the database first in MYSQL before connecting
  * NOTE 2: JDBC is needed to connect Java to MYSQL Tutorial for VSCODE -> (https://www.youtube.com/watch?v=MtME-ERufu0)
+ * 
  * 
  * HOW TO CONNECT YOUR MVC TO THIS CONTROLLER:
  * This class will be the main controller of the DB Application
@@ -19,10 +21,35 @@ import java.sql.*;
  * Also uncomment the setVisible before you show your own viewer -> ( appDBViewer.setVisible(false))
  * NOTE: Add a back button on your viewer so that it will go back to the MainDBViewer.
  * 
+ * 
+ * HOW TO USE CARD VIEWER
+ *
+ * In your viewer class, create a viewer class with a constructor that accepts **JPanel cardPanel**,
+ * Afterwards, extend your class to JFrame and add the class itself as a parameter to the cardPanel JPanel with the appropriate link
+ * EX:
+ * 
+ * public class FeedbackRecordViewer extends JPanel{ <- Extends JPanel
+ * 
+ *      public FeedbackRecordViewer(JPanel cardPanel){ <- Add JPanel parameter
+ *
+ *
+ *
+ *          cardPanel.add(this, MainDBViewer.FEEDBACK_LINK); <- Add Class directly to cardPanel, and use the appropriate link
+ *
+ *       }
+ *
+ *  }
+ * 
+ * Afterwards, in your controller, add the cardPanel when creating the object instance of your viewer.
+ * EX:
+ * view = new FeedbackRecordViewer(cardPanel);
+ * 
+ * If both are implemented properly, when you run the program and click the button, it should now open your JPanel
+ * 
+ * NOTE: Add a back button on your JPanel that will return the Panel back to main via an ActionListener on your own controller
+ * 
+ * 
  */
-
-
-
 
 
 // This class connects to the database and connects to the other controllers in the project
@@ -33,7 +60,7 @@ public class MainDBController implements ActionListener{
     // Attributes define SQL table connection
     private static final String DB_URL = "jdbc:mysql://localhost:3306/hiddengemsdb";
     private static final String USER = "root";
-    private static final String PASSWORD = ""; // Change password to your own local one
+    private static final String PASSWORD = "SQLPass12345Ql"; // Change password to your own local one
 
     private static Connection conn = null; 
 
@@ -51,21 +78,23 @@ public class MainDBController implements ActionListener{
     // Constructor
     public MainDBController(){
 
+        // Creates the GUI Viewer and references itself
+        appDBViewer = new MainDBViewer(this);
+
+        appDBViewer.setActionListener(this);
+
         // Initialize record controllers and pass conn and MainDBController to them
-        userRecord = new UserRecordController(conn, this);
-        travelRecord = new TravelRecordController(conn, this);
-        feedbackRecord = new FeedbackRecordController(conn, this);
-        bookingRecord = new BookingRecordController(conn, this);
+        userRecord = new UserRecordController(conn, this, appDBViewer.getCardPanel());
+        travelRecord = new TravelRecordController(conn, this, appDBViewer.getCardPanel());
+        feedbackRecord = new FeedbackRecordController(conn, this, appDBViewer.getCardPanel());
+        bookingRecord = new BookingRecordController(conn, this, appDBViewer.getCardPanel());
 
 
 
         // Performs the connection to the SQL database
         connectDB();
 
-        // Creates the GUI Viewer and references itself
-        appDBViewer = new MainDBViewer(this);
 
-        appDBViewer.setActionListener(this);
 
 
     }
@@ -111,7 +140,7 @@ public class MainDBController implements ActionListener{
                 // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("User Record Button was pressed");
 
-                // appDBViewer.setVisible(false);
+                //appDBViewer.showPanel(MainDBViewer.USER_LINK);
 
                 break;
 
@@ -120,7 +149,7 @@ public class MainDBController implements ActionListener{
                 // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("Travel Record Button was pressed");
 
-                // appDBViewer.setVisible(false);
+                //appDBViewer.showPanel(MainDBViewer.TRAVEL_LINK);
 
                 break;
 
@@ -129,7 +158,7 @@ public class MainDBController implements ActionListener{
                 // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("Feedback Record Button was pressed");
 
-                // appDBViewer.setVisible(false);
+                appDBViewer.showPanel(MainDBViewer.FEEDBACK_LINK);
 
                 break;
 
@@ -138,7 +167,7 @@ public class MainDBController implements ActionListener{
                  // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("Booking Record Button was pressed");
 
-                // appDBViewer.setVisible(false);
+                //appDBViewer.showPanel(MainDBViewer.BOOKING_LINK);
 
 
         }

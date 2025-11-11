@@ -3,14 +3,14 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 
 import javax.swing.Action;
+import javax.swing.JPanel;
 
 // Class is the main controller for the Feedback Records
 public class FeedbackRecordController {
 
-    // ADD viewer and models here
     
-    public FeedbackRecordController(Connection conn, MainDBController mainController){
-
+    // Public constructor
+    public FeedbackRecordController(Connection conn, MainDBController mainController, JPanel cardPanel){
 
 
     }

@@ -1,0 +1,7 @@
+ADDITIONS / CHANGES:
+
+- Added a cardPanel in MainDBViewer that will be used to show the different viewers
+- Added a method in MainDBViewer called showPanel that will show the view of a panel based on a String parameter
+- Added constant in MainDBViewer for the diff links to use depending on the table that is used
+- Made it so add Controllers have an extra parameter for the cardPanel for easier access in providing the panel to viewers
+- Added extra instructions in MainDBController on how to use card viewer on your own MVC
