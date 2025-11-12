@@ -60,7 +60,7 @@ public class MainDBController implements ActionListener{
     // Attributes define SQL table connection
     private static final String DB_URL = "jdbc:mysql://localhost:3306/hiddengemsdb";
     private static final String USER = "root";
-    private static final String PASSWORD = "SQLPass12345Ql"; // Change password to your own local one
+    private static final String PASSWORD = "123123"; // Change password to your own local one
 
     private static Connection conn = null; 
 
