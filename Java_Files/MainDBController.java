@@ -60,7 +60,7 @@ public class MainDBController implements ActionListener{
     // Attributes define SQL table connection
     private static final String DB_URL = "jdbc:mysql://localhost:3306/hiddengemsdb";
     private static final String USER = "root";
-    private static final String PASSWORD = "SQLPass12345Ql"; // Change password to your own local one
+    private static final String PASSWORD = "96029546Ma@"; // Change password to your own local one
 
     private static Connection conn = null; 
 
@@ -158,7 +158,7 @@ public class MainDBController implements ActionListener{
                 // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("Feedback Record Button was pressed");
 
-                appDBViewer.showPanel(MainDBViewer.FEEDBACK_LINK);
+                // appDBViewer.showPanel(MainDBViewer.FEEDBACK_LINK);
 
                 break;
 
@@ -167,7 +167,12 @@ public class MainDBController implements ActionListener{
                  // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("Booking Record Button was pressed");
 
-                //appDBViewer.showPanel(MainDBViewer.BOOKING_LINK);
+                appDBViewer.showPanel(MainDBViewer.BOOKING_LINK);
+                if (bookingRecord != null) {
+                    // bookingRecord.runConsole();
+                    bookingRecord.showBookingsTable(); 
+            }
+
 
 
         }
