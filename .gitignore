@@ -3,7 +3,7 @@
 # 2. javac -d out *.java (COMPILING)
 # 3. java -cp out Driver (RUNNING)
 # This will make you an out folder
-/out
+out/
 
 # ignore local database creds so that we don't have to keep pushing/pulling each other's passwords
 db.properties
