@@ -1,0 +1,6 @@
+# ignores out folder which SHOULD contain all the class files after compiling your project in cmd
+# 1. Compile in cmd
+# 2. javac -d out *.java (COMPILING)
+# 3. java -cp out Driver (RUNNING)
+# This will make you an out folder
+/out
