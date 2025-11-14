@@ -157,7 +157,7 @@ public class MainDBController implements ActionListener{
                 // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("Feedback Record Button was pressed");
 
-                appDBViewer.showPanel(MainDBViewer.FEEDBACK_LINK);
+                // appDBViewer.showPanel(MainDBViewer.FEEDBACK_LINK);
 
                 break;
 
@@ -166,7 +166,12 @@ public class MainDBController implements ActionListener{
                  // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("Booking Record Button was pressed");
 
-                //appDBViewer.showPanel(MainDBViewer.BOOKING_LINK);
+                appDBViewer.showPanel(MainDBViewer.BOOKING_LINK);
+                if (bookingRecord != null) {
+                    // bookingRecord.runConsole();
+                    bookingRecord.showBookingsTable(); 
+            }
+
 
 
         }
