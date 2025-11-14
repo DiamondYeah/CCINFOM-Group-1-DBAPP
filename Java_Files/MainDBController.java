@@ -22,34 +22,34 @@ import java.sql.*;
  * NOTE: Add a back button on your viewer so that it will go back to the MainDBViewer.
  * 
  * 
- * HOW TO USE CARD VIEWER
- *
- * In your viewer class, create a viewer class with a constructor that accepts **JPanel cardPanel**,
- * Afterwards, extend your class to JFrame and add the class itself as a parameter to the cardPanel JPanel with the appropriate link
- * EX:
- * 
- * public class FeedbackRecordViewer extends JPanel{ <- Extends JPanel
- * 
- *      public FeedbackRecordViewer(JPanel cardPanel){ <- Add JPanel parameter
- *
- *
- *
- *          cardPanel.add(this, MainDBViewer.FEEDBACK_LINK); <- Add Class directly to cardPanel, and use the appropriate link
- *
- *       }
- *
- *  }
- * 
- * Afterwards, in your controller, add the cardPanel when creating the object instance of your viewer.
- * EX:
- * view = new FeedbackRecordViewer(cardPanel);
- * 
- * If both are implemented properly, when you run the program and click the button, it should now open your JPanel
- * 
- * NOTE: Add a back button on your JPanel that will return the Panel back to main via an ActionListener on your own controller
- * 
- * 
- */
+    * HOW TO USE CARD VIEWER
+    *
+    * In your viewer class, create a viewer class with a constructor that accepts **JPanel cardPanel**,
+    * Afterwards, extend your class to JFrame and add the class itself as a parameter to the cardPanel JPanel with the appropriate link
+    * EX:
+    * 
+    * public class FeedbackRecordViewer extends JPanel{ <- Extends JPanel
+    * 
+    *      public FeedbackRecordViewer(JPanel cardPanel){ <- Add JPanel parameter
+    *
+    *
+    *
+    *          cardPanel.add(this, MainDBViewer.FEEDBACK_LINK); <- Add Class directly to cardPanel, and use the appropriate link
+    *
+    *       }
+    *
+    *  }
+    * 
+    * Afterwards, in your controller, add the cardPanel when creating the object instance of your viewer.
+    * EX:
+    * view = new FeedbackRecordViewer(cardPanel);
+    * 
+    * If both are implemented properly, when you run the program and click the button, it should now open your JPanel
+    * 
+    * NOTE: Add a back button on your JPanel that will return the Panel back to main via an ActionListener on your own controller
+    * 
+    * 
+    */
 
 
 // This class connects to the database and connects to the other controllers in the project
@@ -78,6 +78,8 @@ public class MainDBController implements ActionListener{
     // Constructor
     public MainDBController(){
 
+        connectDB();
+        
         // Creates the GUI Viewer and references itself
         appDBViewer = new MainDBViewer(this);
 
@@ -92,7 +94,7 @@ public class MainDBController implements ActionListener{
 
 
         // Performs the connection to the SQL database
-        connectDB();
+        
 
 
 
@@ -113,7 +115,7 @@ public class MainDBController implements ActionListener{
         } catch(SQLException e){
 
             System.out.printf("Error in connecting database occured \n");
-
+            
         }
 
     }
@@ -137,10 +139,7 @@ public class MainDBController implements ActionListener{
 
             case "User Record":
 
-                // Display checking if button works (Remove once you implemented your MVC)
-                System.out.println("User Record Button was pressed");
-
-                //appDBViewer.showPanel(MainDBViewer.USER_LINK);
+                appDBViewer.showPanel(MainDBViewer.USER_LINK);
 
                 break;
 
