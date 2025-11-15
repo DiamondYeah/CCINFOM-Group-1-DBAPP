@@ -60,9 +60,9 @@ public class MainDBController implements ActionListener{
     // NOTE: To make the connection work, please change your password to your own password
 
     // Attributes define SQL table connection
-    private static String DB_URL; //= "jdbc:mysql://localhost:3306/hiddengemsdb";
-    private static String USER; // = "root";
-    private static String PASSWORD; // = "123123"; // Change password to your own local one
+    private static String DB_URL;
+    private static String USER;
+    private static String PASSWORD;
 
     private static Connection conn = null; 
 
@@ -105,7 +105,7 @@ public class MainDBController implements ActionListener{
 
     }
 
-    // NEW: Method to load credentials from the external file
+    // Method to load credentials from the external file
     private static void loadProperties() {
         Properties props = new Properties();
         try (InputStream input = new FileInputStream("db.properties")) {
@@ -119,11 +119,10 @@ public class MainDBController implements ActionListener{
             PASSWORD = props.getProperty("db.password");
             
         } catch (IOException ex) {
-            // Handle case where file is missing (crucial for groupmates!)
+            // Handle case where file is missing
             System.err.println("Error: Could not find or read db.properties file.");
             System.err.println("Please create this file and add your local credentials.");
-            // You might want to exit the program here or set dummy values
-            // System.exit(1);
+            System.exit(1);
         }
     }
 
@@ -174,7 +173,7 @@ public class MainDBController implements ActionListener{
                 // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("Travel Record Button was pressed");
 
-                //appDBViewer.showPanel(MainDBViewer.TRAVEL_LINK);
+                appDBViewer.showPanel(MainDBViewer.TRAVEL_LINK);
 
                 break;
 
@@ -198,5 +197,7 @@ public class MainDBController implements ActionListener{
         }
 
     }
+
+    public MainDBViewer getAppDBViewer() {return appDBViewer;}
     
 }
