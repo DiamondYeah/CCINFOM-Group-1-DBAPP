@@ -7,16 +7,18 @@ public class User {
     private String nationality;
     private int points;
     private PointsTier pointsTier;
+    private boolean isAdmin;
     private List<UserEmail> emails;
     private List<UserPhone> phones;
 
-    public User(int userId, String firstName, String lastName, String nationality, int points, PointsTier pointsTier) {
+    public User(int userId, String firstName, String lastName, String nationality, int points, PointsTier pointsTier, boolean isAdmin) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.nationality = nationality;
         this.points = points;
         this.pointsTier = pointsTier;
+        this.isAdmin = isAdmin;
     }
 
     public int getUserId() { 
@@ -65,6 +67,14 @@ public class User {
 
     public void setPointsTier(PointsTier pointsTier) { 
         this.pointsTier = pointsTier; 
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
 
     public List<UserEmail> getEmails() { 

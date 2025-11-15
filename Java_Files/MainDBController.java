@@ -60,11 +60,14 @@ public class MainDBController implements ActionListener{
     // NOTE: To make the connection work, please change your password to your own password
 
     // Attributes define SQL table connection
-    private static String DB_URL; //= "jdbc:mysql://localhost:3306/hiddengemsdb";
-    private static String USER; // = "root";
-    private static String PASSWORD; // = "123123"; // Change password to your own local one
+    private static String DB_URL;
+    private static String USER;
+    private static String PASSWORD; // Change password to your own local one
 
     private static Connection conn = null; 
+    
+    // Currently authenticated user (null if not logged in)
+    private User currentUser;
 
     // DB App Viewer
     private MainDBViewer appDBViewer;
@@ -94,14 +97,9 @@ public class MainDBController implements ActionListener{
         travelRecord = new TravelRecordController(conn, this, appDBViewer.getCardPanel());
         feedbackRecord = new FeedbackRecordController(conn, this, appDBViewer.getCardPanel());
         bookingRecord = new BookingRecordController(conn, this, appDBViewer.getCardPanel());
-
-
-
-        // Performs the connection to the SQL database
         
-
-
-
+        // Initialize currentUser as null (no one logged in)
+        currentUser = null;
 
     }
 
@@ -145,7 +143,93 @@ public class MainDBController implements ActionListener{
         }
 
     }
+    
+    // Login implementation
+    public boolean login(int userId, String password) {
+        String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
+                      "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
+                      "FROM User u " +
+                      "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
+                      "WHERE u.User_ID = ? AND u.Password = ?";
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            pstmt.setString(2, password);
+            
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                boolean isAdmin = rs.getBoolean("Is_Admin");
+                PointsTier tier = null;
+                
+                if (!isAdmin && rs.getObject("Tier_ID") != null) {
+                    tier = new PointsTier(
+                        rs.getInt("Tier_ID"),
+                        rs.getString("Tier_Name"),
+                        rs.getInt("Min_Points"),
+                        rs.getInt("Max_Points")
+                    );
+                }
+                
+                currentUser = new User(
+                    rs.getInt("User_ID"),
+                    rs.getString("First_Name"),
+                    rs.getString("Last_Name"),
+                    rs.getString("Nationality"),
+                    rs.getInt("Points"),
+                    tier,
+                    isAdmin
+                );
+                
+                System.out.println("Login successful: " + currentUser.getFirstName() + " " + currentUser.getLastName() + 
+                                 (currentUser.isAdmin() ? " (Admin)" : " (User)"));
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error during login: " + e.getMessage());
+        }
+        
+        return false;
+    }
+    
+    public boolean verifyPassword(String password) {
+        if (currentUser == null) {
+            return false;
+        }
+        
+        String query = "SELECT User_ID FROM User WHERE User_ID = ? AND Password = ?";
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, currentUser.getUserId());
+            pstmt.setString(2, password);
+            
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            System.out.println("Error verifying password: " + e.getMessage());
+        }
+        
+        return false;
+    }
+    
+    public void logout() {
+        if (currentUser != null) {
+            System.out.println("User " + currentUser.getFirstName() + " " + currentUser.getLastName() + " logged out");
+        }
+        currentUser = null;
+    }
+    
+    public User getCurrentUser() {
+        return currentUser;
+    }
 
+    public boolean isLoggedIn() {
+        return currentUser != null;
+    }
+    
+    public boolean isCurrentUserAdmin() {
+        return currentUser != null && currentUser.isAdmin();
+    }
 
     // Method provides what the buttons will do when pressed.
     // NOTE: Add your implementation here to connect your MVC inside of your case block
@@ -179,6 +263,9 @@ public class MainDBController implements ActionListener{
                 break;
 
             case "Feedback Record":
+
+                // Display checking if button works (Remove once you implemented your MVC)
+                System.out.println("Feedback Record Button was pressed");
 
                 appDBViewer.showPanel(MainDBViewer.FEEDBACK_LINK);
 
