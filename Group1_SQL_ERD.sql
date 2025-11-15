@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS HiddenGemsDB;
+
 CREATE DATABASE HiddenGemsDB;
 USE HiddenGemsDB;
 
@@ -21,6 +23,8 @@ CREATE TABLE User (
 	Nationality VARCHAR(50),
 	Points INT DEFAULT 0,
 	Tier_ID INT,
+	Password VARCHAR(255) NOT NULL,
+    Is_Admin BOOLEAN DEFAULT FALSE,
         
 	CONSTRAINT User_pk PRIMARY KEY (User_ID),
 	CONSTRAINT User_Tier_fk FOREIGN KEY (Tier_ID) REFERENCES Points_Tier(Tier_ID)
