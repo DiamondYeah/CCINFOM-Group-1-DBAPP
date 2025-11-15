@@ -1,6 +1,8 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.io.*; // Import for FileInputStream
+import java.util.Properties; // Import for Properties class
 
 
 /*
@@ -81,6 +83,8 @@ public class MainDBController implements ActionListener{
     // Constructor
     public MainDBController(){
 
+        loadProperties();
+
         connectDB();
         
         // Creates the GUI Viewer and references itself
@@ -99,6 +103,27 @@ public class MainDBController implements ActionListener{
 
     }
 
+    // NEW: Method to load credentials from the external file
+    private static void loadProperties() {
+        Properties props = new Properties();
+        try (InputStream input = new FileInputStream("db.properties")) {
+            
+            // Load the properties file
+            props.load(input);
+
+            // Assign values from the file to the attributes
+            DB_URL = props.getProperty("db.url");
+            USER = props.getProperty("db.user");
+            PASSWORD = props.getProperty("db.password");
+            
+        } catch (IOException ex) {
+            // Handle case where file is missing (crucial for groupmates!)
+            System.err.println("Error: Could not find or read db.properties file.");
+            System.err.println("Please create this file and add your local credentials.");
+            // You might want to exit the program here or set dummy values
+            // System.exit(1);
+        }
+    }
 
     // Method performs the connection to the SQL Database via DriverManager
     public static void connectDB(){
