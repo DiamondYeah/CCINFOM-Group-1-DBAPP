@@ -11,18 +11,24 @@ public class UserRecordModel {
 
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, " +
-                      "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
+        String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
+                      "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points, " +
+                      "COUNT(ts.Location_ID) as Locations_Shared " +
                       "FROM User u " +
                       "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
+                      "LEFT JOIN Travel_Spot ts ON u.User_ID = ts.User_ID " +
+                      "GROUP BY u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
+                      "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
                       "ORDER BY u.User_ID";
 
         try (PreparedStatement pstmt = conn.prepareStatement(query);
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
+                boolean isAdmin = rs.getBoolean("Is_Admin");
                 PointsTier tier = null;
-                if (rs.getObject("Tier_ID") != null) {
+                
+                if (!isAdmin && rs.getObject("Tier_ID") != null) {
                     tier = new PointsTier(
                         rs.getInt("Tier_ID"),
                         rs.getString("Tier_Name"),
@@ -37,7 +43,8 @@ public class UserRecordModel {
                     rs.getString("Last_Name"),
                     rs.getString("Nationality"),
                     rs.getInt("Points"),
-                    tier
+                    tier,
+                    isAdmin
                 );
 
                 user.setEmails(getUserEmails(user.getUserId()));
@@ -97,7 +104,7 @@ public class UserRecordModel {
     }
 
     public User getUserById(int userId) {
-        String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, " +
+        String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
                       "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
                       "FROM User u " +
                       "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
@@ -108,8 +115,10 @@ public class UserRecordModel {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
+                boolean isAdmin = rs.getBoolean("Is_Admin");
                 PointsTier tier = null;
-                if (rs.getObject("Tier_ID") != null) {
+                
+                if (!isAdmin && rs.getObject("Tier_ID") != null) {
                     tier = new PointsTier(
                         rs.getInt("Tier_ID"),
                         rs.getString("Tier_Name"),
@@ -124,7 +133,8 @@ public class UserRecordModel {
                     rs.getString("Last_Name"),
                     rs.getString("Nationality"),
                     rs.getInt("Points"),
-                    tier
+                    tier,
+                    isAdmin
                 );
 
                 user.setEmails(getUserEmails(user.getUserId()));
@@ -152,7 +162,9 @@ public class UserRecordModel {
             int rowsAffected = pstmt.executeUpdate();
             
             if (rowsAffected > 0) {
-                updateUserTier(userId, points);
+                if (!isUserAdmin(userId)) {
+                    updateUserTier(userId, points);
+                }
             }
             
             return rowsAffected > 0;
@@ -160,6 +172,37 @@ public class UserRecordModel {
             System.out.printf("Error updating user.\n");
             return false;
         }
+    }
+
+    public boolean updateUserPassword(int userId, String newPassword) {
+        String query = "UPDATE User SET Password = ? WHERE User_ID = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, newPassword);
+            pstmt.setInt(2, userId);
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.printf("Error updating password.\n");
+            return false;
+        }
+    }
+
+    private boolean isUserAdmin(int userId) {
+        String query = "SELECT Is_Admin FROM User WHERE User_ID = ?";
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getBoolean("Is_Admin");
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error checking admin status.\n");
+        }
+        
+        return false;
     }
 
     private void updateUserTier(int userId, int points) {
@@ -248,66 +291,96 @@ public class UserRecordModel {
         return tiers;
     }
 
-    public List<Object[]> getRecommendedSpots() {
-        List<Object[]> spots = new ArrayList<>();
+    public List<Object[]> getRecommendationsByTierAndDate(int month, int year) {
+        List<Object[]> recommendations = new ArrayList<>();
         String query = "SELECT ts.location_id, ts.area, c.city_name, r.region_name, co.country_name, " +
-                      "ts.date_shared, COUNT(DISTINCT uf.Review_ID) as review_count, " +
-                      "COALESCE(AVG(uf.Rating), 0) as avg_rating " +
-                      "FROM Travel_Spot ts " +
-                      "JOIN City c ON ts.city_id = c.city_id " +
-                      "JOIN Region r ON c.region_id = r.region_id " +
-                      "JOIN Country co ON r.country_id = co.country_id " +
-                      "LEFT JOIN User_Feedback uf ON ts.location_id = uf.Location_ID " +
-                      "WHERE ts.is_recommended = TRUE " +
-                      "GROUP BY ts.location_id, ts.area, c.city_name, r.region_name, co.country_name, ts.date_shared " +
-                      "ORDER BY avg_rating DESC, review_count DESC";
+                        "pt.Tier_Name as tier_name, " +
+                        "COUNT(DISTINCT u.User_ID) as recommendation_count " +
+                        "FROM Travel_Spot ts " +
+                        "JOIN City c ON ts.city_id = c.city_id " +
+                        "JOIN Region r ON c.region_id = r.region_id " +
+                        "JOIN Country co ON r.country_id = co.country_id " +
+                        "JOIN User u ON ts.User_ID = u.User_ID " +
+                        "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
+                        "WHERE ts.is_recommended = TRUE " +
+                        "AND MONTH(ts.date_shared) = ? " +
+                        "AND YEAR(ts.date_shared) = ? " +
+                        "AND u.Is_Admin = FALSE " +
+                        "GROUP BY ts.location_id, ts.area, c.city_name, r.region_name, co.country_name, pt.Tier_Name " +
+                        "ORDER BY recommendation_count DESC, ts.location_id, tier_name";
 
-        try (PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, month);
+            pstmt.setInt(2, year);
+            ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                Object[] spot = new Object[8];
-                spot[0] = rs.getInt("location_id");
-                spot[1] = rs.getString("area");
-                spot[2] = rs.getString("city_name");
-                spot[3] = rs.getString("region_name");
-                spot[4] = rs.getString("country_name");
-                spot[5] = rs.getDate("date_shared");
-                spot[6] = rs.getInt("review_count");
-                spot[7] = rs.getDouble("avg_rating");
-                spots.add(spot);
+                Object[] rec = new Object[7];
+                rec[0] = rs.getInt("location_id");
+                rec[1] = rs.getString("area");
+                rec[2] = rs.getString("city_name");
+                rec[3] = rs.getString("region_name");
+                rec[4] = rs.getString("country_name");
+            
+                String tier = rs.getString("tier_name");
+                if (tier != null) {
+                    rec[5] = tier;
+                } else {
+                    rec[5] = "No Tier";
+                }
+                
+                rec[6] = rs.getInt("recommendation_count");
+                recommendations.add(rec);
             }
         } catch (SQLException e) {
-            System.out.printf("Error fetching recommended spots.\n");
+            System.out.printf("Error fetching recommendations by tier and date.\n");
+            e.printStackTrace();
         }
 
-        return spots;
+        return recommendations;
     }
 
     public boolean addPointsToUser(int userId, int pointsToAdd) {
-    String query = "UPDATE User SET Points = Points + ? WHERE User_ID = ?";
-    
-    try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-        pstmt.setInt(1, pointsToAdd);
-        pstmt.setInt(2, userId);
+        String query = "UPDATE User SET Points = Points + ? WHERE User_ID = ?";
         
-        int rowsAffected = pstmt.executeUpdate();
-        
-        if (rowsAffected > 0) {
-            String getPointsQuery = "SELECT Points FROM User WHERE User_ID = ?";
-            try (PreparedStatement ps2 = conn.prepareStatement(getPointsQuery)) {
-                ps2.setInt(1, userId);
-                ResultSet rs = ps2.executeQuery();
-                if (rs.next()) {
-                    updateUserTier(userId, rs.getInt("Points"));
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, pointsToAdd);
+            pstmt.setInt(2, userId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            
+            if (rowsAffected > 0 && !isUserAdmin(userId)) {
+                String getPointsQuery = "SELECT Points FROM User WHERE User_ID = ?";
+                try (PreparedStatement ps2 = conn.prepareStatement(getPointsQuery)) {
+                    ps2.setInt(1, userId);
+                    ResultSet rs = ps2.executeQuery();
+                    if (rs.next()) {
+                        updateUserTier(userId, rs.getInt("Points"));
+                    }
                 }
             }
+            
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.printf("Error adding points.\n");
+            return false;
+        }
+    }
+    
+    public int getLocationsSharedByUser(int userId) {
+        String query = "SELECT COUNT(Location_ID) as count FROM Travel_Spot WHERE User_ID = ?";
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error fetching locations shared count.\n");
         }
         
-        return rowsAffected > 0;
-    } catch (SQLException e) {
-        System.out.printf("Error adding points.\n");
-        return false;
-    }
+        return 0;
     }
 }
