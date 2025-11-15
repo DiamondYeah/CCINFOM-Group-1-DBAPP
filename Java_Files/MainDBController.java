@@ -60,9 +60,9 @@ public class MainDBController implements ActionListener{
     // NOTE: To make the connection work, please change your password to your own password
 
     // Attributes define SQL table connection
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/hiddengemsdb";
-    private static final String USER = "root";
-    private static final String PASSWORD = "Dlsu1234!"; // Change password to your own local one
+    private static String DB_URL;
+    private static String USER;
+    private static String PASSWORD; // Change password to your own local one
 
     private static Connection conn = null; 
     
@@ -124,6 +124,7 @@ public class MainDBController implements ActionListener{
             // System.exit(1);
         }
     }
+
 
     // Method performs the connection to the SQL Database via DriverManager
     public static void connectDB(){
