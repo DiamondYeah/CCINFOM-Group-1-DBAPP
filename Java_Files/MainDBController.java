@@ -180,9 +180,6 @@ public class MainDBController implements ActionListener{
 
             case "Feedback Record":
 
-                // Display checking if button works (Remove once you implemented your MVC)
-                System.out.println("Feedback Record Button was pressed");
-
                 appDBViewer.showPanel(MainDBViewer.FEEDBACK_LINK);
 
                 break;
