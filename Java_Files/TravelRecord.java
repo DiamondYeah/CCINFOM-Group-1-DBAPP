@@ -5,14 +5,13 @@ public class TravelRecord {
     private String availability;
     private java.sql.Date dateShared;
     private int city_id;
-    private boolean isRecommended;
     private double basePrice;
     private int maxCap;
 
     // Constructors
     public TravelRecord(int location_id, int user_id, String area, String availability, 
                         java.sql.Date dateShared, int city_id, 
-                        double basePrice, int MaxCap, boolean isRecommended) {
+                        double basePrice, int MaxCap) {
         this.location_id = location_id;
         this.user_id = user_id;
         this.area = area;
@@ -21,13 +20,12 @@ public class TravelRecord {
         this.city_id = city_id;
         this.basePrice = basePrice;
         this.maxCap = maxCap;
-        this.isRecommended = isRecommended;
         }
     
     // Adding a travel spot, as location_id will increment by itself
     public TravelRecord(int user_id, String area, String availability, 
                         java.sql.Date dateShared, int city_id, 
-                        double basePrice, int MaxCap, boolean isRecommended) {
+                        double basePrice, int MaxCap) {
         this.user_id = user_id;
         this.area = area;
         this.availability = availability;
@@ -35,7 +33,6 @@ public class TravelRecord {
         this.city_id = city_id;
         this.basePrice = basePrice;
         this.maxCap = maxCap;
-        this.isRecommended = isRecommended;
         }
 
     // Getter n Setter
@@ -62,7 +59,4 @@ public class TravelRecord {
 
     public int getMaxCap() { return maxCap; }
     public void setMaxCap(int maxCap) { this.maxCap = maxCap; }
-    
-    public boolean isRecommended() { return isRecommended; }
-    public void setRecommended(boolean recommended) { isRecommended = recommended; }
 }
