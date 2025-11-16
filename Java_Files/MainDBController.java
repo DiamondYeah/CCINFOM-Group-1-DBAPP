@@ -139,7 +139,7 @@ public class MainDBController implements ActionListener{
 
             System.out.printf("Error in connecting database occured \n");
             System.out.println("Message: " + e.getMessage());
-            e.printStackTrace();   // <-- IMPORTANT
+            e.printStackTrace();
             
         }
 
