@@ -3,7 +3,6 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.ArrayList;
 
-import javax.swing.Action;
 import javax.swing.JPanel;
 
 // Class is the main controller for the Feedback Records

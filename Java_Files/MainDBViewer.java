@@ -43,7 +43,7 @@ public class MainDBViewer extends JFrame{
     private JButton TravelSpotsButton; // Button links to the travel spots transactions and reports
     private JButton UserFeedbackButton; // Button links to the user feedback transactions and reports
     private JButton BookingRecordButton; // Button links to the booking record transactions and reports
-    private JButton quitButton; // Button closes the program
+    private JButton returnLoginButton; // Button closes the program
 
     
     // Constructor
@@ -83,7 +83,7 @@ public class MainDBViewer extends JFrame{
         TravelSpotsButton.addActionListener(listener);
         UserFeedbackButton.addActionListener(listener);
         BookingRecordButton.addActionListener(listener);
-        quitButton.addActionListener(listener);
+        returnLoginButton.addActionListener(listener);
 
     }
 
@@ -144,8 +144,8 @@ public class MainDBViewer extends JFrame{
         rightButtonPanel.setBorder(new EmptyBorder(100, 0, 0, 300));
 
         // Create a wrapper panel to store quit button to avoid it spanning the entire panel
-        JPanel quitButtonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        quitButtonWrapper.setBorder(new EmptyBorder(0, 0, 250, 0));
+        JPanel returnButtonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        returnButtonWrapper.setBorder(new EmptyBorder(0, 0, 250, 0));
 
         // Create User Record Button and add components
         UserRecordButton = new JButton("User Record");
@@ -176,11 +176,11 @@ public class MainDBViewer extends JFrame{
         BookingRecordButton.setFocusPainted(false);
 
         // Create Quit Record Button and add components
-        quitButton = new JButton("Quit");
-        quitButton.setPreferredSize(new Dimension(300, 100));
-        quitButton.setMaximumSize(new Dimension(300, 100));
-        quitButton.setFont(new Font("Arial", Font.PLAIN, 30));
-        quitButton.setFocusPainted(false);
+        returnLoginButton = new JButton("Return to Login");
+        returnLoginButton.setPreferredSize(new Dimension(300, 100));
+        returnLoginButton.setMaximumSize(new Dimension(300, 100));
+        returnLoginButton.setFont(new Font("Arial", Font.PLAIN, 25));
+        returnLoginButton.setFocusPainted(false);
 
 
         // Add Buttons to Left Button Panel
@@ -194,12 +194,12 @@ public class MainDBViewer extends JFrame{
         rightButtonPanel.add(BookingRecordButton); 
 
         // Add Quit Button to Wrapper
-        quitButtonWrapper.add(quitButton);
+        returnButtonWrapper.add(returnLoginButton);
 
         // Add all components to Center Panel
         panelCenter.add(leftButtonPanel, BorderLayout.WEST);
         panelCenter.add(rightButtonPanel, BorderLayout.EAST);
-        panelCenter.add(quitButtonWrapper, BorderLayout.SOUTH);
+        panelCenter.add(returnButtonWrapper, BorderLayout.SOUTH);
 
     }
 
@@ -211,6 +211,26 @@ public class MainDBViewer extends JFrame{
         // Switch statement determines which panel to open based on link provided in parameter
         switch(link){
 
+
+            case LoginPageViewer.LOGIN_LINK:
+
+                cardLayout.show(cardPanel, LoginPageViewer.LOGIN_LINK);
+                break;    
+
+            case LoginPageViewer.REGISTER_LINK:
+
+                cardLayout.show(cardPanel, LoginPageViewer.REGISTER_LINK);
+                break;  
+
+            case MAIN_LINK:
+
+                cardLayout.show(cardPanel, MAIN_LINK);
+                break;
+
+            case BACK_LINK:
+
+                cardLayout.show(cardPanel, MAIN_LINK);
+                break;
 
             case USER_LINK:
 
@@ -232,9 +252,9 @@ public class MainDBViewer extends JFrame{
                 cardLayout.show(cardPanel, BOOKING_LINK);
                 break;
 
-            case BACK_LINK:
 
-                cardLayout.show(cardPanel, MAIN_LINK);
+
+            
 
             
         }
