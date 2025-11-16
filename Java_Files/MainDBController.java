@@ -117,11 +117,10 @@ public class MainDBController implements ActionListener{
             PASSWORD = props.getProperty("db.password");
             
         } catch (IOException ex) {
-            // Handle case where file is missing (crucial for groupmates!)
+            // case where file is missing
             System.err.println("Error: Could not find or read db.properties file.");
             System.err.println("Please create this file and add your local credentials.");
-            // You might want to exit the program here or set dummy values
-            // System.exit(1);
+            System.exit(1);
         }
     }
 
@@ -139,6 +138,8 @@ public class MainDBController implements ActionListener{
         } catch(SQLException e){
 
             System.out.printf("Error in connecting database occured \n");
+            System.out.println("Message: " + e.getMessage());
+            e.printStackTrace();   // <-- IMPORTANT
             
         }
 
@@ -258,7 +259,7 @@ public class MainDBController implements ActionListener{
                 // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("Travel Record Button was pressed");
 
-                //appDBViewer.showPanel(MainDBViewer.TRAVEL_LINK);
+                appDBViewer.showPanel(MainDBViewer.TRAVEL_LINK);
 
                 break;
 
@@ -282,5 +283,7 @@ public class MainDBController implements ActionListener{
         }
 
     }
+
+    public MainDBViewer getAppDBViewer() { return appDBViewer; }
     
 }

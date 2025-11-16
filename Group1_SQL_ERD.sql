@@ -90,11 +90,12 @@ CREATE TABLE Travel_Spot (
 
 	location_id INT AUTO_INCREMENT PRIMARY KEY,
 	User_id INT NOT NULL,
-	area VARCHAR(100) NOT NULL,
+	spotname VARCHAR(100) NOT NULL,
 	availability ENUM('Available', 'Unavailable') DEFAULT 'Available',
 	date_shared DATE NOT NULL,
 	city_id INT NOT NULL,
-	is_recommended BOOLEAN DEFAULT FALSE,
+    base_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    max_capacity INT NOT NULL DEFAULT 0
         
 	FOREIGN KEY (city_id) REFERENCES City(city_id),
 	FOREIGN KEY (user_id) REFERENCES User(user_id)
@@ -221,6 +222,26 @@ CREATE TABLE User_Booking (
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
+
+INSERT INTO Country (country_name)
+VALUES ('Philippines');
+
+INSERT INTO Region (region_name, country_id)
+VALUES
+    ('NCR', 1),
+    ('CALABARZON', 1);
+    
+INSERT INTO City (city_name, region_id)
+VALUES
+    ('Manila', 1),
+    ('Quezon City', 1),
+    ('Tagaytay', 2);
+    
+INSERT INTO Category (category_name)
+VALUES
+	('Beach'),
+    ('Hike'),
+    ('Museum');
 
 
 
