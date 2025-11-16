@@ -20,7 +20,12 @@ public class LoginPageViewer extends JPanel{
     public static final String REGISTERED_PERFORMED = "Register";
 
     // Constant for different error codes
+    public static final String EMPTY_INPUT = "Inputs Have Blank Field";
     public static final String USER_DOES_NOT_EXIST = "User Not In Database";
+    public static final String USER_ALREADY_EXISTS = "User Already In Database";
+
+    // Constant for different messsage codes
+    public static final String REGISTER_SUCCESSFUL = "User Has Been Registered";
 
 
     // Reference to the Main Controller
@@ -81,13 +86,41 @@ public class LoginPageViewer extends JPanel{
 
     }
 
-
     public JPasswordField getPasswordLoginField(){
 
         return passwordLoginField;
 
     }
 
+    public JTextField getFirstNameRegisterField(){
+
+        return firstNameRegisterField;
+
+    }
+
+    public JTextField getLastNameRegisterField(){
+
+        return lastNameRegisterField;
+
+    }
+
+    public JTextField getEmailRegisterField(){
+
+        return emailRegisterField;
+
+    }
+
+    public JComboBox<String> getNationalityRegisterBox(){
+
+        return nationalityRegisterBox;
+
+    }
+
+    public JPasswordField getPasswordRegisterField(){
+
+        return passwordRegisterField;
+
+    }
 
     // Add an action listener to provide button interactivity (CONNECTED TO MainDBController)
     public void setActionListener (ActionListener listener){
@@ -392,15 +425,43 @@ public class LoginPageViewer extends JPanel{
 
         switch(errorCode){
 
+            case EMPTY_INPUT:
+
+                displayError = "Please fill out all information in the page.";
+                break;
+
             case USER_DOES_NOT_EXIST:
 
                 displayError = "Cannot login as user does not exist with given information.";
                 break;
 
+            case USER_ALREADY_EXISTS:
+
+                displayError = "User already exists.";
+                break;
 
         }
 
         JOptionPane.showMessageDialog(this, displayError,"Login Error",JOptionPane.WARNING_MESSAGE);
+
+    }
+
+
+    // Method displays non JOptionPane errors depending on passed String
+    public void showMessage(String messageCode){
+
+        String displayError = null;
+
+        switch(messageCode){
+
+            case REGISTER_SUCCESSFUL:
+
+                displayError = "User has been registered. Please return to log in page to enter.";
+                break;
+
+        }
+
+        JOptionPane.showMessageDialog(this, displayError,"Login Error",JOptionPane.PLAIN_MESSAGE);
 
     }
 

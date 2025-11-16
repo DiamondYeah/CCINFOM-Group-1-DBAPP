@@ -70,6 +70,9 @@ public class MainDBController implements ActionListener{
     // Currently authenticated user (null if not logged in)
     private User currentUser = null;
 
+    // Stringbuilder to build queries
+    StringBuilder query = new StringBuilder();
+
     // DB App Viewer
     private MainDBViewer appDBViewer;
     private LoginPageViewer loginViewer;
@@ -100,6 +103,7 @@ public class MainDBController implements ActionListener{
         loginViewer = new LoginPageViewer(appDBViewer.getCardPanel(), this);
         loginViewer.setActionListener(this);
         appDBViewer.showPanel(LoginPageViewer.LOGIN_LINK); //Force view on login page
+        appDBViewer.setVisible(true); //Makes the JFrame visible
 
     
 
@@ -186,31 +190,31 @@ public class MainDBController implements ActionListener{
     // Login implementation
     public boolean login() {
 
-        int userID = 0;
         String username = loginViewer.getUserNameLoginField().getText().trim();
         String password = String.valueOf(loginViewer.getPasswordLoginField().getPassword()).trim();
 
-        // Gets the full name of users stored in database
-        String query = "SELECT u.user_id , CONCAT(u.first_name, ' ' , u.last_name) AS full_name FROM USER u ";
 
-        // Try catch tries to check if username given is valid, if so, obtain the userID
-        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-            
-            ResultSet rs = pstmt.executeQuery();
-            
-            // While loop checks database if username is equal to fullname. If it exists, get the user id of its
-            while(rs.next())
-                if(rs.getString("full_name").equals(username))
-                    userID = rs.getInt("user_id");
+        boolean inputValid = checkInputValidity(username, password); // Checks for input validity
+        int userID = findUserID(username); // Calls method to find userID
 
-        } catch (SQLException e) {
-            System.out.println("Error during login: " + e.getMessage());
+        // Checks for invalid inputs, and shows error if found
+        if(!inputValid){
+
+            loginViewer.showError(LoginPageViewer.EMPTY_INPUT);
+            return false;
+
         }
+        else if(userID == 0){
+
+            loginViewer.showError(LoginPageViewer.USER_DOES_NOT_EXIST);   
+            return false; 
+        }     
+
 
         // Checks if ID has been assigned anything, return false if not.
-        if(userID != 0){
+        if(inputValid && userID != 0){
 
-            query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
+            String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
             "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
             "FROM User u " +
             "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
@@ -253,9 +257,137 @@ public class MainDBController implements ActionListener{
             } catch (SQLException e) {
                 System.out.println("Error during login: " + e.getMessage());
             }
-        }
+        } 
         
         return false;
+
+    }
+
+
+    public boolean register(){
+
+        // Will add email depending on Jovere's repsponse
+        String firstName = loginViewer.getFirstNameRegisterField().getText().trim();
+        String lastName = loginViewer.getLastNameRegisterField().getText().trim();
+        //String email = loginViewer.getEmailRegisterField().getText().trim() 
+        String nationality = (String) loginViewer.getNationalityRegisterBox().getSelectedItem();
+        String password = String.valueOf(loginViewer.getPasswordRegisterField().getPassword()).trim();
+
+        boolean inputValid = checkInputValidity(firstName, lastName, password); // Checks for input validity
+        int checkIfUserExists = findUserID(firstName + " " + lastName);
+
+        // Checks for invalid inputs, and shows error if found
+        if(!inputValid){
+
+            loginViewer.showError(LoginPageViewer.EMPTY_INPUT);
+            return false;
+
+        }
+        else if(checkIfUserExists != 0){
+
+            loginViewer.showError(LoginPageViewer.USER_ALREADY_EXISTS);   
+            return false; 
+
+        }  
+
+
+        // Checks if boolean is true
+        if(inputValid && checkIfUserExists == 0){
+
+            // Gets the full name of users stored in database
+            query.setLength(0);
+            query.append("INSERT INTO USER(first_name, last_name, nationality, points, tier_id, password, is_admin) ");
+            query.append("VALUES (?, ?, ?, 0, 1, ?, ?)");
+
+            // Try catch tries to check if username given is valid, if so, obtain the userID
+            try (PreparedStatement pstmt = conn.prepareStatement(query.toString())) {
+                    
+                // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+                pstmt.setString(1, firstName);
+                pstmt.setString(2, lastName);
+                pstmt.setString(3, nationality);
+                pstmt.setString(4, password);
+
+                boolean isAdmin = false;
+
+                // If first name equals to admin, set isAdmin boolean to true
+                if(firstName.toLowerCase().equals("admin"))
+                    isAdmin = true;
+
+                pstmt.setBoolean(5, isAdmin);
+
+                // Insert the data to the dataset
+                pstmt.executeUpdate();
+
+                System.out.println("Register successful: " + firstName + " " + lastName + 
+                (isAdmin ? " (Admin)" : " (User)"));
+
+                return true;
+
+                    
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        // Display error depending on type found
+        if(!inputValid) // Empty input found
+            loginViewer.showPanel(LoginPageViewer.EMPTY_INPUT);
+        else if(checkIfUserExists != 0) // User does not exist
+            loginViewer.showPanel(LoginPageViewer.USER_ALREADY_EXISTS);    
+
+        return false;
+
+    }
+
+
+    // Checks by scanning same usernames and getting returns a non-zero value if found
+    private int findUserID(String username){
+
+        int userID = 0;
+
+        // Gets the full name of users stored in database
+        String query = "SELECT u.user_id , CONCAT(u.first_name, ' ' , u.last_name) AS full_name FROM USER u ";
+
+        // Try catch tries to check if username given is valid, if so, obtain the userID
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            ResultSet rs = pstmt.executeQuery();
+            
+            // While loop checks database if username is equal to fullname. If it exists, get the user id of its
+            while(rs.next())
+                if(rs.getString("full_name").equals(username))
+                    userID = rs.getInt("user_id");
+
+        } catch (SQLException e) {
+            System.out.println("Error during login: " + e.getMessage());
+        }
+
+        return userID;
+
+    }
+
+
+    // Input validity for login user
+    private boolean checkInputValidity(String completeName, String password){
+
+        // Checks for empty inputs
+        if(completeName.isEmpty() || password.isEmpty())
+            return false;
+
+        return true;
+
+    }
+
+    // Input validity for register user
+    private boolean checkInputValidity(String firstName, String lastName, String password){
+
+         // Checks for empty inputs
+        if(firstName.isEmpty() || lastName.isEmpty() || password.isEmpty())
+            return false;
+
+        return true;
 
     }
 
@@ -343,15 +475,20 @@ public class MainDBController implements ActionListener{
                     loginViewer.clearPageInput("Login"); // Clear login page input
                     appDBViewer.showPanel(MainDBViewer.MAIN_LINK); // Show main page
 
-                }
-                else
-                    loginViewer.showError(LoginPageViewer.USER_DOES_NOT_EXIST); // Show error for invalid input
+                }                    
 
                 break;
 
             case LoginPageViewer.REGISTERED_PERFORMED: //TO BE ADDED
             
                 //appDBViewer.showPanel(LoginPageViewer.REGISTER_LINK);
+
+                if(register()){
+
+                    loginViewer.clearPageInput("Register"); // Clear login page input
+                    loginViewer.showMessage(LoginPageViewer.REGISTER_SUCCESSFUL); // Show pop-up that message was successful
+
+                }
                 
                 break;
 
