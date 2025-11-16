@@ -1,21 +1,23 @@
+import java.util.List;
+
 public class TravelRecord {
     private int location_id;
     private int user_id;
-    private String area;
-    private String availability;
+    private String spotname;
     private java.sql.Date dateShared;
     private int city_id;
     private double basePrice;
     private int maxCap;
 
+    private List<Integer> category_id;
+
     // Constructors
-    public TravelRecord(int location_id, int user_id, String area, String availability, 
+    public TravelRecord(int location_id, int user_id, String spotname, 
                         java.sql.Date dateShared, int city_id, 
                         double basePrice, int MaxCap) {
         this.location_id = location_id;
         this.user_id = user_id;
-        this.area = area;
-        this.availability = availability;
+        this.spotname = spotname;
         this.dateShared = dateShared;
         this.city_id = city_id;
         this.basePrice = basePrice;
@@ -23,12 +25,11 @@ public class TravelRecord {
         }
     
     // Adding a travel spot, as location_id will increment by itself
-    public TravelRecord(int user_id, String area, String availability, 
+    public TravelRecord(int user_id, String spotname, 
                         java.sql.Date dateShared, int city_id, 
                         double basePrice, int MaxCap) {
         this.user_id = user_id;
-        this.area = area;
-        this.availability = availability;
+        this.spotname = spotname;
         this.dateShared = dateShared;
         this.city_id = city_id;
         this.basePrice = basePrice;
@@ -42,11 +43,8 @@ public class TravelRecord {
     public int getUserId() { return user_id;}
     public void setUserId(int user_id) { this.user_id = user_id; }
 
-    public String getArea() { return area;}
-    public void setArea(String area) { this.area = area; }
-
-    public String getAvailability() { return availability; }
-    public void setAvailability(String availability) { this.availability = availability; }
+    public String getSpotname() { return spotname;}
+    public void setSpotname(String spotname) { this.spotname = spotname; }
 
     public java.sql.Date getDateShared() { return dateShared; }
     public void setDateShared(java.sql.Date dateShared) { this.dateShared = dateShared; }
@@ -59,4 +57,7 @@ public class TravelRecord {
 
     public int getMaxCap() { return maxCap; }
     public void setMaxCap(int maxCap) { this.maxCap = maxCap; }
+
+    public List<Integer> getCategoryId() {return category_id;}
+    public void setCategoryId(List<Integer> category_id) {this.category_id = category_id;}
 }
