@@ -1,15 +1,10 @@
-import java.sql.*;
+
 import java.util.ArrayList;
 
-import javax.security.auth.kerberos.KerberosKey;
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.Document;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -18,9 +13,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionListener;
 
 public class FeedbackRecordViewer extends JPanel{
@@ -237,8 +229,6 @@ public class FeedbackRecordViewer extends JPanel{
         createLeftPanel();
         createRightPanel();
 
-
-        // Call methods to create the panels for the different transactions and reports
 
     }
 

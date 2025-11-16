@@ -2,6 +2,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import java.io.*; // Import for FileInputStream
+import java.util.ArrayList;
 import java.util.Properties; // Import for Properties class
 
 
@@ -67,10 +68,17 @@ public class MainDBController implements ActionListener{
     private static Connection conn = null; 
     
     // Currently authenticated user (null if not logged in)
-    private User currentUser;
+    private User currentUser = null;
+
+    // Stringbuilder to build queries
+    StringBuilder query = new StringBuilder();
 
     // DB App Viewer
     private MainDBViewer appDBViewer;
+    private LoginPageViewer loginViewer;
+
+    // Mainly for LoginPageViewer, provides a list of nationalities to select from
+    private ArrayList<String> nationalityOptions; 
 
     // Report Controllers
     public UserRecordController userRecord;
@@ -89,17 +97,50 @@ public class MainDBController implements ActionListener{
         
         // Creates the GUI Viewer and references itself
         appDBViewer = new MainDBViewer(this);
-
         appDBViewer.setActionListener(this);
+
+        // Creates the GUI login and references itself
+        loginViewer = new LoginPageViewer(appDBViewer.getCardPanel(), this);
+        loginViewer.setActionListener(this);
+        appDBViewer.showPanel(LoginPageViewer.LOGIN_LINK); //Force view on login page
+        appDBViewer.setVisible(true); //Makes the JFrame visible
+
+    
 
         // Initialize record controllers and pass conn and MainDBController to them
         userRecord = new UserRecordController(conn, this, appDBViewer.getCardPanel());
         travelRecord = new TravelRecordController(conn, this, appDBViewer.getCardPanel());
         feedbackRecord = new FeedbackRecordController(conn, this, appDBViewer.getCardPanel());
         bookingRecord = new BookingRecordController(conn, this, appDBViewer.getCardPanel());
+
+    }
+
+
+    // Getter methods
+
+    public MainDBViewer getMainDBViewer(){
+
+        return appDBViewer;
         
-        // Initialize currentUser as null (no one logged in)
-        currentUser = null;
+    }
+
+    // Special getter method that creates an ArrayList of nationality and returns it. Mainly for login page
+    public ArrayList<String> getNationalityOptions(){
+
+        nationalityOptions = new ArrayList<>();
+
+        nationalityOptions.add("Filipino");
+        nationalityOptions.add("American");
+        nationalityOptions.add("Chinese");
+        nationalityOptions.add("Indian");
+        nationalityOptions.add("German");
+        nationalityOptions.add("French");
+        nationalityOptions.add("Russian");
+        nationalityOptions.add("Brazilian");
+        nationalityOptions.add("Japanese");   
+
+        return nationalityOptions;
+
 
     }
 
@@ -122,6 +163,8 @@ public class MainDBController implements ActionListener{
             System.err.println("Please create this file and add your local credentials.");
             System.exit(1);
         }
+
+        System.out.println(DB_URL + USER + PASSWORD);
     }
 
 
@@ -146,52 +189,209 @@ public class MainDBController implements ActionListener{
     }
     
     // Login implementation
-    public boolean login(int userId, String password) {
-        String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
-                      "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
-                      "FROM User u " +
-                      "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
-                      "WHERE u.User_ID = ? AND u.Password = ?";
+    public boolean login() {
+
+        String username = loginViewer.getUserNameLoginField().getText().trim();
+        String password = String.valueOf(loginViewer.getPasswordLoginField().getPassword()).trim();
+
+
+        boolean inputValid = checkInputValidity(username, password); // Checks for input validity
+        int userID = findUserID(username); // Calls method to find userID
+
+        // Checks for invalid inputs, and shows error if found
+        if(!inputValid){
+
+            loginViewer.showError(LoginPageViewer.EMPTY_INPUT);
+            return false;
+
+        }
+        else if(userID == 0){
+
+            loginViewer.showError(LoginPageViewer.USER_DOES_NOT_EXIST);   
+            return false; 
+        }     
+
+
+        // Checks if ID has been assigned anything, return false if not.
+        if(inputValid && userID != 0){
+
+            String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
+            "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
+            "FROM User u " +
+            "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
+            "WHERE u.User_ID = ? AND u.Password = ?";
+
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setInt(1, userID);
+                pstmt.setString(2, password);
+                
+                ResultSet rs = pstmt.executeQuery();
+                
+                if (rs.next()) {
+                    boolean isAdmin = rs.getBoolean("Is_Admin");
+                    PointsTier tier = null;
+                    
+                    if (!isAdmin && rs.getObject("Tier_ID") != null) {
+                        tier = new PointsTier(
+                            rs.getInt("Tier_ID"),
+                            rs.getString("Tier_Name"),
+                            rs.getInt("Min_Points"),
+                            rs.getInt("Max_Points")
+                        );
+                    }
+                    
+                    currentUser = new User(
+                        rs.getInt("User_ID"),
+                        rs.getString("First_Name"),
+                        rs.getString("Last_Name"),
+                        rs.getString("Nationality"),
+                        rs.getInt("Points"),
+                        tier,
+                        isAdmin
+                    );
+                    
+                    System.out.println("Login successful: " + currentUser.getFirstName() + " " + currentUser.getLastName() + 
+                                    (currentUser.isAdmin() ? " (Admin)" : " (User)"));
+
+                    return true;
+                }
+            } catch (SQLException e) {
+                System.out.println("Error during login: " + e.getMessage());
+            }
+        } 
         
+        return false;
+
+    }
+
+
+    public boolean register(){
+
+        // Will add email depending on Jovere's repsponse
+        String firstName = loginViewer.getFirstNameRegisterField().getText().trim();
+        String lastName = loginViewer.getLastNameRegisterField().getText().trim();
+        //String email = loginViewer.getEmailRegisterField().getText().trim() 
+        String nationality = (String) loginViewer.getNationalityRegisterBox().getSelectedItem();
+        String password = String.valueOf(loginViewer.getPasswordRegisterField().getPassword()).trim();
+
+        boolean inputValid = checkInputValidity(firstName, lastName, password); // Checks for input validity
+        int checkIfUserExists = findUserID(firstName + " " + lastName);
+
+        // Checks for invalid inputs, and shows error if found
+        if(!inputValid){
+
+            loginViewer.showError(LoginPageViewer.EMPTY_INPUT);
+            return false;
+
+        }
+        else if(checkIfUserExists != 0){
+
+            loginViewer.showError(LoginPageViewer.USER_ALREADY_EXISTS);   
+            return false; 
+
+        }  
+
+
+        // Checks if boolean is true
+        if(inputValid && checkIfUserExists == 0){
+
+            // Gets the full name of users stored in database
+            query.setLength(0);
+            query.append("INSERT INTO USER(first_name, last_name, nationality, points, tier_id, password, is_admin) ");
+            query.append("VALUES (?, ?, ?, 0, 1, ?, ?)");
+
+            // Try catch tries to check if username given is valid, if so, obtain the userID
+            try (PreparedStatement pstmt = conn.prepareStatement(query.toString())) {
+                    
+                // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+                pstmt.setString(1, firstName);
+                pstmt.setString(2, lastName);
+                pstmt.setString(3, nationality);
+                pstmt.setString(4, password);
+
+                boolean isAdmin = false;
+
+                // If first name equals to admin, set isAdmin boolean to true
+                if(firstName.toLowerCase().equals("admin"))
+                    isAdmin = true;
+
+                pstmt.setBoolean(5, isAdmin);
+
+                // Insert the data to the dataset
+                pstmt.executeUpdate();
+
+                System.out.println("Register successful: " + firstName + " " + lastName + 
+                (isAdmin ? " (Admin)" : " (User)"));
+
+                return true;
+
+                    
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        // Display error depending on type found
+        if(!inputValid) // Empty input found
+            loginViewer.showPanel(LoginPageViewer.EMPTY_INPUT);
+        else if(checkIfUserExists != 0) // User does not exist
+            loginViewer.showPanel(LoginPageViewer.USER_ALREADY_EXISTS);    
+
+        return false;
+
+    }
+
+
+    // Checks by scanning same usernames and getting returns a non-zero value if found
+    private int findUserID(String username){
+
+        int userID = 0;
+
+        // Gets the full name of users stored in database
+        String query = "SELECT u.user_id , CONCAT(u.first_name, ' ' , u.last_name) AS full_name FROM USER u ";
+
+        // Try catch tries to check if username given is valid, if so, obtain the userID
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, userId);
-            pstmt.setString(2, password);
             
             ResultSet rs = pstmt.executeQuery();
             
-            if (rs.next()) {
-                boolean isAdmin = rs.getBoolean("Is_Admin");
-                PointsTier tier = null;
-                
-                if (!isAdmin && rs.getObject("Tier_ID") != null) {
-                    tier = new PointsTier(
-                        rs.getInt("Tier_ID"),
-                        rs.getString("Tier_Name"),
-                        rs.getInt("Min_Points"),
-                        rs.getInt("Max_Points")
-                    );
-                }
-                
-                currentUser = new User(
-                    rs.getInt("User_ID"),
-                    rs.getString("First_Name"),
-                    rs.getString("Last_Name"),
-                    rs.getString("Nationality"),
-                    rs.getInt("Points"),
-                    tier,
-                    isAdmin
-                );
-                
-                System.out.println("Login successful: " + currentUser.getFirstName() + " " + currentUser.getLastName() + 
-                                 (currentUser.isAdmin() ? " (Admin)" : " (User)"));
-                return true;
-            }
+            // While loop checks database if username is equal to fullname. If it exists, get the user id of its
+            while(rs.next())
+                if(rs.getString("full_name").equals(username))
+                    userID = rs.getInt("user_id");
+
         } catch (SQLException e) {
             System.out.println("Error during login: " + e.getMessage());
         }
-        
-        return false;
+
+        return userID;
+
     }
+
+
+    // Input validity for login user
+    private boolean checkInputValidity(String completeName, String password){
+
+        // Checks for empty inputs
+        if(completeName.isEmpty() || password.isEmpty())
+            return false;
+
+        return true;
+
+    }
+
+    // Input validity for register user
+    private boolean checkInputValidity(String firstName, String lastName, String password){
+
+         // Checks for empty inputs
+        if(firstName.isEmpty() || lastName.isEmpty() || password.isEmpty())
+            return false;
+
+        return true;
+
+    }
+
     
     public boolean verifyPassword(String password) {
         if (currentUser == null) {
@@ -232,6 +432,7 @@ public class MainDBController implements ActionListener{
         return currentUser != null && currentUser.isAdmin();
     }
 
+
     // Method provides what the buttons will do when pressed.
     // NOTE: Add your implementation here to connect your MVC inside of your case block
     @Override
@@ -246,6 +447,50 @@ public class MainDBController implements ActionListener{
             case "Quit":
 
                 System.exit(0); //Closes program
+                break;
+            
+            case LoginPageViewer.REGISTER_LINK:
+            
+                loginViewer.clearPageInput("Login"); // Clear login page input
+                loginViewer.showPanel(LoginPageViewer.REGISTER_LINK);
+
+                break;
+
+            case "Return to Login":
+
+                appDBViewer.showPanel(LoginPageViewer.LOGIN_LINK);
+
+                break;
+
+            case LoginPageViewer.LOGIN_LINK:
+
+                loginViewer.showPanel(LoginPageViewer.LOGIN_LINK);
+
+                break;
+
+            case LoginPageViewer.LOGIN_PERFORMED:
+
+                // Accesses login() method if given username and password exists in database
+                if(login()){
+
+                    loginViewer.clearPageInput("Login"); // Clear login page input
+                    appDBViewer.showPanel(MainDBViewer.MAIN_LINK); // Show main page
+
+                }                    
+
+                break;
+
+            case LoginPageViewer.REGISTERED_PERFORMED: //TO BE ADDED
+            
+                //appDBViewer.showPanel(LoginPageViewer.REGISTER_LINK);
+
+                if(register()){
+
+                    loginViewer.clearPageInput("Register"); // Clear login page input
+                    loginViewer.showMessage(LoginPageViewer.REGISTER_SUCCESSFUL); // Show pop-up that message was successful
+
+                }
+                
                 break;
 
             case "User Record":
@@ -277,7 +522,12 @@ public class MainDBController implements ActionListener{
                  // Display checking if button works (Remove once you implemented your MVC)
                 System.out.println("Booking Record Button was pressed");
 
-                //appDBViewer.showPanel(MainDBViewer.BOOKING_LINK);
+                appDBViewer.showPanel(MainDBViewer.BOOKING_LINK);
+
+                break;
+
+
+
 
 
         }

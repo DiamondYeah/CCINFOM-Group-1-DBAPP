@@ -28,6 +28,8 @@ CREATE TABLE User (
         
 	CONSTRAINT User_pk PRIMARY KEY (User_ID),
 	CONSTRAINT User_Tier_fk FOREIGN KEY (Tier_ID) REFERENCES Points_Tier(Tier_ID)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
     
 );
 
@@ -40,6 +42,8 @@ CREATE TABLE User_Phone (
         
 	CONSTRAINT User_Phone_pk PRIMARY KEY (Phone_ID),
 	CONSTRAINT User_Phone_User_fk FOREIGN KEY (User_ID) REFERENCES User(User_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
     
 );
 
@@ -52,6 +56,8 @@ CREATE TABLE User_Email (
         
 	CONSTRAINT User_Email_pk PRIMARY KEY (Email_ID),
 	CONSTRAINT User_Email_User_fk FOREIGN KEY (User_ID) REFERENCES User(User_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
         
 );
 
@@ -71,6 +77,8 @@ CREATE TABLE Region (
 	country_id INT NOT NULL,
         
 	FOREIGN KEY (country_id) REFERENCES Country(country_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
         
 );
 
@@ -82,6 +90,8 @@ CREATE TABLE City (
 	region_id INT NOT NULL,
         
 	FOREIGN KEY (region_id) REFERENCES Region(region_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
         
 );
 
@@ -90,15 +100,18 @@ CREATE TABLE Travel_Spot (
 
 	location_id INT AUTO_INCREMENT PRIMARY KEY,
 	User_id INT NOT NULL,
-	spotname VARCHAR(100) NOT NULL,
+	area VARCHAR(100) NOT NULL,
 	availability ENUM('Available', 'Unavailable') DEFAULT 'Available',
 	date_shared DATE NOT NULL,
 	city_id INT NOT NULL,
-    base_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    max_capacity INT NOT NULL DEFAULT 0
+	is_recommended BOOLEAN DEFAULT FALSE,
         
-	FOREIGN KEY (city_id) REFERENCES City(city_id),
+	FOREIGN KEY (city_id) REFERENCES City(city_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
 	FOREIGN KEY (user_id) REFERENCES User(user_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
         
 );
 
@@ -117,8 +130,12 @@ CREATE TABLE TS_Category (
 	category_id INT NOT NULL,
         
 	PRIMARY KEY (location_id, category_id),
-	FOREIGN KEY (location_id) REFERENCES Travel_Spot(location_id),
+	FOREIGN KEY (location_id) REFERENCES Travel_Spot(location_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
 	FOREIGN KEY (category_id) REFERENCES Category(category_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
         
 );
 
@@ -137,19 +154,20 @@ CREATE TABLE User_Feedback(
 
 	Review_ID 			INT AUTO_INCREMENT NOT NULL,
     User_ID 			INT NOT NULL,
-    Location_ID 		      INT NOT NULL,
-    Rating 		            DECIMAL(2, 1) CHECK(Rating BETWEEN 1 AND 5),
+    Location_ID 		INT NOT NULL,
+    Rating 		        DECIMAL(2, 1) CHECK(Rating BETWEEN 1 AND 5),
+    is_recommendation   BOOLEAN DEFAULT FALSE,
     Reaction_Count 		INT DEFAULT 0,
     Comment_Count 		INT DEFAULT 0,
     Review_Date 		DATETIME DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT User_Feedback_pk PRIMARY KEY (Review_ID),
     CONSTRAINT User_Feedback_UserID_fk FOREIGN KEY (User_ID) REFERENCES User (User_ID)
-			ON DELETE CASCADE
-			ON UPDATE CASCADE,
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     CONSTRAINT User_Feedback_LocationID_fk FOREIGN KEY (Location_ID) REFERENCES Travel_Spot (Location_ID)
-			ON DELETE CASCADE
-			ON UPDATE CASCADE
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 
 );
 
@@ -164,14 +182,14 @@ CREATE TABLE User_Reaction(
     
     CONSTRAINT User_Reaction_pk PRIMARY KEY (Reaction_ID),
     CONSTRAINT User_Reaction_ReviewID_fk FOREIGN KEY (Review_ID) REFERENCES User_Feedback (Review_ID)
-			ON DELETE CASCADE
-			ON UPDATE CASCADE,
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     CONSTRAINT User_Reaction_UserID_fk FOREIGN KEY (User_ID) REFERENCES User (User_ID)
-			ON DELETE CASCADE
-			ON UPDATE CASCADE,
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     CONSTRAINT User_Reaction_ReactionTypeID_fk FOREIGN KEY (ReactionType_ID) REFERENCES Reaction (ReactionType_ID)
-			ON DELETE CASCADE
-			ON UPDATE CASCADE,
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     CONSTRAINT Unique_User_Reaction UNIQUE (Reaction_ID, Review_ID, User_ID)
                 
 );
@@ -222,26 +240,3 @@ CREATE TABLE User_Booking (
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
-
-INSERT INTO Country (country_name)
-VALUES ('Philippines');
-
-INSERT INTO Region (region_name, country_id)
-VALUES
-    ('NCR', 1),
-    ('CALABARZON', 1);
-    
-INSERT INTO City (city_name, region_id)
-VALUES
-    ('Manila', 1),
-    ('Quezon City', 1),
-    ('Tagaytay', 2);
-    
-INSERT INTO Category (category_name)
-VALUES
-	('Beach'),
-    ('Hike'),
-    ('Museum');
-
-
-

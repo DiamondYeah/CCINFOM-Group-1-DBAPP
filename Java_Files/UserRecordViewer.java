@@ -16,6 +16,18 @@ public class UserRecordViewer extends JPanel {
     private JTable userTable;
     private DefaultTableModel userTableModel;
     private JScrollPane userScrollPane;
+    
+    private JTable tiersTable;
+    private DefaultTableModel tiersTableModel;
+    private JScrollPane tiersScrollPane;
+    
+    private JTable emailsTable;
+    private DefaultTableModel emailsTableModel;
+    private JScrollPane emailsScrollPane;
+    
+    private JTable phonesTable;
+    private DefaultTableModel phonesTableModel;
+    private JScrollPane phonesScrollPane;
 
     private JTable recommendationsTable;
     private DefaultTableModel recommendationsTableModel;
@@ -44,6 +56,7 @@ public class UserRecordViewer extends JPanel {
     private JButton removeEmailButtonAdmin;
     private JButton addPhoneButtonAdmin;
     private JButton removePhoneButtonAdmin;
+    private JButton deleteAccountButtonAdmin;
 
     private JTextField firstNameFieldUser;
     private JTextField lastNameFieldUser;
@@ -62,13 +75,26 @@ public class UserRecordViewer extends JPanel {
     private JButton removeEmailButtonUser;
     private JButton addPhoneButtonUser;
     private JButton removePhoneButtonUser;
+    private JButton deleteAccountButtonUser;
 
     private JButton viewUserButton;
     private JButton viewRecommendedButton;
     private JButton editInfoButton;
     private JButton backButton;
+    
     private JButton refreshTableButton;
     private JButton refreshRecommendationsButton;
+    private JButton refreshTiersButton;
+    private JButton refreshEmailsButton;
+    private JButton refreshPhonesButton;
+    private JButton insertUserButton;
+    private JButton deleteUserButton;
+    private JButton insertTierButton;
+    private JButton deleteTierButton;
+    private JButton insertEmailButton;
+    private JButton deleteEmailButton;
+    private JButton insertPhoneButton;
+    private JButton deletePhoneButton;
 
     public UserRecordViewer() {}
 
@@ -155,28 +181,137 @@ public class UserRecordViewer extends JPanel {
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(titleLabel, BorderLayout.NORTH);
 
-        String[] columns = {"User ID", "First Name", "Last Name", "Nationality", "Points", "Tier", "Locations Shared"};
-        userTableModel = new DefaultTableModel(columns, 0) {
+        JTabbedPane tabbedPane = new JTabbedPane();
+        
+        JPanel userTablePanel = new JPanel(new BorderLayout(5, 5));
+        String[] userColumns = {"User ID", "First Name", "Last Name", "Nationality", "Points", "Tier", "Locations Shared"};
+        userTableModel = new DefaultTableModel(userColumns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-
         userTable = new JTable(userTableModel);
-        userTable.setFont(new Font("Arial", Font.PLAIN, 14));
+        userTable.setFont(new Font("Arial", Font.PLAIN, 12));
         userTable.setRowHeight(25);
-        userTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-
+        userTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
         userScrollPane = new JScrollPane(userTable);
-        panel.add(userScrollPane, BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        userTablePanel.add(userScrollPane, BorderLayout.CENTER);
+        
+        JPanel userButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         refreshTableButton = new JButton("Refresh");
-        refreshTableButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        refreshTableButton.setFont(new Font("Arial", Font.PLAIN, 12));
         refreshTableButton.setActionCommand("RefreshUserTable");
-        buttonPanel.add(refreshTableButton);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+        insertUserButton = new JButton("Insert User");
+        insertUserButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        insertUserButton.setActionCommand("InsertUser");
+        deleteUserButton = new JButton("Delete User");
+        deleteUserButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        deleteUserButton.setActionCommand("DeleteUser");
+        userButtonPanel.add(refreshTableButton);
+        userButtonPanel.add(insertUserButton);
+        userButtonPanel.add(deleteUserButton);
+        userTablePanel.add(userButtonPanel, BorderLayout.SOUTH);
+        
+        tabbedPane.addTab("Users", userTablePanel);
+        
+        JPanel tiersTablePanel = new JPanel(new BorderLayout(5, 5));
+        String[] tierColumns = {"Tier ID", "Tier Name", "Min Points", "Max Points"};
+        tiersTableModel = new DefaultTableModel(tierColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tiersTable = new JTable(tiersTableModel);
+        tiersTable.setFont(new Font("Arial", Font.PLAIN, 12));
+        tiersTable.setRowHeight(25);
+        tiersTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        tiersScrollPane = new JScrollPane(tiersTable);
+        tiersTablePanel.add(tiersScrollPane, BorderLayout.CENTER);
+        
+        JPanel tiersButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        refreshTiersButton = new JButton("Refresh");
+        refreshTiersButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        refreshTiersButton.setActionCommand("RefreshTiers");
+        insertTierButton = new JButton("Insert Tier");
+        insertTierButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        insertTierButton.setActionCommand("InsertTier");
+        deleteTierButton = new JButton("Delete Tier");
+        deleteTierButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        deleteTierButton.setActionCommand("DeleteTier");
+        tiersButtonPanel.add(refreshTiersButton);
+        tiersButtonPanel.add(insertTierButton);
+        tiersButtonPanel.add(deleteTierButton);
+        tiersTablePanel.add(tiersButtonPanel, BorderLayout.SOUTH);
+        
+        tabbedPane.addTab("Points Tiers", tiersTablePanel);
+        
+        JPanel emailsTablePanel = new JPanel(new BorderLayout(5, 5));
+        String[] emailColumns = {"Email ID", "User ID", "Email"};
+        emailsTableModel = new DefaultTableModel(emailColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        emailsTable = new JTable(emailsTableModel);
+        emailsTable.setFont(new Font("Arial", Font.PLAIN, 12));
+        emailsTable.setRowHeight(25);
+        emailsTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        emailsScrollPane = new JScrollPane(emailsTable);
+        emailsTablePanel.add(emailsScrollPane, BorderLayout.CENTER);
+        
+        JPanel emailsButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        refreshEmailsButton = new JButton("Refresh");
+        refreshEmailsButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        refreshEmailsButton.setActionCommand("RefreshEmails");
+        insertEmailButton = new JButton("Insert Email");
+        insertEmailButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        insertEmailButton.setActionCommand("InsertEmail");
+        deleteEmailButton = new JButton("Delete Email");
+        deleteEmailButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        deleteEmailButton.setActionCommand("DeleteEmail");
+        emailsButtonPanel.add(refreshEmailsButton);
+        emailsButtonPanel.add(insertEmailButton);
+        emailsButtonPanel.add(deleteEmailButton);
+        emailsTablePanel.add(emailsButtonPanel, BorderLayout.SOUTH);
+        
+        tabbedPane.addTab("User Emails", emailsTablePanel);
+        
+        JPanel phonesTablePanel = new JPanel(new BorderLayout(5, 5));
+        String[] phoneColumns = {"Phone ID", "User ID", "Phone Number"};
+        phonesTableModel = new DefaultTableModel(phoneColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        phonesTable = new JTable(phonesTableModel);
+        phonesTable.setFont(new Font("Arial", Font.PLAIN, 12));
+        phonesTable.setRowHeight(25);
+        phonesTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        phonesScrollPane = new JScrollPane(phonesTable);
+        phonesTablePanel.add(phonesScrollPane, BorderLayout.CENTER);
+        
+        JPanel phonesButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        refreshPhonesButton = new JButton("Refresh");
+        refreshPhonesButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        refreshPhonesButton.setActionCommand("RefreshPhones");
+        insertPhoneButton = new JButton("Insert Phone");
+        insertPhoneButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        insertPhoneButton.setActionCommand("InsertPhone");
+        deletePhoneButton = new JButton("Delete Phone");
+        deletePhoneButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        deletePhoneButton.setActionCommand("DeletePhone");
+        phonesButtonPanel.add(refreshPhonesButton);
+        phonesButtonPanel.add(insertPhoneButton);
+        phonesButtonPanel.add(deletePhoneButton);
+        phonesTablePanel.add(phonesButtonPanel, BorderLayout.SOUTH);
+        
+        tabbedPane.addTab("User Phones", phonesTablePanel);
+        
+        panel.add(tabbedPane, BorderLayout.CENTER);
 
         return panel;
     }
@@ -434,6 +569,13 @@ public class UserRecordViewer extends JPanel {
         updateUserButtonAdmin.setFont(new Font("Arial", Font.BOLD, 16));
         updateUserButtonAdmin.setActionCommand("UpdateUser");
         buttonPanel.add(updateUserButtonAdmin);
+        
+        deleteAccountButtonAdmin = new JButton("Delete Account");
+        deleteAccountButtonAdmin.setFont(new Font("Arial", Font.BOLD, 16));
+        deleteAccountButtonAdmin.setForeground(Color.RED);
+        deleteAccountButtonAdmin.setActionCommand("DeleteAccount");
+        buttonPanel.add(deleteAccountButtonAdmin);
+        
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         return panel;
@@ -615,6 +757,13 @@ public class UserRecordViewer extends JPanel {
         updateUserButtonUser.setFont(new Font("Arial", Font.BOLD, 16));
         updateUserButtonUser.setActionCommand("UpdateUser");
         buttonPanel.add(updateUserButtonUser);
+        
+        deleteAccountButtonUser = new JButton("Delete Account");
+        deleteAccountButtonUser.setFont(new Font("Arial", Font.BOLD, 16));
+        deleteAccountButtonUser.setForeground(Color.RED);
+        deleteAccountButtonUser.setActionCommand("DeleteAccount");
+        buttonPanel.add(deleteAccountButtonUser);
+        
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         return panel;
@@ -627,6 +776,18 @@ public class UserRecordViewer extends JPanel {
     public JButton getBackButton() { return backButton; }
     public JButton getRefreshTableButton() { return refreshTableButton; }
     public JButton getRefreshRecommendationsButton() { return refreshRecommendationsButton; }
+    public JButton getRefreshTiersButton() { return refreshTiersButton; }
+    public JButton getRefreshEmailsButton() { return refreshEmailsButton; }
+    public JButton getRefreshPhonesButton() { return refreshPhonesButton; }
+    
+    public JButton getInsertUserButton() { return insertUserButton; }
+    public JButton getDeleteUserButton() { return deleteUserButton; }
+    public JButton getInsertTierButton() { return insertTierButton; }
+    public JButton getDeleteTierButton() { return deleteTierButton; }
+    public JButton getInsertEmailButton() { return insertEmailButton; }
+    public JButton getDeleteEmailButton() { return deleteEmailButton; }
+    public JButton getInsertPhoneButton() { return insertPhoneButton; }
+    public JButton getDeletePhoneButton() { return deletePhoneButton; }
 
     public JButton getUpdateUserButton() { return updateUserButtonAdmin; }
     public JButton getLoadUserButton() { return loadUserButtonAdmin; }
@@ -634,6 +795,7 @@ public class UserRecordViewer extends JPanel {
     public JButton getRemoveEmailButton() { return removeEmailButtonAdmin; }
     public JButton getAddPhoneButton() { return addPhoneButtonAdmin; }
     public JButton getRemovePhoneButton() { return removePhoneButtonAdmin; }
+    public JButton getDeleteAccountButton() { return deleteAccountButtonAdmin; }
 
     public JTextField getUserIdField() { return userIdFieldAdmin; }
     public JTextField getFirstNameField() { return firstNameFieldAdmin; }
@@ -654,6 +816,7 @@ public class UserRecordViewer extends JPanel {
     public JButton getRemoveEmailButtonUser() { return removeEmailButtonUser; }
     public JButton getAddPhoneButtonUser() { return addPhoneButtonUser; }
     public JButton getRemovePhoneButtonUser() { return removePhoneButtonUser; }
+    public JButton getDeleteAccountButtonUser() { return deleteAccountButtonUser; }
     
     public JTextField getFirstNameFieldUser() { return firstNameFieldUser; }
     public JTextField getLastNameFieldUser() { return lastNameFieldUser; }
@@ -680,9 +843,46 @@ public class UserRecordViewer extends JPanel {
                 user.getLastName(),
                 user.getNationality(),
                 user.getPoints(),
-                user.getPointsTier() != null ? user.getPointsTier().getTierName() : "No Tier"
+                user.isAdmin() ? "ADMIN" : (user.getPointsTier() != null ? user.getPointsTier().getTierName() : "No Tier")
             };
             userTableModel.addRow(row);
+        }
+    }
+    
+    public void updateTiersTable(List<PointsTier> tiers) {
+        tiersTableModel.setRowCount(0);
+        for (PointsTier tier : tiers) {
+            Object[] row = {
+                tier.getTierId(),
+                tier.getTierName(),
+                tier.getMinPoints(),
+                tier.getMaxPoints()
+            };
+            tiersTableModel.addRow(row);
+        }
+    }
+    
+    public void updateEmailsTable(List<UserEmail> emails) {
+        emailsTableModel.setRowCount(0);
+        for (UserEmail email : emails) {
+            Object[] row = {
+                email.getEmailId(),
+                email.getUserId(),
+                email.getEmail()
+            };
+            emailsTableModel.addRow(row);
+        }
+    }
+    
+    public void updatePhonesTable(List<UserPhone> phones) {
+        phonesTableModel.setRowCount(0);
+        for (UserPhone phone : phones) {
+            Object[] row = {
+                phone.getPhoneId(),
+                phone.getUserId(),
+                phone.getPhoneNumber()
+            };
+            phonesTableModel.addRow(row);
         }
     }
 
