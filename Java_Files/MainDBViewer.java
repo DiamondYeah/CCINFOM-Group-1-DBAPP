@@ -62,7 +62,7 @@ public class MainDBViewer extends JFrame{
 
         initialization(); //Initializes the basic components
 
-        setVisible(true); //Makes the JFrame visible
+        
 
     }
 
