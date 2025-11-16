@@ -102,6 +102,48 @@ public class UserRecordModel {
 
         return phones;
     }
+    
+    public List<UserEmail> getAllEmails() {
+        List<UserEmail> emails = new ArrayList<>();
+        String query = "SELECT Email_ID, User_ID, Email FROM User_Email ORDER BY User_ID, Email_ID";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                emails.add(new UserEmail(
+                    rs.getInt("Email_ID"),
+                    rs.getInt("User_ID"),
+                    rs.getString("Email")
+                ));
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error fetching all emails.\n");
+        }
+
+        return emails;
+    }
+
+    public List<UserPhone> getAllPhones() {
+        List<UserPhone> phones = new ArrayList<>();
+        String query = "SELECT Phone_ID, User_ID, Phone_Number FROM User_Phone ORDER BY User_ID, Phone_ID";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                phones.add(new UserPhone(
+                    rs.getInt("Phone_ID"),
+                    rs.getInt("User_ID"),
+                    rs.getString("Phone_Number")
+                ));
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error fetching all phones.\n");
+        }
+
+        return phones;
+    }
 
     public User getUserById(int userId) {
         String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
@@ -220,6 +262,11 @@ public class UserRecordModel {
     }
 
     public boolean addUserEmail(int userId, String email) {
+        if (!isValidEmail(email)) {
+            System.out.println("Invalid email format: " + email);
+            return false;
+        }
+
         String query = "INSERT INTO User_Email (User_ID, Email) VALUES (?, ?)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -237,14 +284,27 @@ public class UserRecordModel {
 
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, emailId);
-            return pstmt.executeUpdate() > 0;
+            int rows = pstmt.executeUpdate();
+            if (rows > 0) {
+                System.out.println("Email deleted successfully: " + emailId);
+                return true;
+            } else {
+                System.out.println("No email found with ID: " + emailId);
+                return false;
+            }
         } catch (SQLException e) {
-            System.out.printf("Error deleting email.\n");
+            System.out.printf("Error deleting email: %s\n", e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
 
     public boolean addUserPhone(int userId, String phoneNumber) {
+        if (!isValidPhone(phoneNumber)) {
+            System.out.println("Invalid phone format: " + phoneNumber);
+            return false;
+        }
+
         String query = "INSERT INTO User_Phone (User_ID, Phone_Number) VALUES (?, ?)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -267,6 +327,32 @@ public class UserRecordModel {
             System.out.printf("Error deleting phone.\n");
             return false;
         }
+    }
+
+    private boolean isValidEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        email = email.trim();
+        
+        if (!email.contains("@") || !email.contains(".com")) {
+            return false;
+        }
+        
+        int atIndex = email.indexOf("@");
+        int comIndex = email.indexOf(".com");
+        
+        return atIndex < comIndex && atIndex > 0;
+    }
+
+    private boolean isValidPhone(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            return false;
+        }
+        
+        String digitsOnly = phoneNumber.replaceAll("[^0-9]", "");
+        
+        return digitsOnly.length() >= 7 && digitsOnly.length() <= 15;
     }
 
     public List<PointsTier> getAllTiers() {
@@ -295,16 +381,17 @@ public class UserRecordModel {
         List<Object[]> recommendations = new ArrayList<>();
         String query = "SELECT ts.location_id, ts.area, c.city_name, r.region_name, co.country_name, " +
                         "pt.Tier_Name as tier_name, " +
-                        "COUNT(DISTINCT u.User_ID) as recommendation_count " +
-                        "FROM Travel_Spot ts " +
+                        "COUNT(DISTINCT uf.Review_ID) as recommendation_count " +
+                        "FROM User_Feedback uf " +
+                        "JOIN Travel_Spot ts ON uf.Location_ID = ts.location_id " +
                         "JOIN City c ON ts.city_id = c.city_id " +
                         "JOIN Region r ON c.region_id = r.region_id " +
                         "JOIN Country co ON r.country_id = co.country_id " +
-                        "JOIN User u ON ts.User_ID = u.User_ID " +
+                        "JOIN User u ON uf.User_ID = u.User_ID " +
                         "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
-                        "WHERE ts.is_recommended = TRUE " +
-                        "AND MONTH(ts.date_shared) = ? " +
-                        "AND YEAR(ts.date_shared) = ? " +
+                        "WHERE uf.is_recommendation = TRUE " +
+                        "AND MONTH(uf.Review_Date) = ? " +
+                        "AND YEAR(uf.Review_Date) = ? " +
                         "AND u.Is_Admin = FALSE " +
                         "GROUP BY ts.location_id, ts.area, c.city_name, r.region_name, co.country_name, pt.Tier_Name " +
                         "ORDER BY recommendation_count DESC, ts.location_id, tier_name";
@@ -382,5 +469,103 @@ public class UserRecordModel {
         }
         
         return 0;
+    }
+    
+    public boolean insertUser(String firstName, String lastName, String nationality, int points, String password, boolean isAdmin) {
+        String query = "INSERT INTO User (First_Name, Last_Name, Nationality, Points, Password, Is_Admin) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, firstName);
+            pstmt.setString(2, lastName);
+            pstmt.setString(3, nationality);
+            pstmt.setInt(4, points);
+            pstmt.setString(5, password);
+            pstmt.setBoolean(6, isAdmin);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            
+            if (rowsAffected > 0 && !isAdmin && points > 0) {
+                String getIdQuery = "SELECT LAST_INSERT_ID() as id";
+                try (PreparedStatement ps2 = conn.prepareStatement(getIdQuery)) {
+                    ResultSet rs = ps2.executeQuery();
+                    if (rs.next()) {
+                        updateUserTier(rs.getInt("id"), points);
+                    }
+                }
+            }
+            
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.printf("Error inserting user.\n");
+            return false;
+        }
+    }
+    
+    public boolean deleteUser(int userId) {
+        String query = "DELETE FROM User WHERE User_ID = ?";
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            int rows = pstmt.executeUpdate();
+            if (rows > 0) {
+                System.out.println("User deleted successfully: " + userId);
+                return true;
+            } else {
+                System.out.println("No user found with ID: " + userId);
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error deleting user: %s\n", e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean insertTier(String tierName, int minPoints, int maxPoints) {
+        String query = "INSERT INTO Points_Tier (Tier_Name, Min_Points, Max_Points) VALUES (?, ?, ?)";
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, tierName);
+            pstmt.setInt(2, minPoints);
+            pstmt.setInt(3, maxPoints);
+            int rows = pstmt.executeUpdate();
+            if (rows > 0) {
+                System.out.println("Tier inserted successfully");
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            System.out.printf("Error inserting tier: %s\n", e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean deleteTier(int tierId) {
+        String updateQuery = "UPDATE User SET Tier_ID = NULL WHERE Tier_ID = ?";
+        String deleteQuery = "DELETE FROM Points_Tier WHERE Tier_ID = ?";
+        
+        try {
+            try (PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
+                pstmt.setInt(1, tierId);
+                pstmt.executeUpdate();
+            }
+            
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
+                pstmt.setInt(1, tierId);
+                int rows = pstmt.executeUpdate();
+                if (rows > 0) {
+                    System.out.println("Tier deleted successfully: " + tierId);
+                    return true;
+                } else {
+                    System.out.println("No tier found with ID: " + tierId);
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error deleting tier: %s\n", e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 }
