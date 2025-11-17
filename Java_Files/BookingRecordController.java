@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
@@ -15,11 +14,11 @@ public class BookingRecordController implements ActionListener {
     public BookingRecordController(Connection conn, MainDBController mainController, JPanel cardPane) {
         this.cardPane = cardPane;
         this.mainController = mainController;
-        
+
         // Initialize Model and View
         this.model = new BookingModel(conn);
         this.view = new BookingRecordViewer(cardPane);
-        
+
         // Attach ActionListeners
         view.setActionListener(this);
 
@@ -38,7 +37,7 @@ public class BookingRecordController implements ActionListener {
             view.showCreateBooking();
 
         } else if (src == view.getViewBookingButton()) {
-            loadBookingsToTable();
+            loadBookingsForCurrentUser();
 
         } else if (src == view.getSaveButton()) {
             if (editingBookingID != -1) {
@@ -76,42 +75,43 @@ public class BookingRecordController implements ActionListener {
                 view.showViewBooking();
                 view.setTableModel(model.getBookingRecords(dateInput));
             }
+
         } else if (src == view.getDeleteBookingButton()) {
-    String input = view.promptBookingID();
-    if (input == null || input.isEmpty()) return;
+            String input = view.promptBookingID();
+            if (input == null || input.isEmpty()) return;
 
-    int bookingID;
-    try {
-        bookingID = Integer.parseInt(input.trim());
-    } catch (NumberFormatException ex) {
-        view.showMessage("Invalid Booking ID.");
-        return;
-    }
+            int bookingID;
+            try {
+                bookingID = Integer.parseInt(input.trim());
+            } catch (NumberFormatException ex) {
+                view.showMessage("Invalid Booking ID.");
+                return;
+            }
 
-    int confirm = JOptionPane.showConfirmDialog(
-        null,
-        "Are you sure you want to delete Booking ID " + bookingID + "?",
-        "Confirm Deletion",
-        JOptionPane.YES_NO_OPTION
-    );
+            int confirm = JOptionPane.showConfirmDialog(
+                null,
+                "Are you sure you want to delete Booking ID " + bookingID + "?",
+                "Confirm Deletion",
+                JOptionPane.YES_NO_OPTION
+            );
 
-    if (confirm == JOptionPane.YES_OPTION) {
-        boolean success = model.deleteBooking(bookingID);
-        if (success) {
-            view.showMessage("Booking deleted successfully!");
-            loadBookingsToTable(); // refresh table
-        } else {
-            view.showMessage("Failed to delete booking. It may not exist.");
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean success = model.deleteBooking(bookingID);
+                if (success) {
+                    view.showMessage("Booking deleted successfully!");
+                    loadBookingsForCurrentUser(); // refresh only current user's bookings
+                } else {
+                    view.showMessage("Failed to delete booking. It may not exist.");
+                }
+            }
         }
     }
-}
 
-    }
-
-    /** Load all bookings from model into JTable */
-    private void loadBookingsToTable() {
+    /** Load bookings only for the currently logged-in user */
+    private void loadBookingsForCurrentUser() {
         view.showViewBooking();
-        view.setTableModel(model.getBookingTableModel());
+        int currentUserId = mainController.getCurrentUser().getUserId();
+        view.setTableModel(model.getBookingsForUser(currentUserId));
     }
 
     /** Create new booking via Model */
@@ -132,7 +132,7 @@ public class BookingRecordController implements ActionListener {
             if (model.createBooking(booking)) {
                 view.showMessage("Booking created successfully!");
                 clearBookingFields();
-                loadBookingsToTable();
+                loadBookingsForCurrentUser(); // refresh only current user's bookings
             } else {
                 view.showMessage("Failed to create booking.");
             }
@@ -206,7 +206,7 @@ public class BookingRecordController implements ActionListener {
                 view.showMessage("Booking updated successfully!");
                 editingBookingID = -1;
                 clearBookingFields();
-                loadBookingsToTable();
+                loadBookingsForCurrentUser();
                 view.showCreateBooking();
             } else {
                 view.showMessage("Failed to update booking.");
@@ -244,7 +244,6 @@ public class BookingRecordController implements ActionListener {
             view.showMessage("Booking ID must be a number.");
         }
     }
-
 
     /** Clear all input fields */
     private void clearBookingFields() {

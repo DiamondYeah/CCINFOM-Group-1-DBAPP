@@ -68,6 +68,7 @@ public class BookingModel {
         return null;
     }
 
+
     /** Create a new booking */
     public boolean createBooking(Book b) {
         String sql = "INSERT INTO Booking (Organizer_ID, Location_ID, Current_Capacity, Max_Capacity, Start_date, End_date, Status) " +
@@ -109,7 +110,7 @@ public class BookingModel {
     public DefaultTableModel getUserBookingTableModel() {
         String[] columns = { "User Booking ID", "Booking ID", "User ID", "Role" };
         DefaultTableModel model = new DefaultTableModel(columns, 0);
-        String sql = "SELECT User_Booking_ID, Booking_ID, User_ID, Role FROM User_Booking";
+        String sql = "SELECT User_Booking_ID, Booking_ID, User_ID, Role FROM User_Booking ORDER BY Booking_ID";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -127,6 +128,36 @@ public class BookingModel {
 
         return model;
     }
+
+    /** Get bookings for a specific user */
+    public DefaultTableModel getBookingsForUser(int userId) {
+    DefaultTableModel model = new DefaultTableModel();
+    model.setColumnIdentifiers(new String[]{"Booking ID", "Location ID", "Start Date", "End Date", "Pax", "Status"});
+
+    String query = "SELECT Booking_ID, Location_ID, Start_Date, End_Date, Current_Capacity, Status " +
+                   "FROM Booking WHERE Organizer_ID = ?";
+
+    try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+        pstmt.setInt(1, userId);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                rs.getInt("Booking_ID"),
+                rs.getInt("Location_ID"),
+                rs.getDate("Start_Date"),
+                rs.getDate("End_Date"),
+                rs.getInt("Current_Capacity"),
+                rs.getString("Status")
+            });
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return model;
+}
+
 
     /** Most visited locations by year/month */
     public DefaultTableModel getMostVisitedLocations(String dateInput) {
