@@ -8,7 +8,7 @@ public class BookingRecordViewer extends JPanel {
     // --- Buttons ---
     private JButton viewBookingBtn, createBookingBtn, backBtn, saveBtn,
             partyBtn, viewPartiesBtn, mostVisitedBtn, viewBookingRecordsBtn, 
-            editBookingBtn, deleteBookingBtn;
+            editBookingBtn, deleteBookingBtn, leavePartyBtn;
 
     // --- Text Fields ---
     private JTextField orgIDField, locIDField, paxField, sDateField, eDateField;
@@ -48,7 +48,8 @@ public class BookingRecordViewer extends JPanel {
 
         
 
-        partyBtn = new JButton("Join/Create a Party");
+        partyBtn = new JButton("Join a Party");
+        leavePartyBtn = new JButton("Leave Party");
         viewPartiesBtn = new JButton("View Parties");
         viewBookingBtn = new JButton("View Your Bookings");
         createBookingBtn = new JButton("Create Booking");
@@ -66,8 +67,9 @@ public class BookingRecordViewer extends JPanel {
         gbc.gridx = 0;
 
         int row = 0;
-        panelWest.add(partyBtn, gbc); gbc.gridy = ++row;
         panelWest.add(mostVisitedBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(partyBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(leavePartyBtn, gbc); gbc.gridy = ++row;
         panelWest.add(viewPartiesBtn, gbc); gbc.gridy = ++row;
         panelWest.add(viewBookingBtn, gbc); gbc.gridy = ++row;
         panelWest.add(createBookingBtn, gbc); gbc.gridy = ++row;
@@ -79,31 +81,34 @@ public class BookingRecordViewer extends JPanel {
         add(panelWest, BorderLayout.WEST);
     }
 
-    private void buildCreateBookingPanel() {
-        createPanel = new JPanel(new GridBagLayout());
-        createPanel.setBackground(Color.decode("#bfbfb2"));
+private void buildCreateBookingPanel() {
+    createPanel = new JPanel(new GridBagLayout());
+    createPanel.setBackground(Color.decode("#bfbfb2"));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(15, 20, 15, 20);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(15, 20, 15, 20);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Fonts
-        Font headerFont = new Font("Arial", Font.BOLD, 24);
-        Font labelFont = new Font("Arial", Font.PLAIN, 20);
-        Font fieldFont = new Font("Arial", Font.PLAIN, 18);
+    // Fonts
+    Font headerFont = new Font("Arial", Font.BOLD, 24);
+    Font labelFont = new Font("Arial", Font.PLAIN, 20);
+    Font fieldFont = new Font("Arial", Font.PLAIN, 18);
 
-        JLabel header = new JLabel("Create / Edit Booking");
-        header.setFont(headerFont);
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        createPanel.add(header, gbc);
-        gbc.gridwidth = 1;
+    JLabel header = new JLabel("Create / Edit Booking");
+    header.setFont(headerFont);
+    gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+    createPanel.add(header, gbc);
+    gbc.gridwidth = 1;
 
-        orgIDField = createInputRow(createPanel, gbc, 1, "Organizer ID:", labelFont, fieldFont);
-        locIDField = createInputRow(createPanel, gbc, 2, "Location ID:", labelFont, fieldFont);
-        paxField = createInputRow(createPanel, gbc, 3, "Number of People:", labelFont, fieldFont);
-        sDateField = createInputRow(createPanel, gbc, 4, "Start Date (YYYY-MM-DD):", labelFont, fieldFont);
-        eDateField = createInputRow(createPanel, gbc, 5, "End Date (YYYY-MM-DD):", labelFont, fieldFont);
-    }
+    // Remove Organizer ID input completely
+    // orgIDField = createInputRow(createPanel, gbc, 1, "Organizer ID:", labelFont, fieldFont);
+
+    int row = 1; // start row count at 1 (since header is row 0)
+    locIDField = createInputRow(createPanel, gbc, row++, "Location ID:", labelFont, fieldFont);
+    paxField = createInputRow(createPanel, gbc, row++, "Number of People:", labelFont, fieldFont);
+    sDateField = createInputRow(createPanel, gbc, row++, "Start Date (YYYY-MM-DD):", labelFont, fieldFont);
+    eDateField = createInputRow(createPanel, gbc, row++, "End Date (YYYY-MM-DD):", labelFont, fieldFont);
+}
 
     private JTextField createInputRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, Font labelFont, Font fieldFont) {
         JLabel label = new JLabel(labelText);
@@ -220,6 +225,8 @@ public class BookingRecordViewer extends JPanel {
         viewBookingRecordsBtn.addActionListener(listener);
         editBookingBtn.addActionListener(listener);
         deleteBookingBtn.addActionListener(listener);
+        leavePartyBtn.addActionListener(listener);
+
     }
 
 
@@ -234,6 +241,8 @@ public class BookingRecordViewer extends JPanel {
     public JButton getViewBookingRecordsButton() { return viewBookingRecordsBtn; }
     public JButton getEditBookingBtn() { return editBookingBtn; }
     public JButton getDeleteBookingButton() { return deleteBookingBtn; }
+    public JButton getLeavePartyButton() { return leavePartyBtn; }
+
 
     public JTextField getOrgIDField() { return orgIDField; }
     public JTextField getLocIDField() { return locIDField; }
