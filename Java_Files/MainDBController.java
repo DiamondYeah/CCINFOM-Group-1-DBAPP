@@ -163,8 +163,6 @@ public class MainDBController implements ActionListener{
             System.err.println("Please create this file and add your local credentials.");
             System.exit(1);
         }
-
-        System.out.println(DB_URL + USER + PASSWORD);
     }
 
 

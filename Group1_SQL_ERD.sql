@@ -99,12 +99,11 @@ CREATE TABLE City (
 CREATE TABLE Travel_Spot (
 
 	location_id INT AUTO_INCREMENT PRIMARY KEY,
-	User_id INT NOT NULL,
-	area VARCHAR(100) NOT NULL,
+	user_id INT NOT NULL,
+	spotname VARCHAR(100) NOT NULL,
 	availability ENUM('Available', 'Unavailable') DEFAULT 'Available',
 	date_shared DATE NOT NULL,
 	city_id INT NOT NULL,
-	is_recommended BOOLEAN DEFAULT FALSE,
         
 	FOREIGN KEY (city_id) REFERENCES City(city_id)
         ON DELETE CASCADE
