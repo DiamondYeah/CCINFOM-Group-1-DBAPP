@@ -158,6 +158,18 @@ public class BookingModel {
     return model;
 }
 
+    public int getLastInsertedBookingID() {
+    String sql = "SELECT LAST_INSERT_ID() AS last_id"; // MySQL example
+    try (PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+        if (rs.next()) {
+            return rs.getInt("last_id");
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+    }
+    return -1; // fallback
+}
 
     /** Most visited locations by year/month */
     public DefaultTableModel getMostVisitedLocations(String dateInput) {
@@ -296,5 +308,48 @@ public class BookingModel {
         }
     }
 
+    // Get the role of a user in a booking
+    public String getUserRoleInBooking(int userId, int bookingId) {
+        String sql = "SELECT Role FROM User_Booking WHERE User_ID = ? AND Booking_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            stmt.setInt(2, bookingId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("Role");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    // Remove a user from a booking (only participants)
+    public boolean removeUserFromBooking(int userId, int bookingId) {
+        String sql = "DELETE FROM User_Booking WHERE User_ID = ? AND Booking_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            stmt.setInt(2, bookingId);
+            int affected = stmt.executeUpdate();
+            return affected > 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    // Check if a user is already in a booking
+    public boolean isUserInBooking(int userId, int bookingId) {
+        String sql = "SELECT 1 FROM User_Booking WHERE User_ID = ? AND Booking_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            stmt.setInt(2, bookingId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next(); // returns true if a row exists
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
 
 }
