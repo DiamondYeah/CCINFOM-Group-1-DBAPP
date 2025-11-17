@@ -1,134 +1,135 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class BookingRecordViewer extends JPanel {
 
-    // Buttons
-    private JButton viewBookingBtn, createBookingBtn, backBtn, saveBtn;
+    // --- Buttons ---
+    private JButton viewBookingBtn, createBookingBtn, backBtn, saveBtn,
+            partyBtn, viewPartiesBtn, mostVisitedBtn, viewBookingRecordsBtn, 
+            editBookingBtn, deleteBookingBtn;
 
-    // Text fields (only created ONCE)
+    // --- Text Fields ---
     private JTextField orgIDField, locIDField, paxField, sDateField, eDateField;
 
-    // Panels
+    // --- Panels ---
     private JPanel panelCenter;
     private JPanel createPanel;
     private JPanel viewPanel;
     private JPanel savePanel;
-    private JPanel bookingTableContainer; // where JTable will be inserted
+    private JPanel bookingTableContainer;
 
     public BookingRecordViewer(JPanel cardPanel) {
         setLayout(new BorderLayout());
         setBackground(Color.decode("#bfbfb2"));
 
-        // Left side navigation buttons
+        // Build left navigation panel
         initLeftButtonPanel();
 
-        // Center panel where create/view panels will swap
+        // Center container
         panelCenter = new JPanel(new BorderLayout());
         panelCenter.setBackground(Color.decode("#bfbfb2"));
         add(panelCenter, BorderLayout.CENTER);
 
-        // Build ALL UI pieces ONCE
+        // Build panels
         buildCreateBookingPanel();
         buildViewBookingPanel();
         buildSavePanel();
 
-        // Container for View Booking table
+        // Table container
         bookingTableContainer = new JPanel(new BorderLayout());
         bookingTableContainer.setBackground(Color.decode("#bfbfb2"));
     }
 
-    // -------------------------------------------------------------
-    // LEFT BUTTON PANEL
-    // -------------------------------------------------------------
     private void initLeftButtonPanel() {
         JPanel panelWest = new JPanel(new GridBagLayout());
         panelWest.setBackground(Color.GRAY);
 
+        
+
+        partyBtn = new JButton("Join/Create a Party");
+        viewPartiesBtn = new JButton("View Parties");
         viewBookingBtn = new JButton("View Booking");
         createBookingBtn = new JButton("Create Booking");
+        mostVisitedBtn = new JButton("See Most Visited Locations");
+        editBookingBtn = new JButton("Edit Booking");
+        viewBookingRecordsBtn = new JButton("View Booking Records");
+        deleteBookingBtn = new JButton("Delete Booking");
+
+
         backBtn = new JButton("Back");
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
 
-        gbc.gridx = 0; gbc.gridy = 0;
-        panelWest.add(viewBookingBtn, gbc);
-        gbc.gridy++;
-        panelWest.add(createBookingBtn, gbc);
-        gbc.gridy++;
+        int row = 0;
+        panelWest.add(partyBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(mostVisitedBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(viewPartiesBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(viewBookingBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(createBookingBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(viewBookingRecordsBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(editBookingBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(deleteBookingBtn, gbc); gbc.gridy = ++row;
         panelWest.add(backBtn, gbc);
 
         add(panelWest, BorderLayout.WEST);
     }
 
-    // -------------------------------------------------------------
-    // CREATE BOOKING PANEL (Built ONCE)
-    // -------------------------------------------------------------
     private void buildCreateBookingPanel() {
-        createPanel = new JPanel(null);
-        createPanel.setPreferredSize(new Dimension(600, 400));
+        createPanel = new JPanel(new GridBagLayout());
         createPanel.setBackground(Color.decode("#bfbfb2"));
 
-        JLabel header = new JLabel("Creating a booking");
-        header.setBounds(400, 0, 300, 30);
-        createPanel.add(header);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 20, 15, 20);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel orgLabel = new JLabel("Enter Organizer ID");
-        JLabel locLabel = new JLabel("Enter Location ID");
-        JLabel paxLabel = new JLabel("Number of People");
-        JLabel sdateLabel = new JLabel("Start Date");
-        JLabel edateLabel = new JLabel("End Date");
+        // Fonts
+        Font headerFont = new Font("Arial", Font.BOLD, 24);
+        Font labelFont = new Font("Arial", Font.PLAIN, 20);
+        Font fieldFont = new Font("Arial", Font.PLAIN, 18);
 
-        orgLabel.setBounds(350, 80, 250, 20);
-        locLabel.setBounds(350, 120, 250, 20);
-        paxLabel.setBounds(350, 160, 250, 20);
-        sdateLabel.setBounds(350, 200, 250, 20);
-        edateLabel.setBounds(350, 240, 250, 20);
+        JLabel header = new JLabel("Create / Edit Booking");
+        header.setFont(headerFont);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        createPanel.add(header, gbc);
+        gbc.gridwidth = 1;
 
-        createPanel.add(orgLabel);
-        createPanel.add(locLabel);
-        createPanel.add(paxLabel);
-        createPanel.add(sdateLabel);
-        createPanel.add(edateLabel);
-
-        orgIDField = new JTextField();
-        locIDField = new JTextField();
-        paxField = new JTextField();
-        sDateField = new JTextField();
-        eDateField = new JTextField();
-
-        orgIDField.setBounds(500, 80, 200, 20);
-        locIDField.setBounds(500, 120, 200, 20);
-        paxField.setBounds(500, 160, 200, 20);
-        sDateField.setBounds(500, 200, 200, 20);
-        eDateField.setBounds(500, 240, 200, 20);
-
-        createPanel.add(orgIDField);
-        createPanel.add(locIDField);
-        createPanel.add(paxField);
-        createPanel.add(sDateField);
-        createPanel.add(eDateField);
+        orgIDField = createInputRow(createPanel, gbc, 1, "Organizer ID:", labelFont, fieldFont);
+        locIDField = createInputRow(createPanel, gbc, 2, "Location ID:", labelFont, fieldFont);
+        paxField = createInputRow(createPanel, gbc, 3, "Number of People:", labelFont, fieldFont);
+        sDateField = createInputRow(createPanel, gbc, 4, "Start Date (YYYY-MM-DD):", labelFont, fieldFont);
+        eDateField = createInputRow(createPanel, gbc, 5, "End Date (YYYY-MM-DD):", labelFont, fieldFont);
     }
 
-    // -------------------------------------------------------------
-    // VIEW BOOKING PANEL (Built ONCE)
-    // -------------------------------------------------------------
+    private JTextField createInputRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, Font labelFont, Font fieldFont) {
+        JLabel label = new JLabel(labelText);
+        label.setFont(labelFont);
+        JTextField field = new JTextField(18);
+        field.setFont(fieldFont);
+        field.setPreferredSize(new Dimension(250, 35));
+
+        gbc.gridy = row;
+        gbc.gridx = 0;
+        panel.add(label, gbc);
+        gbc.gridx = 1;
+        panel.add(field, gbc);
+
+        return field;
+    }
+
     private void buildViewBookingPanel() {
-        viewPanel = new JPanel(null);
-        viewPanel.setPreferredSize(new Dimension(600, 70));
+        viewPanel = new JPanel(new BorderLayout());
         viewPanel.setBackground(Color.decode("#bfbfb2"));
-
         JLabel header = new JLabel("Viewing Bookings");
-        header.setBounds(400, 10, 300, 30);
-        viewPanel.add(header);
+        header.setFont(new Font("Arial", Font.BOLD, 22));
+        header.setHorizontalAlignment(SwingConstants.CENTER);
+        viewPanel.add(header, BorderLayout.NORTH);
     }
 
-    // -------------------------------------------------------------
-    // SAVE BUTTON PANEL (Built ONCE)
-    // -------------------------------------------------------------
     private void buildSavePanel() {
         savePanel = new JPanel(new FlowLayout());
         savePanel.setBackground(Color.decode("#bfbfb2"));
@@ -136,9 +137,7 @@ public class BookingRecordViewer extends JPanel {
         savePanel.add(saveBtn);
     }
 
-    // -------------------------------------------------------------
-    // SWITCH PANELS
-    // -------------------------------------------------------------
+    // --- Panel switches ---
     public void showCreateBooking() {
         panelCenter.removeAll();
         panelCenter.add(createPanel, BorderLayout.CENTER);
@@ -155,33 +154,93 @@ public class BookingRecordViewer extends JPanel {
         panelCenter.repaint();
     }
 
-    // -------------------------------------------------------------
-    // ALLOW CONTROLLER TO INSERT A JTable
-    // -------------------------------------------------------------
-    public JPanel getTableContainer() {
-        return bookingTableContainer;
+    // --- Table management ---
+    public void setTableModel(DefaultTableModel model) {
+        bookingTableContainer.removeAll();
+        JTable table = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(table);
+        bookingTableContainer.add(scrollPane, BorderLayout.CENTER);
+        bookingTableContainer.revalidate();
+        bookingTableContainer.repaint();
     }
 
-    // -------------------------------------------------------------
-    // Getters for controller
-    // -------------------------------------------------------------
+    // --- Dialogs ---
+    public int promptRoleSelection() {
+        String[] options = {"Organizer", "Participant"};
+        return JOptionPane.showOptionDialog(
+                this, "Select your role:", "Role Selection",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, options, options[0]);
+    }
+
+    public String promptBookingID() {
+        return JOptionPane.showInputDialog(this, "Enter Booking ID:");
+    }
+
+    public String promptUserID() {
+        return JOptionPane.showInputDialog(this, "Enter your User ID:");
+    }
+
+    public boolean showOrganizerExistsDialog() {
+        int confirm = JOptionPane.showConfirmDialog(
+                this, "Organizer is already present. Go back?", "Duplicate Organizer",
+                JOptionPane.YES_NO_OPTION);
+        return confirm == JOptionPane.YES_OPTION;
+    }
+
+    public void showMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    public String promptBookingRecordsDate() {
+        String[] options = {"Enter Year/Month", "Show All"};
+        int choice = JOptionPane.showOptionDialog(
+                this, "Filter bookings by date or show all?", "Booking Records Filter",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, options, options[0]);
+
+        if (choice == 1) return "ALL";
+        if (choice == 0) {
+            while (true) {
+                String input = JOptionPane.showInputDialog(this, "Enter Year (YYYY) or Month (YYYY-MM):");
+                if (input == null) return null;
+                if (input.matches("\\d{4}") || input.matches("\\d{4}-\\d{2}")) return input;
+                JOptionPane.showMessageDialog(this, "Invalid format. Enter YYYY or YYYY-MM.");
+            }
+        }
+        return null;
+    }
+
+    // --- Action Listener ---
+    public void setActionListener(ActionListener listener) {
+        viewBookingBtn.addActionListener(listener);
+        createBookingBtn.addActionListener(listener);
+        backBtn.addActionListener(listener);
+        saveBtn.addActionListener(listener);
+        partyBtn.addActionListener(listener);
+        viewPartiesBtn.addActionListener(listener);
+        mostVisitedBtn.addActionListener(listener);
+        viewBookingRecordsBtn.addActionListener(listener);
+        editBookingBtn.addActionListener(listener);
+        deleteBookingBtn.addActionListener(listener);
+    }
+
+
+    // --- Getters ---
     public JButton getViewBookingButton() { return viewBookingBtn; }
     public JButton getCreateBookingButton() { return createBookingBtn; }
     public JButton getBackButton() { return backBtn; }
     public JButton getSaveButton() { return saveBtn; }
+    public JButton getPartyButton() { return partyBtn; }
+    public JButton getViewPartiesButton() { return viewPartiesBtn; }
+    public JButton getMostVisitedButton() { return mostVisitedBtn; }
+    public JButton getViewBookingRecordsButton() { return viewBookingRecordsBtn; }
+    public JButton getEditBookingBtn() { return editBookingBtn; }
+    public JButton getDeleteBookingButton() { return deleteBookingBtn; }
 
     public JTextField getOrgIDField() { return orgIDField; }
     public JTextField getLocIDField() { return locIDField; }
     public JTextField getPaxField() { return paxField; }
     public JTextField getSDateField() { return sDateField; }
     public JTextField getEDateField() { return eDateField; }
-
-    public JPanel getPanelCenter() { return panelCenter; }
-
-    public void setActionListener(ActionListener listener) {
-        viewBookingBtn.addActionListener(listener);
-        createBookingBtn.addActionListener(listener);
-        backBtn.addActionListener(listener);
-        saveBtn.addActionListener(listener);
-    }
 }
