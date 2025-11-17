@@ -3,37 +3,29 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.Scanner;
 
 public class BookingRecordController implements ActionListener {
 
     private BookingRecordViewer view;
-    private MainDBController mainController;
+    private BookingModel model;
     private JPanel cardPane;
-    private Connection conn;  // use the real DB connection
-    private Scanner sc;
+    private int editingBookingID = -1;
 
     public BookingRecordController(Connection conn, MainDBController mainController, JPanel cardPane) {
-        this.conn = conn;
-        this.mainController = mainController;
         this.cardPane = cardPane;
 
-        // Initialize VIEW
+        // Initialize Model and View
+        this.model = new BookingModel(conn);
         this.view = new BookingRecordViewer(cardPane);
 
-        // Attach action listeners
-        this.view.setActionListener(this);
+        // Attach ActionListeners
+        view.setActionListener(this);
 
-        // Add viewer to card layout
+        // Add view to card layout
         cardPane.add(view, MainDBViewer.BOOKING_LINK);
 
-        // Start on Create Booking screen
+        // Start with Create Booking screen
         view.showCreateBooking();
-
-        // Scanner for console input
-        sc = new Scanner(System.in);
     }
 
     @Override
@@ -42,198 +34,223 @@ public class BookingRecordController implements ActionListener {
 
         if (src == view.getCreateBookingButton()) {
             view.showCreateBooking();
+
         } else if (src == view.getViewBookingButton()) {
-            showBookingsTable();
+            loadBookingsToTable();
+
         } else if (src == view.getSaveButton()) {
-            saveBooking();
+            if (editingBookingID != -1) {
+                saveEditedBooking();
+            } else {
+                saveNewBooking();
+            }
+
+        } else if (src == view.getEditBookingBtn()) {
+            editBooking();
+
         } else if (src == view.getBackButton()) {
             CardLayout cl = (CardLayout) cardPane.getLayout();
             cl.show(cardPane, MainDBViewer.MAIN_LINK);
-        }
+
+        } else if (src == view.getPartyButton()) {
+            handlePartyAssignment();
+
+        } else if (src == view.getViewPartiesButton()) {
+            view.showViewBooking();
+            view.setTableModel(model.getUserBookingTableModel());
+
+        } else if (src == view.getMostVisitedButton()) {
+            String dateInput = JOptionPane.showInputDialog(null,
+                    "Enter Year (YYYY) or Month (YYYY-MM):",
+                    "Most Visited Locations", JOptionPane.QUESTION_MESSAGE);
+            if (dateInput != null && !dateInput.isEmpty()) {
+                view.showViewBooking();
+                view.setTableModel(model.getMostVisitedLocations(dateInput));
+            }
+
+        } else if (src == view.getViewBookingRecordsButton()) {
+            String dateInput = view.promptBookingRecordsDate();
+            if (dateInput != null) {
+                view.showViewBooking();
+                view.setTableModel(model.getBookingRecords(dateInput));
+            }
+        } else if (src == view.getDeleteBookingButton()) {
+    String input = view.promptBookingID();
+    if (input == null || input.isEmpty()) return;
+
+    int bookingID;
+    try {
+        bookingID = Integer.parseInt(input.trim());
+    } catch (NumberFormatException ex) {
+        view.showMessage("Invalid Booking ID.");
+        return;
     }
 
-    /** ------------------ VIEW BOOKINGS TABLE ------------------ **/
-    public void showBookingsTable() {
+    int confirm = JOptionPane.showConfirmDialog(
+        null,
+        "Are you sure you want to delete Booking ID " + bookingID + "?",
+        "Confirm Deletion",
+        JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirm == JOptionPane.YES_OPTION) {
+        boolean success = model.deleteBooking(bookingID);
+        if (success) {
+            view.showMessage("Booking deleted successfully!");
+            loadBookingsToTable(); // refresh table
+        } else {
+            view.showMessage("Failed to delete booking. It may not exist.");
+        }
+    }
+}
+
+    }
+
+    /** Load all bookings from model into JTable */
+    private void loadBookingsToTable() {
         view.showViewBooking();
-
-        String sql = "SELECT Booking_ID, Organizer_ID, Location_ID, " +
-                     "Current_Capacity, Start_date, End_date, Booking_Dates " +
-                     "FROM Booking";
-
-        DefaultTableModel tableModel = new DefaultTableModel();
-        tableModel.addColumn("Booking ID");
-        tableModel.addColumn("Organizer ID");
-        tableModel.addColumn("Location ID");
-        tableModel.addColumn("Current Capacity");
-        tableModel.addColumn("Start Date");
-        tableModel.addColumn("End Date");
-        tableModel.addColumn("Booking Period");
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                tableModel.addRow(new Object[]{
-                        rs.getInt("Booking_ID"),
-                        rs.getInt("Organizer_ID"),
-                        rs.getInt("Location_ID"),
-                        rs.getInt("Current_Capacity"),
-                        rs.getDate("Start_date"),
-                        rs.getDate("End_date"),
-                        rs.getString("Booking_Dates")
-                });
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to load bookings from database.");
-        }
-
-        JTable table = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(table);
-
-        JPanel center = view.getPanelCenter();
-        center.removeAll();
-        center.add(scrollPane, BorderLayout.CENTER);
-        center.revalidate();
-        center.repaint();
+        view.setTableModel(model.getBookingTableModel());
     }
 
-    /** ------------------ SAVE BOOKING ------------------ **/
-    private void saveBooking() {
+    /** Create new booking via Model */
+    private void saveNewBooking() {
         try {
-            int organizerID = Integer.parseInt(view.getOrgIDField().getText());
-            int locationID = Integer.parseInt(view.getLocIDField().getText());
-            int pax = Integer.parseInt(view.getPaxField().getText());
-            String startDate = view.getSDateField().getText();
-            String endDate = view.getEDateField().getText();
+            int organizerID = Integer.parseInt(view.getOrgIDField().getText().trim());
+            int locationID = Integer.parseInt(view.getLocIDField().getText().trim());
+            int pax = Integer.parseInt(view.getPaxField().getText().trim());
+            java.sql.Date startDate = java.sql.Date.valueOf(view.getSDateField().getText().trim());
+            java.sql.Date endDate = java.sql.Date.valueOf(view.getEDateField().getText().trim());
 
-            String sql = "INSERT INTO Booking (Organizer_ID, Location_ID, Current_Capacity, Start_date, End_date, Max_Capacity, Status) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, organizerID);
-                stmt.setInt(2, locationID);
-                stmt.setInt(3, pax); // current capacity
-                stmt.setString(4, startDate);
-                stmt.setString(5, endDate);
-                stmt.setInt(6, pax); // max capacity same as pax initially
-                stmt.setString(7, "Confirmed"); // default status
-                stmt.executeUpdate();
+            if (endDate.before(startDate)) {
+                view.showMessage("End date must be after start date.");
+                return;
             }
 
-            JOptionPane.showMessageDialog(null, "Booking saved successfully!");
+            Book booking = new Book(0, organizerID, locationID, pax, pax, startDate, endDate, "Booked");
+            if (model.createBooking(booking)) {
+                view.showMessage("Booking created successfully!");
+                clearBookingFields();
+                loadBookingsToTable();
+            } else {
+                view.showMessage("Failed to create booking.");
+            }
+        } catch (NumberFormatException ex) {
+            view.showMessage("Organizer ID, Location ID, and Pax must be numbers.");
+        } catch (IllegalArgumentException ex) {
+            view.showMessage("Dates must be in YYYY-MM-DD format.");
+        }
+    }
 
-            // Clear input fields
-            view.getOrgIDField().setText("");
-            view.getLocIDField().setText("");
-            view.getPaxField().setText("");
-            view.getSDateField().setText("");
-            view.getEDateField().setText("");
+    /** Begin editing a booking */
+    private void editBooking() {
+        String input = view.promptBookingID();
+        if (input == null || input.isEmpty()) return;
 
-            // Refresh table
-            showBookingsTable();
+        try {
+            int bookingID = Integer.parseInt(input.trim());
+            Book booking = model.getBookingById(bookingID);
+
+            if (booking == null) {
+                view.showMessage("Booking not found.");
+                return;
+            }
+
+            view.getOrgIDField().setText(String.valueOf(booking.getOrganizerID()));
+            view.getOrgIDField().setEditable(false);
+
+            view.getLocIDField().setText(String.valueOf(booking.getLocationID()));
+            view.getLocIDField().setEditable(false);
+
+            view.getPaxField().setText(String.valueOf(booking.getCurrentCapacity()));
+            view.getSDateField().setText(booking.getStartDate().toString());
+            view.getEDateField().setText(booking.getEndDate().toString());
+
+            editingBookingID = bookingID;
+            view.showCreateBooking();
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null,
-                    "Please enter valid numbers for Organizer ID, Location ID, and Pax.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to save booking to database.");
+            view.showMessage("Invalid Booking ID.");
         }
     }
 
-    /** ------------------ CONSOLE VIEW ------------------ **/
-    public void runConsole() {
-        while (true) {
-            System.out.println("\n--- Booking Console ---");
-            System.out.println("1. Create Booking");
-            System.out.println("2. View Bookings");
-            System.out.println("3. Exit");
-            System.out.print("Select option: ");
-            String input = sc.nextLine();
-
-            switch (input) {
-                case "1":
-                    consoleCreateBooking();
-                    break;
-                case "2":
-                    consoleViewBookings();
-                    break;
-                case "3":
-                    System.out.println("Exiting console...");
-                    return;
-                default:
-                    System.out.println("Invalid option. Try again.");
-            }
-        }
-    }
-
-    private void consoleCreateBooking() {
+    /** Save edited booking via Model */
+    private void saveEditedBooking() {
         try {
-            System.out.print("Organizer ID: ");
-            int organizerID = Integer.parseInt(sc.nextLine());
+            int currentCapacity = Integer.parseInt(view.getPaxField().getText().trim());
+            java.sql.Date startDate = java.sql.Date.valueOf(view.getSDateField().getText().trim());
+            java.sql.Date endDate = java.sql.Date.valueOf(view.getEDateField().getText().trim());
 
-            System.out.print("Location ID: ");
-            int locationID = Integer.parseInt(sc.nextLine());
-
-            System.out.print("Number of people (Pax): ");
-            int pax = Integer.parseInt(sc.nextLine());
-
-            System.out.print("Start Date (YYYY-MM-DD): ");
-            String startDate = sc.nextLine();
-
-            System.out.print("End Date (YYYY-MM-DD): ");
-            String endDate = sc.nextLine();
-
-            String sql = "INSERT INTO Booking (Organizer_ID, Location_ID, Current_Capacity, Start_date, End_date, Max_Capacity, Status) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, organizerID);
-                stmt.setInt(2, locationID);
-                stmt.setInt(3, pax);
-                stmt.setString(4, startDate);
-                stmt.setString(5, endDate);
-                stmt.setInt(6, pax);
-                stmt.setString(7, "Confirmed");
-                stmt.executeUpdate();
+            Book booking = model.getBookingById(editingBookingID);
+            if (booking == null) {
+                view.showMessage("Booking not found.");
+                editingBookingID = -1;
+                return;
             }
 
-            System.out.println("Booking saved successfully!");
+            if (endDate.before(startDate)) {
+                view.showMessage("End date must be after start date.");
+                return;
+            }
+            if (currentCapacity > booking.getMaxCapacity()) {
+                view.showMessage("Current capacity cannot exceed max capacity (" + booking.getMaxCapacity() + ").");
+                return;
+            }
+
+            booking.setCurrentCapacity(currentCapacity);
+            booking.setStartDate(startDate);
+            booking.setEndDate(endDate);
+
+            if (model.updateBooking(booking)) {
+                view.showMessage("Booking updated successfully!");
+                editingBookingID = -1;
+                clearBookingFields();
+                loadBookingsToTable();
+                view.showCreateBooking();
+            } else {
+                view.showMessage("Failed to update booking.");
+            }
 
         } catch (NumberFormatException ex) {
-            System.out.println("Invalid input. Organizer ID, Location ID, and Pax must be numbers.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Failed to save booking to database.");
+            view.showMessage("Current Capacity must be a number.");
+        } catch (IllegalArgumentException ex) {
+            view.showMessage("Dates must be in YYYY-MM-DD format.");
         }
     }
 
-    private void consoleViewBookings() {
-        String sql = "SELECT Booking_ID, Organizer_ID, Location_ID, Current_Capacity, Start_date, End_date, Booking_Dates FROM Booking";
+    /** Assign user to a booking (Organizer/Participant) */
+    private void handlePartyAssignment() {
+        int roleChoice = view.promptRoleSelection();
+        if (roleChoice == -1) return;
+        String role = roleChoice == 0 ? "Organizer" : "Participant";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        String userIdStr = view.promptUserID();
+        if (userIdStr == null) return;
 
-            System.out.printf("%-10s %-12s %-12s %-5s %-12s %-12s %-20s%n",
-                    "BookingID", "OrganizerID", "LocationID", "Pax",
-                    "StartDate", "EndDate", "BookingPeriod");
+        String bookingIdStr = view.promptBookingID();
+        if (bookingIdStr == null) return;
 
-            while (rs.next()) {
-                System.out.printf("%-10d %-12d %-12d %-5d %-12s %-12s %-20s%n",
-                        rs.getInt("Booking_ID"),
-                        rs.getInt("Organizer_ID"),
-                        rs.getInt("Location_ID"),
-                        rs.getInt("Current_Capacity"),
-                        rs.getDate("Start_date"),
-                        rs.getDate("End_date"),
-                        rs.getString("Booking_Dates"));
+        try {
+            int userID = Integer.parseInt(userIdStr.trim());
+            int bookingID = Integer.parseInt(bookingIdStr.trim());
+
+            boolean success = model.assignUserToBooking(userID, bookingID, role);
+            if (success) {
+                view.showMessage("User added to booking successfully!");
+            } else {
+                view.showMessage("Failed to add user. Organizer may already exist.");
             }
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Failed to load bookings from database.");
+        } catch (NumberFormatException ex) {
+            view.showMessage("User ID and Booking ID must be numbers.");
         }
+    }
+
+    /** Clear all input fields */
+    private void clearBookingFields() {
+        view.getOrgIDField().setText("");
+        view.getLocIDField().setText("");
+        view.getPaxField().setText("");
+        view.getSDateField().setText("");
+        view.getEDateField().setText("");
     }
 }
