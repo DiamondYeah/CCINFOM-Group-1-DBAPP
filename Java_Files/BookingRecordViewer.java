@@ -177,9 +177,6 @@ public class BookingRecordViewer extends JPanel {
         return JOptionPane.showInputDialog(this, "Enter Booking ID:");
     }
 
-    public String promptUserID() {
-        return JOptionPane.showInputDialog(this, "Enter your User ID:");
-    }
 
     public boolean showOrganizerExistsDialog() {
         int confirm = JOptionPane.showConfirmDialog(
