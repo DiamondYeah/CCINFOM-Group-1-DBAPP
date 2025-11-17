@@ -50,7 +50,7 @@ public class BookingRecordViewer extends JPanel {
 
         partyBtn = new JButton("Join/Create a Party");
         viewPartiesBtn = new JButton("View Parties");
-        viewBookingBtn = new JButton("View Booking");
+        viewBookingBtn = new JButton("View Your Bookings");
         createBookingBtn = new JButton("Create Booking");
         mostVisitedBtn = new JButton("See Most Visited Locations");
         editBookingBtn = new JButton("Edit Booking");
