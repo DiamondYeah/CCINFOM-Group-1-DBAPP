@@ -10,14 +10,16 @@ public class BookingRecordController implements ActionListener {
     private BookingModel model;
     private JPanel cardPane;
     private int editingBookingID = -1;
+    private MainDBController mainController;
 
     public BookingRecordController(Connection conn, MainDBController mainController, JPanel cardPane) {
         this.cardPane = cardPane;
-
+        this.mainController = mainController;
+        
         // Initialize Model and View
         this.model = new BookingModel(conn);
         this.view = new BookingRecordViewer(cardPane);
-
+        
         // Attach ActionListeners
         view.setActionListener(this);
 
@@ -223,14 +225,12 @@ public class BookingRecordController implements ActionListener {
         if (roleChoice == -1) return;
         String role = roleChoice == 0 ? "Organizer" : "Participant";
 
-        String userIdStr = view.promptUserID();
-        if (userIdStr == null) return;
+        int userID = mainController.getCurrentUser().getUserId();
 
         String bookingIdStr = view.promptBookingID();
         if (bookingIdStr == null) return;
 
         try {
-            int userID = Integer.parseInt(userIdStr.trim());
             int bookingID = Integer.parseInt(bookingIdStr.trim());
 
             boolean success = model.assignUserToBooking(userID, bookingID, role);
@@ -241,9 +241,10 @@ public class BookingRecordController implements ActionListener {
             }
 
         } catch (NumberFormatException ex) {
-            view.showMessage("User ID and Booking ID must be numbers.");
+            view.showMessage("Booking ID must be a number.");
         }
     }
+
 
     /** Clear all input fields */
     private void clearBookingFields() {
