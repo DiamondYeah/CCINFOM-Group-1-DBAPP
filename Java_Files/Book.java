@@ -34,4 +34,5 @@ public class Book {
     public void setCurrentCapacity(int currentCapacity) { this.currentCapacity = currentCapacity; }
     public void setStartDate(Date startDate) { this.startDate = startDate; }
     public void setEndDate(Date endDate) { this.endDate = endDate; }
+    //
 }
