@@ -184,7 +184,8 @@ public class UserRecordViewer extends JPanel {
         JTabbedPane tabbedPane = new JTabbedPane();
         
         JPanel userTablePanel = new JPanel(new BorderLayout(5, 5));
-        String[] userColumns = {"User ID", "First Name", "Last Name", "Nationality", "Points", "Tier", "Locations Shared"};
+        String[] userColumns = {"User ID", "First Name", "Last Name", "Nationality", "Points", "Tier", 
+                                "Password", "Is Admin", "Locations Shared", "Reviews Made", "Bookings Count"};
         userTableModel = new DefaultTableModel(userColumns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -843,7 +844,12 @@ public class UserRecordViewer extends JPanel {
                 user.getLastName(),
                 user.getNationality(),
                 user.getPoints(),
-                user.isAdmin() ? "ADMIN" : (user.getPointsTier() != null ? user.getPointsTier().getTierName() : "No Tier")
+                user.isAdmin() ? "ADMIN" : (user.getPointsTier() != null ? user.getPointsTier().getTierName() : "No Tier"),
+                user.getPassword(),
+                user.isAdmin() ? "TRUE" : "FALSE",
+                user.getLocationsShared(),
+                user.getReviewsMade(),
+                user.getBookingsCount()
             };
             userTableModel.addRow(row);
         }
