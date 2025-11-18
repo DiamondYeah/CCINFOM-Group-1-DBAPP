@@ -6,55 +6,6 @@ import java.util.ArrayList;
 import java.util.Properties; // Import for Properties class
 
 
-/*
- *
- * HOW TO CONNECT TO SQL:
- * below you will see 3 attributes called DB_URL, USER, and PASSWORD. Change the password to your local version assuming
- * URL and USER are the same as mine.
- * NOTE 1: Table should have been made in MYSQL to make this work. So create the database first in MYSQL before connecting
- * NOTE 2: JDBC is needed to connect Java to MYSQL Tutorial for VSCODE -> (https://www.youtube.com/watch?v=MtME-ERufu0)
- * 
- * 
- * HOW TO CONNECT YOUR MVC TO THIS CONTROLLER:
- * This class will be the main controller of the DB Application
- * I have already made sample Controllers for you guys to use, and they are already connected to this main controller.
- * Please implement your MVC seperately of the Main Controller and Viewer as it is only meant to connect the record together.
- * If you wish to use another controller to connect your MVC from my sample,
- * go to the actionPerformed method in the very button, and add the code that will show the viewer of your records in your respective case. 
- * Also uncomment the setVisible before you show your own viewer -> ( appDBViewer.setVisible(false))
- * NOTE: Add a back button on your viewer so that it will go back to the MainDBViewer.
- * 
- * 
-    * HOW TO USE CARD VIEWER
-    *
-    * In your viewer class, create a viewer class with a constructor that accepts **JPanel cardPanel**,
-    * Afterwards, extend your class to JFrame and add the class itself as a parameter to the cardPanel JPanel with the appropriate link
-    * EX:
-    * 
-    * public class FeedbackRecordViewer extends JPanel{ <- Extends JPanel
-    * 
-    *      public FeedbackRecordViewer(JPanel cardPanel){ <- Add JPanel parameter
-    *
-    *
-    *
-    *          cardPanel.add(this, MainDBViewer.FEEDBACK_LINK); <- Add Class directly to cardPanel, and use the appropriate link
-    *
-    *       }
-    *
-    *  }
-    * 
-    * Afterwards, in your controller, add the cardPanel when creating the object instance of your viewer.
-    * EX:
-    * view = new FeedbackRecordViewer(cardPanel);
-    * 
-    * If both are implemented properly, when you run the program and click the button, it should now open your JPanel
-    * 
-    * NOTE: Add a back button on your JPanel that will return the Panel back to main via an ActionListener on your own controller
-    * 
-    * 
-    */
-
-
 // This class connects to the database and connects to the other controllers in the project
 public class MainDBController implements ActionListener{
 
@@ -122,6 +73,13 @@ public class MainDBController implements ActionListener{
 
         return appDBViewer;
         
+    }
+
+
+    public UserRecordController getUserRecord(){
+
+        return userRecord;
+
     }
 
     // Special getter method that creates an ArrayList of nationality and returns it. Mainly for login page

@@ -748,6 +748,7 @@ public class FeedbackRecordController implements ActionListener{
             case UserFeedbackPanelViewer.CREATE_FEEDBACK_USER_LINK:
 
                 storeFeedbackInfo();
+                mainController.getUserRecord().getUserRecordModel().addPointsToUser(currentUserID, 20);
 
                 break;
 
@@ -860,6 +861,7 @@ public class FeedbackRecordController implements ActionListener{
             case UserReactionPanelViewer.CREATE_USERREACTION_USER_LINK:
 
                 storeUserReactionInfo();
+                mainController.getUserRecord().getUserRecordModel().addPointsToUser(currentUserID, 10);
 
                 break;
 

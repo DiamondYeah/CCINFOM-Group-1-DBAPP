@@ -1,13 +1,10 @@
 import java.sql.*;
 import java.util.ArrayList;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
 public class FeedbackRecord {
@@ -219,7 +216,7 @@ public class FeedbackRecord {
 
         // String builder query to create the SELECT statement
         query.setLength(0);
-        query.append("SELECT uf.*, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, ts.area ");
+        query.append("SELECT uf.*, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, ts.spotname ");
         query.append("FROM USER_FEEDBACK uf JOIN user u ON u.user_id = uf.user_id ");
         query.append("JOIN travel_spot ts ON ts.location_id = uf.location_id ");
         query.append("WHERE review_id = ?; ");
@@ -246,7 +243,7 @@ public class FeedbackRecord {
 
                 // Information mainly for making comboBox work
                 String fullname = set.getString("full_name");
-                String area = set.getString("area");
+                String spotName = set.getString("spotname");
 
                 // Display the results of the query to the input components
                 
@@ -254,7 +251,7 @@ public class FeedbackRecord {
                 System.out.println(commentCount); 
 
                 userBox.setSelectedItem(userID + " - " + fullname);
-                locationBox.setSelectedItem(locationID + " - " + area);
+                locationBox.setSelectedItem(locationID + " - " + spotName);
                 ratingSlider.setValue(Math.round((rating - 1.0f) * 10));
                 reactionSpinner.setValue(reactionCount);
                 commentSpinner.setValue(commentCount);
@@ -758,16 +755,16 @@ public class FeedbackRecord {
             query.setLength(0);
 
             // Query that will generate the report
-            query.append("SELECT uf.review_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.area, uf.rating, ");
+            query.append("SELECT uf.review_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.spotname, uf.rating, ");
             query.append("COUNT(CASE WHEN r.Reaction_Name = 'LIKE' THEN 1 END) AS likes, ");
             query.append("COUNT(CASE WHEN r.Reaction_Name = 'DISLIKE' THEN 1 END) AS dislikes, ");
             query.append("DATE_FORMAT(uf.Review_Date, '%M %Y') AS Review_Month_Year ");
             query.append("FROM User_feedback uf JOIN User u ON uf.User_ID = u.User_ID ");
-            query.append("JOIN Points_tier pt ON u.Tier_ID = pt.Tier_ID ");
+            query.append("LEFT JOIN Points_tier pt ON u.Tier_ID = pt.Tier_ID ");
             query.append("JOIN Travel_spot ts ON uf.Location_ID = ts.Location_ID ");
             query.append("LEFT JOIN User_reaction ur ON uf.Review_ID = ur.Review_ID ");
             query.append("LEFT JOIN Reaction r ON ur.ReactionType_ID = r.ReactionType_ID ");
-            query.append("GROUP BY review_id, full_name, tier_name, ts.area, uf.rating, Review_Month_Year ");
+            query.append("GROUP BY review_id, full_name, tier_name, ts.spotname, uf.rating, Review_Month_Year ");
             query.append("ORDER BY pt.tier_id DESC, uf.rating DESC; ");
 
             stmt = conn.prepareStatement(query.toString());
@@ -778,14 +775,14 @@ public class FeedbackRecord {
                 int reviewID = set.getInt("Review_ID");
                 String fullName = set.getString("Full_Name");
                 String tierName = set.getString("Tier_Name");
-                String area = set.getString("Area");
+                String spotName = set.getString("Spotname");
                 double rating = set.getDouble("Rating");
                 int likes = set.getInt("Likes");
                 int dislikes = set.getInt("Dislikes");
                 String reviewMonthYear = set.getString("Review_Month_Year");
                 
                 model.addRow(new Object[]{
-                    reviewID, fullName, tierName, area, rating, likes, dislikes, reviewMonthYear
+                    reviewID, fullName, tierName, spotName, rating, likes, dislikes, reviewMonthYear
                 });
 
             }
@@ -809,12 +806,12 @@ public class FeedbackRecord {
             query.setLength(0);
 
             // Query that will generate the report
-            query.append("SELECT uf.review_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.area, uf.rating, ");
+            query.append("SELECT uf.review_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.spotname, uf.rating, ");
             query.append("COUNT(CASE WHEN r.Reaction_Name = 'LIKE' THEN 1 END) AS likes, ");
             query.append("COUNT(CASE WHEN r.Reaction_Name = 'DISLIKE' THEN 1 END) AS dislikes, ");
             query.append("DATE_FORMAT(uf.Review_Date, '%M %Y') AS Review_Month_Year ");
             query.append("FROM User_feedback uf JOIN User u ON uf.User_ID = u.User_ID ");
-            query.append("JOIN Points_tier pt ON u.Tier_ID = pt.Tier_ID ");
+            query.append("LEFT JOIN Points_tier pt ON u.Tier_ID = pt.Tier_ID ");
             query.append("JOIN Travel_spot ts ON uf.Location_ID = ts.Location_ID ");
             query.append("LEFT JOIN User_reaction ur ON uf.Review_ID = ur.Review_ID ");
             query.append("LEFT JOIN Reaction r ON ur.ReactionType_ID = r.ReactionType_ID ");
@@ -837,7 +834,7 @@ public class FeedbackRecord {
             }
 
             // Add the rest of the query
-            query.append("GROUP BY review_id, full_name, tier_name, ts.area, uf.rating, Review_Month_Year ");
+            query.append("GROUP BY review_id, full_name, tier_name, ts.spotname, uf.rating, Review_Month_Year ");
             query.append("ORDER BY pt.tier_id DESC, uf.rating DESC; ");
 
             stmt = conn.prepareStatement(query.toString());
@@ -864,14 +861,14 @@ public class FeedbackRecord {
                 int reviewID = set.getInt("Review_ID");
                 String fullName = set.getString("Full_Name");
                 String tierName = set.getString("Tier_Name");
-                String area = set.getString("Area");
+                String spotName = set.getString("spotname");
                 double rating = set.getDouble("Rating");
                 int likes = set.getInt("Likes");
                 int dislikes = set.getInt("Dislikes");
                 String reviewMonthYear = set.getString("Review_Month_Year");
                 
                 model.addRow(new Object[]{
-                    reviewID, fullName, tierName, area, rating, likes, dislikes, reviewMonthYear
+                    reviewID, fullName, tierName, spotName, rating, likes, dislikes, reviewMonthYear
                 });
 
             }
@@ -954,7 +951,7 @@ public class FeedbackRecord {
 
             while(set.next()){
 
-                String getLocationOption = set.getString("location_id") + " - " + set.getString("area");
+                String getLocationOption = set.getString("location_id") + " - " + set.getString("spotname");
                 feedbackLocationIDOptions.add(getLocationOption); // Add reaction type to array list
 
             }

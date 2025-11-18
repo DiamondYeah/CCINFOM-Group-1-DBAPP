@@ -11,11 +11,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -53,7 +50,6 @@ public class ReactionPanelViewer {
     // Components for Buttons for create reaction tables
     private JButton createReactionLinkButton; // Button links to the reaction creation view
     private JButton editReactionLinkButton; // Button links to the reaction edit view
-    private JButton deleteReactionLinkButton; // Button links to the reaction delete view
 
 
     // Components for Buttons for create reaction

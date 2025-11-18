@@ -437,6 +437,7 @@ public class UserRecordModel {
     }
 
     public boolean addPointsToUser(int userId, int pointsToAdd) {
+
         String query = "UPDATE User SET Points = Points + ? WHERE User_ID = ?";
         
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
