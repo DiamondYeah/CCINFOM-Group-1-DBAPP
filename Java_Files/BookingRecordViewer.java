@@ -6,19 +6,21 @@ import java.awt.event.ActionListener;
 public class BookingRecordViewer extends JPanel {
 
     // --- Buttons ---
-    private JButton viewBookingBtn, createBookingBtn, backBtn, saveBtn,
-            partyBtn, viewPartiesBtn, mostVisitedBtn, viewBookingRecordsBtn, 
+    private JButton viewBookingBtn, createBookingBtn, backBtn, saveCreateBtn, saveEditBtn,
+            partyBtn, viewPartiesBtn, viewYourPartiesBtn, mostVisitedBtn, viewBookingRecordsBtn, 
             editBookingBtn, deleteBookingBtn, leavePartyBtn;
 
-    // --- Text Fields ---
-    private JTextField orgIDField, locIDField, paxField, sDateField, eDateField;
+    // --- Text Fields for CREATE panel ---
+    private JTextField createLocIDField, createPaxField, createSDateField, createEDateField;
+
+    // --- Text Fields for EDIT panel ---
+    private JTextField editLocIDField, editPaxField, editSDateField, editEDateField;
 
     // --- Panels ---
-    private JPanel panelCenter;
-    private JPanel createPanel;
-    private JPanel viewPanel;
-    private JPanel savePanel;
-    private JPanel bookingTableContainer;
+    private JPanel panelCenter, createPanel, editPanel, viewPanel, savePanelCreate, savePanelEdit, bookingTableContainer;
+
+    // --- Header label for view panel ---
+    private JLabel viewHeaderLabel;
 
     public BookingRecordViewer(JPanel cardPanel) {
         setLayout(new BorderLayout());
@@ -34,8 +36,9 @@ public class BookingRecordViewer extends JPanel {
 
         // Build panels
         buildCreateBookingPanel();
+        buildEditBookingPanel();
         buildViewBookingPanel();
-        buildSavePanel();
+        buildSavePanels();
 
         // Table container
         bookingTableContainer = new JPanel(new BorderLayout());
@@ -46,18 +49,16 @@ public class BookingRecordViewer extends JPanel {
         JPanel panelWest = new JPanel(new GridBagLayout());
         panelWest.setBackground(Color.GRAY);
 
-        
-
         partyBtn = new JButton("Join a Party");
         leavePartyBtn = new JButton("Leave Party");
-        viewPartiesBtn = new JButton("View Parties");
+        viewYourPartiesBtn = new JButton("View Your Parties");
+        viewPartiesBtn = new JButton("View All Parties");
         viewBookingBtn = new JButton("View Your Bookings");
         createBookingBtn = new JButton("Create Booking");
         mostVisitedBtn = new JButton("See Most Visited Locations");
         editBookingBtn = new JButton("Edit Booking");
         viewBookingRecordsBtn = new JButton("View Booking Records");
         deleteBookingBtn = new JButton("Delete Booking");
-
 
         backBtn = new JButton("Back");
 
@@ -70,6 +71,7 @@ public class BookingRecordViewer extends JPanel {
         panelWest.add(mostVisitedBtn, gbc); gbc.gridy = ++row;
         panelWest.add(partyBtn, gbc); gbc.gridy = ++row;
         panelWest.add(leavePartyBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(viewYourPartiesBtn, gbc); gbc.gridy = ++row;
         panelWest.add(viewPartiesBtn, gbc); gbc.gridy = ++row;
         panelWest.add(viewBookingBtn, gbc); gbc.gridy = ++row;
         panelWest.add(createBookingBtn, gbc); gbc.gridy = ++row;
@@ -81,34 +83,57 @@ public class BookingRecordViewer extends JPanel {
         add(panelWest, BorderLayout.WEST);
     }
 
-private void buildCreateBookingPanel() {
-    createPanel = new JPanel(new GridBagLayout());
-    createPanel.setBackground(Color.decode("#bfbfb2"));
+    private void buildCreateBookingPanel() {
+        createPanel = new JPanel(new GridBagLayout());
+        createPanel.setBackground(Color.decode("#bfbfb2"));
 
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(15, 20, 15, 20);
-    gbc.fill = GridBagConstraints.HORIZONTAL;
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 20, 15, 20);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-    // Fonts
-    Font headerFont = new Font("Arial", Font.BOLD, 24);
-    Font labelFont = new Font("Arial", Font.PLAIN, 20);
-    Font fieldFont = new Font("Arial", Font.PLAIN, 18);
+        // Fonts
+        Font headerFont = new Font("Arial", Font.BOLD, 24);
+        Font labelFont = new Font("Arial", Font.PLAIN, 20);
+        Font fieldFont = new Font("Arial", Font.PLAIN, 18);
 
-    JLabel header = new JLabel("Create / Edit Booking");
-    header.setFont(headerFont);
-    gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-    createPanel.add(header, gbc);
-    gbc.gridwidth = 1;
+        JLabel header = new JLabel("Create Booking");
+        header.setFont(headerFont);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        createPanel.add(header, gbc);
+        gbc.gridwidth = 1;
 
-    // Remove Organizer ID input completely
-    // orgIDField = createInputRow(createPanel, gbc, 1, "Organizer ID:", labelFont, fieldFont);
+        int row = 1;
+        createLocIDField = createInputRow(createPanel, gbc, row++, "Location ID:", labelFont, fieldFont);
+        createPaxField = createInputRow(createPanel, gbc, row++, "Number of People:", labelFont, fieldFont);
+        createSDateField = createInputRow(createPanel, gbc, row++, "Start Date (YYYY-MM-DD):", labelFont, fieldFont);
+        createEDateField = createInputRow(createPanel, gbc, row++, "End Date (YYYY-MM-DD):", labelFont, fieldFont);
+    }
 
-    int row = 1; // start row count at 1 (since header is row 0)
-    locIDField = createInputRow(createPanel, gbc, row++, "Location ID:", labelFont, fieldFont);
-    paxField = createInputRow(createPanel, gbc, row++, "Number of People:", labelFont, fieldFont);
-    sDateField = createInputRow(createPanel, gbc, row++, "Start Date (YYYY-MM-DD):", labelFont, fieldFont);
-    eDateField = createInputRow(createPanel, gbc, row++, "End Date (YYYY-MM-DD):", labelFont, fieldFont);
-}
+    private void buildEditBookingPanel() {
+        editPanel = new JPanel(new GridBagLayout());
+        editPanel.setBackground(Color.decode("#bfbfb2"));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 20, 15, 20);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Fonts
+        Font headerFont = new Font("Arial", Font.BOLD, 24);
+        Font labelFont = new Font("Arial", Font.PLAIN, 20);
+        Font fieldFont = new Font("Arial", Font.PLAIN, 18);
+
+        JLabel header = new JLabel("Edit Booking");
+        header.setFont(headerFont);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        editPanel.add(header, gbc);
+        gbc.gridwidth = 1;
+
+        int row = 1;
+        editLocIDField = createInputRow(editPanel, gbc, row++, "Location ID:", labelFont, fieldFont);
+        editPaxField = createInputRow(editPanel, gbc, row++, "Number of People:", labelFont, fieldFont);
+        editSDateField = createInputRow(editPanel, gbc, row++, "Start Date (YYYY-MM-DD):", labelFont, fieldFont);
+        editEDateField = createInputRow(editPanel, gbc, row++, "End Date (YYYY-MM-DD):", labelFont, fieldFont);
+    }
 
     private JTextField createInputRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, Font labelFont, Font fieldFont) {
         JLabel label = new JLabel(labelText);
@@ -129,29 +154,53 @@ private void buildCreateBookingPanel() {
     private void buildViewBookingPanel() {
         viewPanel = new JPanel(new BorderLayout());
         viewPanel.setBackground(Color.decode("#bfbfb2"));
-        JLabel header = new JLabel("Viewing Bookings");
-        header.setFont(new Font("Arial", Font.BOLD, 22));
-        header.setHorizontalAlignment(SwingConstants.CENTER);
-        viewPanel.add(header, BorderLayout.NORTH);
+        viewHeaderLabel = new JLabel("Viewing Bookings");
+        viewHeaderLabel.setFont(new Font("Arial", Font.BOLD, 22));
+        viewHeaderLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        viewPanel.add(viewHeaderLabel, BorderLayout.NORTH);
     }
 
-    private void buildSavePanel() {
-        savePanel = new JPanel(new FlowLayout());
-        savePanel.setBackground(Color.decode("#bfbfb2"));
-        saveBtn = new JButton("Save Booking");
-        savePanel.add(saveBtn);
+    private void buildSavePanels() {
+        // Create separate buttons for Create and Edit
+        savePanelCreate = new JPanel(new FlowLayout());
+        savePanelCreate.setBackground(Color.decode("#bfbfb2"));
+        saveCreateBtn = new JButton("Save Booking");
+        savePanelCreate.add(saveCreateBtn);
+
+        savePanelEdit = new JPanel(new FlowLayout());
+        savePanelEdit.setBackground(Color.decode("#bfbfb2"));
+        saveEditBtn = new JButton("Save Changes");
+        savePanelEdit.add(saveEditBtn);
     }
 
     // --- Panel switches ---
     public void showCreateBooking() {
         panelCenter.removeAll();
         panelCenter.add(createPanel, BorderLayout.CENTER);
-        panelCenter.add(savePanel, BorderLayout.SOUTH);
+        panelCenter.add(savePanelCreate, BorderLayout.SOUTH);
+        panelCenter.revalidate();
+        panelCenter.repaint();
+    }
+
+    public void showEditBooking() {
+        panelCenter.removeAll();
+        panelCenter.add(editPanel, BorderLayout.CENTER);
+        panelCenter.add(savePanelEdit, BorderLayout.SOUTH);
         panelCenter.revalidate();
         panelCenter.repaint();
     }
 
     public void showViewBooking() {
+        viewHeaderLabel.setText("Viewing Bookings");
+        panelCenter.removeAll();
+        panelCenter.add(viewPanel, BorderLayout.NORTH);
+        panelCenter.add(bookingTableContainer, BorderLayout.CENTER);
+        panelCenter.revalidate();
+        panelCenter.repaint();
+    }
+
+    public void showViewParties() {
+        viewHeaderLabel.setText("Viewing Parties");
         panelCenter.removeAll();
         panelCenter.add(viewPanel, BorderLayout.NORTH);
         panelCenter.add(bookingTableContainer, BorderLayout.CENTER);
@@ -181,7 +230,6 @@ private void buildCreateBookingPanel() {
     public String promptBookingID() {
         return JOptionPane.showInputDialog(this, "Enter Booking ID:");
     }
-
 
     public boolean showOrganizerExistsDialog() {
         int confirm = JOptionPane.showConfirmDialog(
@@ -213,40 +261,68 @@ private void buildCreateBookingPanel() {
         return null;
     }
 
+    /** Prompt for password verification */
+    public String promptPassword() {
+        JPasswordField passwordField = new JPasswordField(20);
+        JPanel panel = new JPanel(new GridLayout(2, 1, 5, 5));
+        panel.add(new JLabel("Enter the organizer's password:"));
+        panel.add(passwordField);
+
+        int result = JOptionPane.showConfirmDialog(
+            this,
+            panel,
+            "Password Verification",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (result == JOptionPane.OK_OPTION) {
+            return new String(passwordField.getPassword());
+        }
+        return null;
+    }
+
     // --- Action Listener ---
     public void setActionListener(ActionListener listener) {
         viewBookingBtn.addActionListener(listener);
         createBookingBtn.addActionListener(listener);
         backBtn.addActionListener(listener);
-        saveBtn.addActionListener(listener);
+        saveCreateBtn.addActionListener(listener);
+        saveEditBtn.addActionListener(listener);
         partyBtn.addActionListener(listener);
         viewPartiesBtn.addActionListener(listener);
+        viewYourPartiesBtn.addActionListener(listener);
         mostVisitedBtn.addActionListener(listener);
         viewBookingRecordsBtn.addActionListener(listener);
         editBookingBtn.addActionListener(listener);
         deleteBookingBtn.addActionListener(listener);
         leavePartyBtn.addActionListener(listener);
-
     }
-
 
     // --- Getters ---
     public JButton getViewBookingButton() { return viewBookingBtn; }
     public JButton getCreateBookingButton() { return createBookingBtn; }
     public JButton getBackButton() { return backBtn; }
-    public JButton getSaveButton() { return saveBtn; }
+    public JButton getSaveCreateButton() { return saveCreateBtn; }
+    public JButton getSaveEditButton() { return saveEditBtn; }
     public JButton getPartyButton() { return partyBtn; }
     public JButton getViewPartiesButton() { return viewPartiesBtn; }
+    public JButton getViewYourPartiesButton() { return viewYourPartiesBtn; }
     public JButton getMostVisitedButton() { return mostVisitedBtn; }
     public JButton getViewBookingRecordsButton() { return viewBookingRecordsBtn; }
     public JButton getEditBookingBtn() { return editBookingBtn; }
     public JButton getDeleteBookingButton() { return deleteBookingBtn; }
     public JButton getLeavePartyButton() { return leavePartyBtn; }
 
+    // Getters for CREATE fields
+    public JTextField getLocIDField() { return createLocIDField; }
+    public JTextField getPaxField() { return createPaxField; }
+    public JTextField getSDateField() { return createSDateField; }
+    public JTextField getEDateField() { return createEDateField; }
 
-    public JTextField getOrgIDField() { return orgIDField; }
-    public JTextField getLocIDField() { return locIDField; }
-    public JTextField getPaxField() { return paxField; }
-    public JTextField getSDateField() { return sDateField; }
-    public JTextField getEDateField() { return eDateField; }
+    // Getters for EDIT fields
+    public JTextField getEditLocIDField() { return editLocIDField; }
+    public JTextField getEditPaxField() { return editPaxField; }
+    public JTextField getEditSDateField() { return editSDateField; }
+    public JTextField getEditEDateField() { return editEDateField; }
 }
