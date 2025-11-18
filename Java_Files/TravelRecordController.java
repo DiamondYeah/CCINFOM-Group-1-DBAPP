@@ -225,7 +225,7 @@ public class TravelRecordController {
 
         // Back
         view.getBackB().addActionListener(e -> {
-            maincon.getAppDBViewer().showPanel(MainDBViewer.MAIN_LINK);
+            maincon.getMainDBViewer().showPanel(MainDBViewer.MAIN_LINK);
         });
     }
 
