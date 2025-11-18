@@ -154,7 +154,7 @@ public class BookingModel {
             stmt.setDate(6, endDate);
             stmt.setDouble(7, gemPrice);
             stmt.setDouble(8, tax);
-            stmt.setString(9, "Open");
+            stmt.setString(9, "Booked");
             
             stmt.executeUpdate();
             return true;
