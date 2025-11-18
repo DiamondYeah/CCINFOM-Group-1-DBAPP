@@ -768,7 +768,7 @@ public class FeedbackRecord {
             query.append("LEFT JOIN User_reaction ur ON uf.Review_ID = ur.Review_ID ");
             query.append("LEFT JOIN Reaction r ON ur.ReactionType_ID = r.ReactionType_ID ");
             query.append("GROUP BY user_id, full_name, tier_name, ts.area, uf.rating, Review_Month_Year ");
-            query.append("ORDER BY u.points DESC ");
+            query.append("ORDER BY pt.tier_id DESC, uf.rating DESC; ");
 
             stmt = conn.prepareStatement(query.toString());
             set = stmt.executeQuery();
@@ -798,6 +798,91 @@ public class FeedbackRecord {
 
     }
 
+
+    // Method filters the exisiting report based on the given month and year
+    public void loadFilteredReport(DefaultTableModel model, String month, String year){
+
+        model.setRowCount(0);
+
+        try{
+
+            query.setLength(0);
+
+            // Query that will generate the report
+            query.append("SELECT u.user_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.area, uf.rating, ");
+            query.append("COUNT(CASE WHEN r.Reaction_Name = 'LIKE' THEN 1 END) AS likes, ");
+            query.append("COUNT(CASE WHEN r.Reaction_Name = 'DISLIKE' THEN 1 END) AS dislikes, ");
+            query.append("DATE_FORMAT(uf.Review_Date, '%M %Y') AS Review_Month_Year ");
+            query.append("FROM User_feedback uf JOIN User u ON uf.User_ID = u.User_ID ");
+            query.append("JOIN Points_tier pt ON u.Tier_ID = pt.Tier_ID ");
+            query.append("JOIN Travel_spot ts ON uf.Location_ID = ts.Location_ID ");
+            query.append("LEFT JOIN User_reaction ur ON uf.Review_ID = ur.Review_ID ");
+            query.append("LEFT JOIN Reaction r ON ur.ReactionType_ID = r.ReactionType_ID ");
+
+            // Append WHERE clause depending on the given month and year
+
+            // Checks if a filter has been applied to either month or year
+            if(!month.equals("All") || !year.equals("All")){
+                
+                query.append("WHERE ");
+
+                // Checks for month and year and sees if they have a filter. If so, append to query with condition
+                if(!month.equals("All") && !year.equals("All"))
+                    query.append("MONTHNAME(uf.Review_Date) = ? AND YEAR(uf.Review_Date) = ? ");
+                else if(!month.equals("All"))
+                    query.append("MONTHNAME(uf.Review_Date) = ? ");
+                else if(!year.equals("All"))
+                    query.append("YEAR(uf.Review_Date) = ?");
+
+            }
+
+            // Add the rest of the query
+            query.append("GROUP BY user_id, full_name, tier_name, ts.area, uf.rating, Review_Month_Year ");
+            query.append("ORDER BY pt.tier_id DESC, uf.rating DESC; ");
+
+            stmt = conn.prepareStatement(query.toString());
+
+            // Set parameters to filter query
+
+            // Conditional checking whether month or year has a filter, and adds corresponding values to parameters
+            if(!month.equals("All") && !year.equals("All")){
+
+                stmt.setString(1, month);
+                stmt.setInt(2, Integer.parseInt(year));
+
+            }
+            else if(!month.equals("All"))
+                stmt.setString(1, month); 
+            else if(!year.equals("All"))
+                stmt.setInt(1, Integer.parseInt(year));
+
+
+            set = stmt.executeQuery();
+
+            while(set.next()){
+
+                int userID = set.getInt("User_ID");
+                String fullName = set.getString("Full_Name");
+                String tierName = set.getString("Tier_Name");
+                String area = set.getString("Area");
+                double rating = set.getDouble("Rating");
+                int likes = set.getInt("Likes");
+                int dislikes = set.getInt("Dislikes");
+                String reviewMonthYear = set.getString("Review_Month_Year");
+                
+                model.addRow(new Object[]{
+                    userID, fullName, tierName, area, rating, likes, dislikes, reviewMonthYear
+                });
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+    }
 
     // -------------------------------------------------------
 
@@ -869,7 +954,7 @@ public class FeedbackRecord {
 
             while(set.next()){
 
-                String getLocationOption = set.getString("location_id") + " - " + set.getString("spotname");
+                String getLocationOption = set.getString("location_id") + " - " + set.getString("area");
                 feedbackLocationIDOptions.add(getLocationOption); // Add reaction type to array list
 
             }

@@ -69,7 +69,12 @@ public class UserFeedbackPanelViewer{
     private JTextField locationIDField;
     private JSlider ratingsSlider;
 
+    private JLabel ratingValueLabel;
+
     // Components and Input fields for edit feedback
+    private JLabel editRatingValueLabel;
+
+
     private JButton feedbackConfirmEditButton;
     private JButton feedbackConfirmDeleteButton;
     private JButton loadFeedbackButton;
@@ -211,14 +216,22 @@ public class UserFeedbackPanelViewer{
         locationIDField.setFont(new Font("Arial", Font.PLAIN, 20));
 
         // Create Ratings Slider
-        ratingsSlider = new JSlider(JSlider.HORIZONTAL, 1, 5, 1);
+        ratingsSlider = new JSlider(JSlider.HORIZONTAL, 0, 40, 1);
         ratingsSlider.setMaximumSize(new Dimension(250, 50));
         ratingsSlider.setPreferredSize(new Dimension(250, 50));
         ratingsSlider.setMajorTickSpacing(1);
         ratingsSlider.setSnapToTicks(true);
-        ratingsSlider.setPaintTicks(true);
-        ratingsSlider.setPaintLabels(true);
+        ratingsSlider.setPaintTicks(false);
+        ratingsSlider.setPaintLabels(false);
 
+        // Add a label for rating slider
+        ratingValueLabel = new JLabel("1");
+        ratingValueLabel.setFont(new Font("Arial", Font.BOLD, 15));
+
+        // Adds a change listener
+        ratingsSlider.addChangeListener(e -> {
+            ratingValueLabel.setText(String.valueOf(ratingsSlider.getValue() / 10.0 + 1));
+        });
     }
 
 
@@ -362,7 +375,7 @@ public class UserFeedbackPanelViewer{
         ratingsWrapper.setPreferredSize(new Dimension(800, 70));
         ratingsWrapper.add(ratingsLabel);
         ratingsWrapper.add(ratingsSlider);
-
+        ratingsWrapper.add(ratingValueLabel);
 
         // Create Enter Button and add components
         enterFeedbackButton = new JButton("Enter");
@@ -470,20 +483,29 @@ public class UserFeedbackPanelViewer{
         JLabel ratingLabel = new JLabel("Rating:");
         ratingLabel.setFont(new Font("Arial", Font.BOLD, 20));
         
-        editFeedbackRatingsSlider = new JSlider(JSlider.HORIZONTAL, 1, 5, 1);
+        editFeedbackRatingsSlider = new JSlider(JSlider.HORIZONTAL, 0, 40, 1);
         editFeedbackRatingsSlider.setMaximumSize(new Dimension(250, 50));
         editFeedbackRatingsSlider.setPreferredSize(new Dimension(250, 50));
-        editFeedbackRatingsSlider.setPaintTicks(true);
-        editFeedbackRatingsSlider.setPaintLabels(true);
+        editFeedbackRatingsSlider.setPaintTicks(false);
+        editFeedbackRatingsSlider.setPaintLabels(false);
         editFeedbackRatingsSlider.setEnabled(false);
 
         JPanel ratingWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         ratingWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         ratingWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
 
+        // Add a display for edit rating slider
+        editRatingValueLabel = new JLabel("1");
+        editRatingValueLabel.setFont(new Font("Arial", Font.BOLD, 15));
+
+        // Adds a change listener
+        editFeedbackRatingsSlider.addChangeListener(e -> {
+            editRatingValueLabel.setText(String.valueOf(editFeedbackRatingsSlider.getValue() / 10.0 + 1));
+        });
+
         ratingWrapper.add(ratingLabel);
         ratingWrapper.add(editFeedbackRatingsSlider);
-
+        ratingWrapper.add(editRatingValueLabel);
 
 
         JLabel reactionCountLabel = new JLabel("Reaction Count:");
