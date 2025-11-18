@@ -57,6 +57,14 @@ public class UserRecordController implements ActionListener {
         view.getDeletePhoneButton().addActionListener(this);
     }
 
+    // Getter method
+    public UserRecordModel getUserRecordModel(){
+
+        return model;
+
+    }
+
+
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
