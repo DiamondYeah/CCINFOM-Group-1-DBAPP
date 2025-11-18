@@ -363,7 +363,7 @@ public class UserRecordViewer extends JPanel {
         topPanel.add(filterPanel, BorderLayout.CENTER);
         panel.add(topPanel, BorderLayout.NORTH);
 
-        String[] columns = {"Location ID", "Area", "City", "Region", "Country", 
+        String[] columns = {"Location ID", "Spot Name", "City", "Region", "Country", 
                            "Points Tier", "Recommendations Count"};
         recommendationsTableModel = new DefaultTableModel(columns, 0) {
             @Override

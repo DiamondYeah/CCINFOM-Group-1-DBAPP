@@ -388,7 +388,7 @@ public class UserRecordModel {
 
     public List<Object[]> getRecommendationsByTierAndDate(int month, int year) {
         List<Object[]> recommendations = new ArrayList<>();
-        String query = "SELECT ts.location_id, ts.area, c.city_name, r.region_name, co.country_name, " +
+        String query = "SELECT ts.location_id, ts.spotname, c.city_name, r.region_name, co.country_name, " +
                         "pt.Tier_Name as tier_name, " +
                         "COUNT(DISTINCT uf.Review_ID) as recommendation_count " +
                         "FROM User_Feedback uf " +
@@ -402,7 +402,7 @@ public class UserRecordModel {
                         "AND MONTH(uf.Review_Date) = ? " +
                         "AND YEAR(uf.Review_Date) = ? " +
                         "AND u.Is_Admin = FALSE " +
-                        "GROUP BY ts.location_id, ts.area, c.city_name, r.region_name, co.country_name, pt.Tier_Name " +
+                        "GROUP BY ts.location_id, ts.spotname, c.city_name, r.region_name, co.country_name, pt.Tier_Name " +
                         "ORDER BY recommendation_count DESC, ts.location_id, tier_name";
 
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -413,7 +413,7 @@ public class UserRecordModel {
             while (rs.next()) {
                 Object[] rec = new Object[7];
                 rec[0] = rs.getInt("location_id");
-                rec[1] = rs.getString("area");
+                rec[1] = rs.getString("spotname");
                 rec[2] = rs.getString("city_name");
                 rec[3] = rs.getString("region_name");
                 rec[4] = rs.getString("country_name");
