@@ -101,11 +101,11 @@ CREATE TABLE Travel_Spot (
 	location_id INT AUTO_INCREMENT PRIMARY KEY,
 	user_id INT NOT NULL,
 	spotname VARCHAR(100) NOT NULL,
-	availability ENUM('Available', 'Unavailable') DEFAULT 'Available',
 	date_shared DATE NOT NULL,
 	city_id INT NOT NULL,
     base_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     max_capacity INT NOT NULL DEFAULT 0,
+    availability ENUM('Available', 'Unavailable') DEFAULT 'Available',
         
 	FOREIGN KEY (city_id) REFERENCES City(city_id)
         ON DELETE CASCADE

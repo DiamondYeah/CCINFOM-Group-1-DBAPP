@@ -8,13 +8,14 @@ public class TravelRecord {
     private int city_id;
     private double basePrice;
     private int maxCap;
+    private String availability;
 
     private List<Integer> category_id;
 
     // Constructors
     public TravelRecord(int location_id, int user_id, String spotname, 
                         java.sql.Date dateShared, int city_id, 
-                        double basePrice, int maxCap) {
+                        double basePrice, int maxCap, String availability) {
         this.location_id = location_id;
         this.user_id = user_id;
         this.spotname = spotname;
@@ -22,18 +23,20 @@ public class TravelRecord {
         this.city_id = city_id;
         this.basePrice = basePrice;
         this.maxCap = maxCap;
+        this.availability = availability;
         }
     
     // Adding a travel spot, as location_id will increment by itself
     public TravelRecord(int user_id, String spotname, 
                         java.sql.Date dateShared, int city_id, 
-                        double basePrice, int maxCap) {
+                        double basePrice, int maxCap, String availability) {
         this.user_id = user_id;
         this.spotname = spotname;
         this.dateShared = dateShared;
         this.city_id = city_id;
         this.basePrice = basePrice;
         this.maxCap = maxCap;
+        this.availability = "Available";
         }
 
     // Getter n Setter
@@ -57,6 +60,9 @@ public class TravelRecord {
 
     public int getMaxCap() { return maxCap; }
     public void setMaxCap(int maxCap) { this.maxCap = maxCap; }
+
+    public String getAvailability() { return availability;}
+    public void setAvailability(String availability) {this.availability = availability;}
 
     public List<Integer> getCategoryId() {return category_id;}
     public void setCategoryId(List<Integer> category_id) {this.category_id = category_id;}
