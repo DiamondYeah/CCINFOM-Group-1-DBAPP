@@ -73,7 +73,7 @@ public class TravelRecordController {
         }
     }
 
-
+    // Action Listeners =========================
     private void addListeners() {
         // country to regions
         view.getCountriesCB().addActionListener(e -> {
@@ -125,8 +125,9 @@ public class TravelRecordController {
             int cityId = city.getId();
             double basePrice = Double.parseDouble(view.getBasePrice());
             int maxCap = Integer.parseInt(view.getMaxCap());
+            String availability = view.getAvailability();
 
-            TravelRecord tr = new TravelRecord(userId, spotname, dateShared, cityId, basePrice, maxCap);
+            TravelRecord tr = new TravelRecord(userId, spotname, dateShared, cityId, basePrice, maxCap, availability);
 
             // categories
             List<IdName> selected = view.getCategoriesList().getSelectedValuesList();
@@ -164,8 +165,9 @@ public class TravelRecordController {
             int cityId = city.getId();
             double basePrice = Double.parseDouble(view.getBasePrice());
             int maxCap = Integer.parseInt(view.getMaxCap());
+            String availability = view.getAvailability();
 
-            TravelRecord tr = new TravelRecord(locationId, userId, spotname, dateShared, cityId, basePrice, maxCap);
+            TravelRecord tr = new TravelRecord(locationId, userId, spotname, dateShared, cityId, basePrice, maxCap, availability);
             model.updTravelSpot(tr);
 
             // updating categories
@@ -180,7 +182,7 @@ public class TravelRecordController {
 
         }
         catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error updating travel spot.");
+            JOptionPane.showMessageDialog(null, "Error updating travel spot: " + ex.getMessage());
         }
         });
 
@@ -194,7 +196,7 @@ public class TravelRecordController {
 
         }
         catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error deleting travel spot.");
+            JOptionPane.showMessageDialog(null, "Error deleting travel spot: " + ex.getMessage());
         }
         });
 
@@ -216,9 +218,16 @@ public class TravelRecordController {
 
                     view.setBasePrice(view.getTable().getValueAt(row, 7).toString());
                     view.setMaxCap(view.getTable().getValueAt(row, 8).toString());
+                    view.setAvailability(view.getTable().getValueAt(row, 9).toString());
 
+                    // load and selecting categories
                     int locationId = Integer.parseInt(view.getTable().getValueAt(row, 0).toString());
-                    loadCategoriesForSpot(locationId);
+                    try {
+                        List<Integer> catIds = model.getCategoryOfSpot(locationId);
+                        view.selectCategories(catIds);
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(null, "Error loading categories: : " + ex.getMessage());
+                    }
                 }
             }
         });
@@ -237,7 +246,7 @@ public class TravelRecordController {
             List<Object[]> rows = model.getAllTravelSpotsDetailed();
             for (Object[] r : rows) {
                 tm.addRow(new Object[] {
-                    r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9]
+                    r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10]
                 });
             }
         }
