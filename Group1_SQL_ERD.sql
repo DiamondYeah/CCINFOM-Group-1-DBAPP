@@ -104,6 +104,8 @@ CREATE TABLE Travel_Spot (
 	availability ENUM('Available', 'Unavailable') DEFAULT 'Available',
 	date_shared DATE NOT NULL,
 	city_id INT NOT NULL,
+    base_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    max_capacity INT NOT NULL DEFAULT 0,
         
 	FOREIGN KEY (city_id) REFERENCES City(city_id)
         ON DELETE CASCADE
@@ -239,3 +241,29 @@ CREATE TABLE User_Booking (
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
+
+INSERT INTO Points_Tier (Tier_Name, Min_Points, Max_Points) VALUES
+('Bronze', 0, 999),
+('Silver', 1000, 4999),
+('Gold', 5000, 9999),
+('Platinum', 10000, 999999);
+
+INSERT INTO Country (country_name)
+VALUES ('Philippines');
+
+INSERT INTO Region (region_name, country_id)
+VALUES
+    ('Ilocos Region', 1),
+    ('Calabarzon', 1);
+    
+INSERT INTO City (city_name, region_id)
+VALUES
+    ('Vigan', 1),
+    ('Batangas City', 2),
+    ('Lucena', 2);
+    
+INSERT INTO Category (category_name)
+VALUES
+    ('Beach'),
+    ('Hiking'),
+    ('Museum');

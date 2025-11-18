@@ -158,14 +158,11 @@ public class MainDBController implements ActionListener{
             PASSWORD = props.getProperty("db.password");
             
         } catch (IOException ex) {
-            // Handle case where file is missing (crucial for groupmates!)
+            // case where file is missing
             System.err.println("Error: Could not find or read db.properties file.");
             System.err.println("Please create this file and add your local credentials.");
-            // You might want to exit the program here or set dummy values
-            // System.exit(1);
+            System.exit(1);
         }
-
-        System.out.println(DB_URL + USER + PASSWORD);
     }
 
 
@@ -182,6 +179,8 @@ public class MainDBController implements ActionListener{
         } catch(SQLException e){
 
             System.out.printf("Error in connecting database occured \n");
+            System.out.println("Message: " + e.getMessage());
+            e.printStackTrace();
             
         }
 
@@ -269,6 +268,7 @@ public class MainDBController implements ActionListener{
         // Will add email depending on Jovere's repsponse
         String firstName = loginViewer.getFirstNameRegisterField().getText().trim();
         String lastName = loginViewer.getLastNameRegisterField().getText().trim();
+        //String email = loginViewer.getEmailRegisterField().getText().trim() 
         String nationality = (String) loginViewer.getNationalityRegisterBox().getSelectedItem();
         String password = String.valueOf(loginViewer.getPasswordRegisterField().getPassword()).trim();
 
@@ -473,8 +473,7 @@ public class MainDBController implements ActionListener{
 
                     loginViewer.clearPageInput("Login"); // Clear login page input
                     appDBViewer.showPanel(MainDBViewer.MAIN_LINK); // Show main page
-
-                    feedbackRecord.setIsAdmin(isCurrentUserAdmin()); // Disables or enables admin view
+                    travelRecord.updateLoggedUser(currentUser.getUserId()); // Gets the user id only AFTER logging in when making a travel spot
 
                 }                    
 
@@ -533,5 +532,7 @@ public class MainDBController implements ActionListener{
         }
 
     }
+
+    public MainDBViewer getAppDBViewer() { return appDBViewer; }
     
 }
