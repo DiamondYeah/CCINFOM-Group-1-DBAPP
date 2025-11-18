@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
@@ -10,9 +9,11 @@ public class BookingRecordController implements ActionListener {
     private BookingModel model;
     private JPanel cardPane;
     private int editingBookingID = -1;
+    private MainDBController mainController;
 
     public BookingRecordController(Connection conn, MainDBController mainController, JPanel cardPane) {
         this.cardPane = cardPane;
+        this.mainController = mainController;
 
         // Initialize Model and View
         this.model = new BookingModel(conn);
@@ -32,11 +33,14 @@ public class BookingRecordController implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
 
+        // clearBookingFields();
+
         if (src == view.getCreateBookingButton()) {
+            resetCreateFields();
             view.showCreateBooking();
 
         } else if (src == view.getViewBookingButton()) {
-            loadBookingsToTable();
+            loadBookingsForCurrentUser();
 
         } else if (src == view.getSaveButton()) {
             if (editingBookingID != -1) {
@@ -59,6 +63,8 @@ public class BookingRecordController implements ActionListener {
             view.showViewBooking();
             view.setTableModel(model.getUserBookingTableModel());
 
+        } else if (src == view.getLeavePartyButton()) {
+            handleLeaveParty();
         } else if (src == view.getMostVisitedButton()) {
             String dateInput = JOptionPane.showInputDialog(null,
                     "Enter Year (YYYY) or Month (YYYY-MM):",
@@ -74,72 +80,88 @@ public class BookingRecordController implements ActionListener {
                 view.showViewBooking();
                 view.setTableModel(model.getBookingRecords(dateInput));
             }
+
         } else if (src == view.getDeleteBookingButton()) {
-    String input = view.promptBookingID();
-    if (input == null || input.isEmpty()) return;
+            String input = view.promptBookingID();
+            if (input == null || input.isEmpty()) return;
 
-    int bookingID;
-    try {
-        bookingID = Integer.parseInt(input.trim());
-    } catch (NumberFormatException ex) {
-        view.showMessage("Invalid Booking ID.");
-        return;
-    }
+            int bookingID;
+            try {
+                bookingID = Integer.parseInt(input.trim());
+            } catch (NumberFormatException ex) {
+                view.showMessage("Invalid Booking ID.");
+                return;
+            }
 
-    int confirm = JOptionPane.showConfirmDialog(
-        null,
-        "Are you sure you want to delete Booking ID " + bookingID + "?",
-        "Confirm Deletion",
-        JOptionPane.YES_NO_OPTION
-    );
+            int confirm = JOptionPane.showConfirmDialog(
+                null,
+                "Are you sure you want to delete Booking ID " + bookingID + "?",
+                "Confirm Deletion",
+                JOptionPane.YES_NO_OPTION
+            );
 
-    if (confirm == JOptionPane.YES_OPTION) {
-        boolean success = model.deleteBooking(bookingID);
-        if (success) {
-            view.showMessage("Booking deleted successfully!");
-            loadBookingsToTable(); // refresh table
-        } else {
-            view.showMessage("Failed to delete booking. It may not exist.");
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean success = model.deleteBooking(bookingID);
+                if (success) {
+                    view.showMessage("Booking deleted successfully!");
+                    loadBookingsForCurrentUser(); // refresh only current user's bookings
+                } else {
+                    view.showMessage("Failed to delete booking. It may not exist.");
+                }
+            }
         }
     }
-}
 
-    }
-
-    /** Load all bookings from model into JTable */
-    private void loadBookingsToTable() {
+    /** Load bookings only for the currently logged-in user */
+    private void loadBookingsForCurrentUser() {
         view.showViewBooking();
-        view.setTableModel(model.getBookingTableModel());
+        int currentUserId = mainController.getCurrentUser().getUserId();
+        view.setTableModel(model.getBookingsForUser(currentUserId));
     }
 
     /** Create new booking via Model */
     private void saveNewBooking() {
-        try {
-            int organizerID = Integer.parseInt(view.getOrgIDField().getText().trim());
-            int locationID = Integer.parseInt(view.getLocIDField().getText().trim());
-            int pax = Integer.parseInt(view.getPaxField().getText().trim());
-            java.sql.Date startDate = java.sql.Date.valueOf(view.getSDateField().getText().trim());
-            java.sql.Date endDate = java.sql.Date.valueOf(view.getEDateField().getText().trim());
+    try {
+        int organizerID = mainController.getCurrentUser().getUserId();
 
-            if (endDate.before(startDate)) {
-                view.showMessage("End date must be after start date.");
-                return;
-            }
+        String locText = view.getLocIDField().getText().trim();
+        String paxText = view.getPaxField().getText().trim();
 
-            Book booking = new Book(0, organizerID, locationID, pax, pax, startDate, endDate, "Booked");
-            if (model.createBooking(booking)) {
-                view.showMessage("Booking created successfully!");
-                clearBookingFields();
-                loadBookingsToTable();
-            } else {
-                view.showMessage("Failed to create booking.");
-            }
-        } catch (NumberFormatException ex) {
-            view.showMessage("Organizer ID, Location ID, and Pax must be numbers.");
-        } catch (IllegalArgumentException ex) {
-            view.showMessage("Dates must be in YYYY-MM-DD format.");
+        if (locText.isEmpty() || paxText.isEmpty()) {
+            view.showMessage("Location ID and Pax cannot be empty.");
+            return;
         }
+
+        int locationID = Integer.parseInt(locText);
+        int pax = Integer.parseInt(paxText);
+
+        java.sql.Date startDate = java.sql.Date.valueOf(view.getSDateField().getText().trim());
+        java.sql.Date endDate = java.sql.Date.valueOf(view.getEDateField().getText().trim());
+
+        if (endDate.before(startDate)) {
+            view.showMessage("End date must be after start date.");
+            return;
+        }
+
+        Book booking = new Book(0, organizerID, locationID, pax, pax, startDate, endDate, "Booked");
+        if (model.createBooking(booking)) {
+            int bookingID = model.getLastInsertedBookingID();
+            model.assignUserToBooking(organizerID, bookingID, "Organizer");
+
+            view.showMessage("Booking created successfully!");
+            clearBookingFields();
+            loadBookingsForCurrentUser();
+        } else {
+            view.showMessage("Failed to create booking.");
+        }
+
+    } catch (NumberFormatException ex) {
+        view.showMessage("Location ID and Pax must be numbers.");
+    } catch (IllegalArgumentException ex) {
+        view.showMessage("Dates must be in YYYY-MM-DD format.");
     }
+}
+
 
     /** Begin editing a booking */
     private void editBooking() {
@@ -155,8 +177,9 @@ public class BookingRecordController implements ActionListener {
                 return;
             }
 
-            view.getOrgIDField().setText(String.valueOf(booking.getOrganizerID()));
-            view.getOrgIDField().setEditable(false);
+            // Organizer ID field removed → do not set it
+            // view.getOrgIDField().setText(String.valueOf(booking.getOrganizerID()));
+            // view.getOrgIDField().setEditable(false);
 
             view.getLocIDField().setText(String.valueOf(booking.getLocationID()));
             view.getLocIDField().setEditable(false);
@@ -173,67 +196,72 @@ public class BookingRecordController implements ActionListener {
         }
     }
 
+
     /** Save edited booking via Model */
-    private void saveEditedBooking() {
-        try {
-            int currentCapacity = Integer.parseInt(view.getPaxField().getText().trim());
-            java.sql.Date startDate = java.sql.Date.valueOf(view.getSDateField().getText().trim());
-            java.sql.Date endDate = java.sql.Date.valueOf(view.getEDateField().getText().trim());
+private void saveEditedBooking() {
+    try {
+        int currentCapacity = Integer.parseInt(view.getPaxField().getText().trim());
+        java.sql.Date startDate = java.sql.Date.valueOf(view.getSDateField().getText().trim());
+        java.sql.Date endDate = java.sql.Date.valueOf(view.getEDateField().getText().trim());
 
-            Book booking = model.getBookingById(editingBookingID);
-            if (booking == null) {
-                view.showMessage("Booking not found.");
-                editingBookingID = -1;
-                return;
-            }
-
-            if (endDate.before(startDate)) {
-                view.showMessage("End date must be after start date.");
-                return;
-            }
-            if (currentCapacity > booking.getMaxCapacity()) {
-                view.showMessage("Current capacity cannot exceed max capacity (" + booking.getMaxCapacity() + ").");
-                return;
-            }
-
-            booking.setCurrentCapacity(currentCapacity);
-            booking.setStartDate(startDate);
-            booking.setEndDate(endDate);
-
-            if (model.updateBooking(booking)) {
-                view.showMessage("Booking updated successfully!");
-                editingBookingID = -1;
-                clearBookingFields();
-                loadBookingsToTable();
-                view.showCreateBooking();
-            } else {
-                view.showMessage("Failed to update booking.");
-            }
-
-        } catch (NumberFormatException ex) {
-            view.showMessage("Current Capacity must be a number.");
-        } catch (IllegalArgumentException ex) {
-            view.showMessage("Dates must be in YYYY-MM-DD format.");
+        Book booking = model.getBookingById(editingBookingID);
+        if (booking == null) {
+            view.showMessage("Booking not found.");
+            editingBookingID = -1;
+            return;
         }
+
+        if (endDate.before(startDate)) {
+            view.showMessage("End date must be after start date.");
+            return;
+        }
+
+        if (currentCapacity > booking.getMaxCapacity()) {
+            view.showMessage("Current capacity cannot exceed max capacity (" + booking.getMaxCapacity() + ").");
+            return;
+        }
+
+        // Update editable fields only
+        booking.setCurrentCapacity(currentCapacity);
+        booking.setStartDate(startDate);
+        booking.setEndDate(endDate);
+
+        if (model.updateBooking(booking)) {
+            view.showMessage("Booking updated successfully!");
+            editingBookingID = -1;
+            clearBookingFields();
+            loadBookingsForCurrentUser(); // refresh only current user's bookings
+            view.showCreateBooking();
+        } else {
+            view.showMessage("Failed to update booking.");
+        }
+
+    } catch (NumberFormatException ex) {
+        view.showMessage("Current Capacity must be a number.");
+    } catch (IllegalArgumentException ex) {
+        view.showMessage("Dates must be in YYYY-MM-DD format.");
     }
+}
+
 
     /** Assign user to a booking (Organizer/Participant) */
     private void handlePartyAssignment() {
-        int roleChoice = view.promptRoleSelection();
-        if (roleChoice == -1) return;
-        String role = roleChoice == 0 ? "Organizer" : "Participant";
 
-        String userIdStr = view.promptUserID();
-        if (userIdStr == null) return;
+        int userID = mainController.getCurrentUser().getUserId();
 
         String bookingIdStr = view.promptBookingID();
         if (bookingIdStr == null) return;
 
         try {
-            int userID = Integer.parseInt(userIdStr.trim());
             int bookingID = Integer.parseInt(bookingIdStr.trim());
 
-            boolean success = model.assignUserToBooking(userID, bookingID, role);
+            // Check if user is already in this booking
+            if (model.isUserInBooking(userID, bookingID)) {
+                view.showMessage("You are already part of this booking!");
+                return;
+            }
+
+            boolean success = model.assignUserToBooking(userID, bookingID, "Participant");
             if (success) {
                 view.showMessage("User added to booking successfully!");
             } else {
@@ -241,16 +269,60 @@ public class BookingRecordController implements ActionListener {
             }
 
         } catch (NumberFormatException ex) {
-            view.showMessage("User ID and Booking ID must be numbers.");
+            view.showMessage("Booking ID must be a number.");
         }
     }
 
+
     /** Clear all input fields */
     private void clearBookingFields() {
-        view.getOrgIDField().setText("");
+        // orgIDField removed because organizer is automatic
         view.getLocIDField().setText("");
         view.getPaxField().setText("");
         view.getSDateField().setText("");
         view.getEDateField().setText("");
     }
+
+    private void resetCreateFields() {
+        clearBookingFields();
+        view.getLocIDField().setEditable(true);
+    }
+
+    private void handleLeaveParty() {
+    int userId = mainController.getCurrentUser().getUserId();
+    String bookingIdStr = JOptionPane.showInputDialog(
+        null, "Enter Booking ID to leave:", "Leave Party", JOptionPane.QUESTION_MESSAGE
+    );
+
+    if (bookingIdStr == null || bookingIdStr.trim().isEmpty()) return;
+
+    try {
+        int bookingId = Integer.parseInt(bookingIdStr.trim());
+
+        // Check if user is part of the booking
+        String role = model.getUserRoleInBooking(userId, bookingId);
+        if (role == null) {
+            view.showMessage("You are not part of this booking.");
+            return;
+        }
+
+        if (role.equalsIgnoreCase("Organizer")) {
+            view.showMessage("You cannot leave as you are the organizer. You must delete the booking.");
+            return;
+        }
+
+        // Remove participant
+        boolean success = model.removeUserFromBooking(userId, bookingId);
+        if (success) {
+            view.showMessage("You have successfully left the party.");
+        } else {
+            view.showMessage("Failed to leave the party.");
+        }
+
+    } catch (NumberFormatException ex) {
+        view.showMessage("Booking ID must be a number.");
+    }
+}
+
+
 }
