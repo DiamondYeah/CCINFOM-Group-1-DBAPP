@@ -7,9 +7,13 @@ public class User {
     private String nationality;
     private int points;
     private PointsTier pointsTier;
+    private String password;
     private boolean isAdmin;
     private List<UserEmail> emails;
     private List<UserPhone> phones;
+    private int locationsShared;
+    private int reviewsMade;
+    private int bookingsCount;
 
     public User(int userId, String firstName, String lastName, String nationality, int points, PointsTier pointsTier, boolean isAdmin) {
         this.userId = userId;
@@ -69,6 +73,14 @@ public class User {
         this.pointsTier = pointsTier; 
     }
 
+    public String getPassword() { 
+        return password; 
+    }
+
+    public void setPassword(String password) { 
+        this.password = password; 
+    }
+
     public boolean isAdmin() {
         return isAdmin;
     }
@@ -91,5 +103,29 @@ public class User {
 
     public void setPhones(List<UserPhone> phones) { 
         this.phones = phones; 
+    }
+
+    public int getLocationsShared() { 
+        return locationsShared; 
+    }
+
+    public void setLocationsShared(int locationsShared) { 
+        this.locationsShared = locationsShared; 
+    }
+
+    public int getReviewsMade() { 
+        return reviewsMade; 
+    }
+
+    public void setReviewsMade(int reviewsMade) { 
+        this.reviewsMade = reviewsMade; 
+    }
+
+    public int getBookingsCount() { 
+        return bookingsCount; 
+    }
+
+    public void setBookingsCount(int bookingsCount) { 
+        this.bookingsCount = bookingsCount; 
     }
 }
