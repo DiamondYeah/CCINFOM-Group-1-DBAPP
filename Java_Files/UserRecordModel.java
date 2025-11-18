@@ -11,30 +11,34 @@ public class UserRecordModel {
 
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
-                      "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points, " +
-                      "COUNT(ts.Location_ID) as Locations_Shared " +
-                      "FROM User u " +
-                      "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
-                      "LEFT JOIN Travel_Spot ts ON u.User_ID = ts.User_ID " +
-                      "GROUP BY u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
-                      "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
-                      "ORDER BY u.User_ID";
+        String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, u.Password, " +
+                        "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points, " +
+                        "COUNT(DISTINCT ts.Location_ID) as Locations_Shared, " +
+                        "COUNT(DISTINCT uf.Review_ID) as Reviews_Made, " +
+                        "COUNT(DISTINCT b.Booking_ID) as Bookings_Count " +
+                        "FROM User u " +
+                        "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
+                        "LEFT JOIN Travel_Spot ts ON u.User_ID = ts.User_ID " +
+                        "LEFT JOIN User_Feedback uf ON u.User_ID = uf.User_ID " +
+                        "LEFT JOIN Booking b ON u.User_ID = b.Organizer_ID " +
+                        "GROUP BY u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, u.Password, " +
+                        "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
+                        "ORDER BY u.User_ID";
 
         try (PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
+            ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 boolean isAdmin = rs.getBoolean("Is_Admin");
                 PointsTier tier = null;
-                
+            
                 if (!isAdmin && rs.getObject("Tier_ID") != null) {
                     tier = new PointsTier(
                         rs.getInt("Tier_ID"),
                         rs.getString("Tier_Name"),
                         rs.getInt("Min_Points"),
                         rs.getInt("Max_Points")
-                    );
+                        );
                 }
 
                 User user = new User(
@@ -43,9 +47,13 @@ public class UserRecordModel {
                     rs.getString("Last_Name"),
                     rs.getString("Nationality"),
                     rs.getInt("Points"),
-                    tier,
-                    isAdmin
-                );
+                    tier, isAdmin);
+            
+                user.setPassword(rs.getString("Password"));
+            
+                user.setLocationsShared(rs.getInt("Locations_Shared"));
+                user.setReviewsMade(rs.getInt("Reviews_Made"));
+                user.setBookingsCount(rs.getInt("Bookings_Count"));
 
                 user.setEmails(getUserEmails(user.getUserId()));
                 user.setPhones(getUserPhones(user.getUserId()));
@@ -54,6 +62,7 @@ public class UserRecordModel {
             }
         } catch (SQLException e) {
             System.out.printf("Error fetching users.\n");
+            e.printStackTrace();
         }
 
         return users;
@@ -379,7 +388,7 @@ public class UserRecordModel {
 
     public List<Object[]> getRecommendationsByTierAndDate(int month, int year) {
         List<Object[]> recommendations = new ArrayList<>();
-        String query = "SELECT ts.location_id, ts.area, c.city_name, r.region_name, co.country_name, " +
+        String query = "SELECT ts.location_id, ts.spotname, c.city_name, r.region_name, co.country_name, " +
                         "pt.Tier_Name as tier_name, " +
                         "COUNT(DISTINCT uf.Review_ID) as recommendation_count " +
                         "FROM User_Feedback uf " +
@@ -393,7 +402,7 @@ public class UserRecordModel {
                         "AND MONTH(uf.Review_Date) = ? " +
                         "AND YEAR(uf.Review_Date) = ? " +
                         "AND u.Is_Admin = FALSE " +
-                        "GROUP BY ts.location_id, ts.area, c.city_name, r.region_name, co.country_name, pt.Tier_Name " +
+                        "GROUP BY ts.location_id, ts.spotname, c.city_name, r.region_name, co.country_name, pt.Tier_Name " +
                         "ORDER BY recommendation_count DESC, ts.location_id, tier_name";
 
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -404,7 +413,7 @@ public class UserRecordModel {
             while (rs.next()) {
                 Object[] rec = new Object[7];
                 rec[0] = rs.getInt("location_id");
-                rec[1] = rs.getString("area");
+                rec[1] = rs.getString("spotname");
                 rec[2] = rs.getString("city_name");
                 rec[3] = rs.getString("region_name");
                 rec[4] = rs.getString("country_name");

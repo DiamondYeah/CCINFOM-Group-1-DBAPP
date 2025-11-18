@@ -869,7 +869,7 @@ public class FeedbackRecord {
 
             while(set.next()){
 
-                String getLocationOption = set.getString("location_id") + " - " + set.getString("area");
+                String getLocationOption = set.getString("location_id") + " - " + set.getString("spotname");
                 feedbackLocationIDOptions.add(getLocationOption); // Add reaction type to array list
 
             }
