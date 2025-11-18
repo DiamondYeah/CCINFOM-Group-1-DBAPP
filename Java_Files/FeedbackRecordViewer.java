@@ -399,7 +399,7 @@ public class FeedbackRecordViewer extends JPanel{
 
         // Create the table model with the different fields
         reportModel = new DefaultTableModel();
-        reportModel.addColumn("User_ID");
+        reportModel.addColumn("Review_ID");
         reportModel.addColumn("Full_Name");
         reportModel.addColumn("Tier_Name");
         reportModel.addColumn("Area");

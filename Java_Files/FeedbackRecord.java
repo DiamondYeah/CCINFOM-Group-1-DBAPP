@@ -239,7 +239,7 @@ public class FeedbackRecord {
                 // Get information
                 int userID = set.getInt("User_ID");
                 int locationID = set.getInt("Location_ID");
-                int rating = set.getInt("Rating");
+                float rating = set.getFloat("Rating");
                 int reactionCount = getReviewCount(set.getInt("Review_ID"));
                 int commentCount = set.getInt("Comment_Count");
                 Timestamp reviewDate = set.getTimestamp("Review_Date");
@@ -255,7 +255,7 @@ public class FeedbackRecord {
 
                 userBox.setSelectedItem(userID + " - " + fullname);
                 locationBox.setSelectedItem(locationID + " - " + area);
-                ratingSlider.setValue(rating);
+                ratingSlider.setValue(Math.round((rating - 1.0f) * 10));
                 reactionSpinner.setValue(reactionCount);
                 commentSpinner.setValue(commentCount);
                 dateSpinner.setValue(reviewDate);
@@ -758,7 +758,7 @@ public class FeedbackRecord {
             query.setLength(0);
 
             // Query that will generate the report
-            query.append("SELECT u.user_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.area, uf.rating, ");
+            query.append("SELECT uf.review_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.area, uf.rating, ");
             query.append("COUNT(CASE WHEN r.Reaction_Name = 'LIKE' THEN 1 END) AS likes, ");
             query.append("COUNT(CASE WHEN r.Reaction_Name = 'DISLIKE' THEN 1 END) AS dislikes, ");
             query.append("DATE_FORMAT(uf.Review_Date, '%M %Y') AS Review_Month_Year ");
@@ -767,7 +767,7 @@ public class FeedbackRecord {
             query.append("JOIN Travel_spot ts ON uf.Location_ID = ts.Location_ID ");
             query.append("LEFT JOIN User_reaction ur ON uf.Review_ID = ur.Review_ID ");
             query.append("LEFT JOIN Reaction r ON ur.ReactionType_ID = r.ReactionType_ID ");
-            query.append("GROUP BY user_id, full_name, tier_name, ts.area, uf.rating, Review_Month_Year ");
+            query.append("GROUP BY review_id, full_name, tier_name, ts.area, uf.rating, Review_Month_Year ");
             query.append("ORDER BY pt.tier_id DESC, uf.rating DESC; ");
 
             stmt = conn.prepareStatement(query.toString());
@@ -775,7 +775,7 @@ public class FeedbackRecord {
 
             while(set.next()){
 
-                int userID = set.getInt("User_ID");
+                int reviewID = set.getInt("Review_ID");
                 String fullName = set.getString("Full_Name");
                 String tierName = set.getString("Tier_Name");
                 String area = set.getString("Area");
@@ -785,7 +785,7 @@ public class FeedbackRecord {
                 String reviewMonthYear = set.getString("Review_Month_Year");
                 
                 model.addRow(new Object[]{
-                    userID, fullName, tierName, area, rating, likes, dislikes, reviewMonthYear
+                    reviewID, fullName, tierName, area, rating, likes, dislikes, reviewMonthYear
                 });
 
             }
@@ -809,7 +809,7 @@ public class FeedbackRecord {
             query.setLength(0);
 
             // Query that will generate the report
-            query.append("SELECT u.user_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.area, uf.rating, ");
+            query.append("SELECT uf.review_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.area, uf.rating, ");
             query.append("COUNT(CASE WHEN r.Reaction_Name = 'LIKE' THEN 1 END) AS likes, ");
             query.append("COUNT(CASE WHEN r.Reaction_Name = 'DISLIKE' THEN 1 END) AS dislikes, ");
             query.append("DATE_FORMAT(uf.Review_Date, '%M %Y') AS Review_Month_Year ");
@@ -837,7 +837,7 @@ public class FeedbackRecord {
             }
 
             // Add the rest of the query
-            query.append("GROUP BY user_id, full_name, tier_name, ts.area, uf.rating, Review_Month_Year ");
+            query.append("GROUP BY review_id, full_name, tier_name, ts.area, uf.rating, Review_Month_Year ");
             query.append("ORDER BY pt.tier_id DESC, uf.rating DESC; ");
 
             stmt = conn.prepareStatement(query.toString());
@@ -861,7 +861,7 @@ public class FeedbackRecord {
 
             while(set.next()){
 
-                int userID = set.getInt("User_ID");
+                int reviewID = set.getInt("Review_ID");
                 String fullName = set.getString("Full_Name");
                 String tierName = set.getString("Tier_Name");
                 String area = set.getString("Area");
@@ -871,7 +871,7 @@ public class FeedbackRecord {
                 String reviewMonthYear = set.getString("Review_Month_Year");
                 
                 model.addRow(new Object[]{
-                    userID, fullName, tierName, area, rating, likes, dislikes, reviewMonthYear
+                    reviewID, fullName, tierName, area, rating, likes, dislikes, reviewMonthYear
                 });
 
             }
