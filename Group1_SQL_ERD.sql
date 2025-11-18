@@ -243,27 +243,72 @@ CREATE TABLE User_Booking (
 );
 
 INSERT INTO Points_Tier (Tier_Name, Min_Points, Max_Points) VALUES
-('Bronze', 0, 999),
-('Silver', 1000, 4999),
-('Gold', 5000, 9999),
-('Platinum', 10000, 999999);
+('Surface Miner', 0, 99),
+('Shallow Digger', 100, 299),
+('Deep Miner', 300, 599),
+('Cavern Navigator', 600, 999),
+('Chasm Delver', 1000, 1999),
+('Vein Striker', 2000, 3999),
+('Molten Explorer', 4000, 6999),
+('Abyss Excavator', 7000, 9999),
+('Bedrock Breaker', 10000, 14999),
+('Core Conqueror', 15000, 24999);
 
-INSERT INTO Country (country_name)
-VALUES ('Philippines');
+INSERT INTO User (First_Name, Last_Name, Nationality, Points, Tier_ID, Password, Is_Admin) VALUES
+('Admin', 'User', NULL, NULL, NULL, 'admin123', TRUE),
+('Joreve', 'De Jesus', 'Filipino', 50, 1, 'joreve123', FALSE),
+('Martin', 'Gamilla', 'Filipino', 199, 2, 'password1234PogzLi', FALSE),
+('Jhiro', 'Lirio', 'Filipino', 459, 3, '12413224JL', FALSE),
+('Aaron', 'Romero', 'Filipino', 999, 4, 'aaroncool', FALSE),
+('Frederick Voltair', 'Garcia', 'Filipino', 1234, 5, 'thunder1515', FALSE),
+('Stefan Manuel', 'Domingo', 'Filipino', 2001, 6, 'uh}>aCyWt?tY95Y', FALSE),
+('Ejreen', 'Del Mundo', 'Filipino', 6998, 7, '15Th15Th@Kru5TyKr4B?', FALSE),
+('Ethan', 'Franco', 'Filipino', 8000, 8, '#$21yeSyeS@', FALSE),
+('Neil Jr.', 'Gutang', 'Filipino', 10000, 9, 'TheSh4DowNeverB3trays!!!', FALSE),
+('Jakov Benedict', 'Santos', 'Filipino', 23000, 10, 'Cisco123', FALSE);
 
-INSERT INTO Region (region_name, country_id)
-VALUES
-    ('Ilocos Region', 1),
-    ('Calabarzon', 1);
-    
-INSERT INTO City (city_name, region_id)
-VALUES
-    ('Vigan', 1),
-    ('Batangas City', 2),
-    ('Lucena', 2);
-    
-INSERT INTO Category (category_name)
-VALUES
-    ('Beach'),
-    ('Hiking'),
-    ('Museum');
+INSERT INTO User_Email (User_ID, Email) VALUES
+(2, 'jorevepangandejesus@gmail.com'),
+(3, 'martin_gamilla@dlsu.edu.ph'),
+(4, 'lirio@email.com'),
+(4, 'jhiro_lirio@dlsu.edu.ph'),
+(5, 'aaronzrom@gmail.com'),
+(6, 'derickgarcia1212@gmail.com'),
+(7, 'stefan_manuel_domingo@dlsu.edu.ph'),
+(8, 'ejreen_delmundo@dlsu.edu.ph'),
+(10, 'darkgamer17298@gmail.com'),
+(11, 'santosjakov@gmail.com');
+
+INSERT INTO User_Phone (User_ID, Phone_Number) VALUES
+(2, '09287232389'),
+(3, '09171287361'),
+(4, '09159773025'),
+(5, '+86-138-1234-5678'),
+(5, '639562600656'),
+(6, '09162579113'),
+(7, '09279109865'),
+(8, '09175119762'),
+(11, '09493339430'),
+(11, '09214223377');
+
+-- INSERT INTO Country (country_name) VALUES
+
+-- INSERT INTO Region (region_name, country_id) VALUES
+
+-- INSERT INTO City (city_name, region_id) VALUES
+
+-- INSERT INTO Category (category_name) VALUES
+
+-- INSERT INTO Travel_Spot (user_id, spotname, availability, date_shared, city_id, base_price, max_capacity) VALUES
+
+-- INSERT INTO TS_Category (location_id, category_id) VALUES
+
+-- INSERT INTO Reaction (Reaction_Name) VALUES
+
+-- INSERT INTO User_Feedback (User_ID, Location_ID, Rating, is_recommendation, Reaction_Count, Comment_Count, Review_Date) VALUES
+
+-- INSERT INTO User_Reaction (Review_ID, User_ID, ReactionType_ID, Reaction_Date) VALUES
+
+-- INSERT INTO Booking (Location_ID, Status, Start_date, End_date, Tax, Gem_price, Organizer_ID, Current_Capacity, Max_Capacity) VALUES
+
+-- INSERT INTO User_Booking (Booking_ID, User_ID, Role) VALUES
