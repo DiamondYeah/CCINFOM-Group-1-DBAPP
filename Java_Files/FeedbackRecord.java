@@ -1,13 +1,22 @@
 import java.sql.*;
 import java.util.ArrayList;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
 public class FeedbackRecord {
 
     public StringBuilder query;
 
+
+    // Main controller
+    private FeedbackRecordController controller;
 
     public Connection conn;
     public PreparedStatement stmt; // Gets the statements
@@ -17,20 +26,48 @@ public class FeedbackRecord {
     // Private attributes containing information of different attributes from the dataset
     private ArrayList<String> reactionOptions;
 
+    private ArrayList<String> userFeedbackOptions;
+    private ArrayList<String> feedbackUserIDOptions;
+    private ArrayList<String> feedbackLocationIDOptions;
+
+    private ArrayList<String> userReactionOptions;
+    private ArrayList<String> userReactionReviewIDOptions;
+    private ArrayList<String> userReactionUserIDOptions;
+    private ArrayList<String> userReactionReactionTypeIDOptions;
+
+    private ArrayList<String> reactionWithIDOptions;
+
     // Public Constructor
-    public FeedbackRecord(Connection conn){
+    public FeedbackRecord(Connection conn, FeedbackRecordController controller){
 
         this.conn = conn;
+        this.controller = controller;
 
         // Initialize StringBuilder
         query = new StringBuilder();
 
-        reactionOptions = new ArrayList<>();
-        updateReactionOptions();
+        
+        // Initialize the User Feedback Panel Arraylist Options
+        userFeedbackOptions = new ArrayList<>();
+        feedbackUserIDOptions = new ArrayList<>();
+        feedbackLocationIDOptions = new ArrayList<>();
+        updateUserFeedbackOptions();
 
+        // Initialize the User Reaction Panel Arraylist Options
+        userReactionOptions = new ArrayList<>();
+        userReactionReviewIDOptions = new ArrayList<>();
+        userReactionUserIDOptions = new ArrayList<>();
+        userReactionReactionTypeIDOptions = new ArrayList<>();
+        updateUserReactionOptions();
+
+        // Initialize the Reaction Options and Reaction Panel Arraylist Options
+        reactionOptions = new ArrayList<>();
+        reactionWithIDOptions = new ArrayList<>();
+        updateReactionOptions();
 
     }
 
+    // -------------------------------------------------------
 
     // Getter Methods
 
@@ -41,7 +78,68 @@ public class FeedbackRecord {
     }
 
 
+    // Getters for User Feedback Panel
+    public ArrayList<String> getUserFeedbackOptions(){
 
+        return userFeedbackOptions;
+
+    }
+
+
+    public ArrayList<String> getFeedbackUserIDOptions(){
+
+        return feedbackUserIDOptions;
+
+    }
+
+
+    public ArrayList<String> getFeedbackLocationIDOptions(){
+
+        return feedbackLocationIDOptions;
+
+    }
+
+
+    // Getters for User Reaction Panel
+    public ArrayList<String> getUserReactionOptions(){
+
+        return userReactionOptions;
+
+    }
+
+
+    public ArrayList<String> getUserReactionReviewIDOptions(){
+
+        return userReactionReviewIDOptions;
+
+    }
+
+  
+    public ArrayList<String> getUserReactionUserIDOptions(){
+
+        return userReactionUserIDOptions;
+
+    }
+
+
+    public ArrayList<String> getUserReactionReactionTypeIDOptions(){
+
+        return userReactionReactionTypeIDOptions;
+
+    }
+
+
+    // Getters for Reaction Panel
+    public ArrayList<String> getReactionWithIDOptions(){
+
+        return reactionWithIDOptions;
+
+    }
+
+    // -------------------------------------------------------
+
+
+    
     // Method adds details of user feedback into the database
     public void addUserFeedback(int userID, int locationID, float rating){
 
@@ -65,6 +163,9 @@ public class FeedbackRecord {
             // Insert the data to the dataset
             stmt.executeUpdate();
 
+            // Update choices
+            updateUserFeedbackOptions();
+
         } catch(SQLException e){
 
             e.printStackTrace();
@@ -76,7 +177,7 @@ public class FeedbackRecord {
 
 
     // Method obtains the infromation from stmt and gets the needed information and adds them to the feedback model
-    public void loadUserFeedback(DefaultTableModel model){
+    public void loadUserFeedbackTable(DefaultTableModel model){
 
         model.setRowCount(0);
 
@@ -111,6 +212,145 @@ public class FeedbackRecord {
         }
 
     }
+
+
+    // Method loads the user chosen in the edit feedback table and shows information of them
+    public void loadUserFeedback(String feedbackUser, JComboBox<String> userBox, JComboBox<String> locationBox,
+                                 JSlider ratingSlider, JSpinner reactionSpinner, JSpinner commentSpinner, JSpinner dateSpinner){
+
+        int reviewID = Integer.parseInt(feedbackUser.split(" ")[0]);
+
+        // String builder query to create the SELECT statement
+        query.setLength(0);
+        query.append("SELECT uf.*, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, ts.area ");
+        query.append("FROM USER_FEEDBACK uf JOIN user u ON u.user_id = uf.user_id ");
+        query.append("JOIN travel_spot ts ON ts.location_id = uf.location_id ");
+        query.append("WHERE review_id = ?; ");
+
+        // Try-catch block to catch any errors with SQL
+        try{
+
+            stmt = conn.prepareStatement(query.toString());
+
+            // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+            stmt.setInt(1, reviewID);
+
+            set = stmt.executeQuery();
+
+            if(set.next()){
+
+                // Get information
+                int userID = set.getInt("User_ID");
+                int locationID = set.getInt("Location_ID");
+                int rating = set.getInt("Rating");
+                int reactionCount = getReviewCount(set.getInt("Review_ID"));
+                int commentCount = set.getInt("Comment_Count");
+                Timestamp reviewDate = set.getTimestamp("Review_Date");
+
+                // Information mainly for making comboBox work
+                String fullname = set.getString("full_name");
+                String area = set.getString("area");
+
+                // Display the results of the query to the input components
+                
+                System.out.println(reactionCount);
+                System.out.println(commentCount); 
+
+                userBox.setSelectedItem(userID + " - " + fullname);
+                locationBox.setSelectedItem(locationID + " - " + area);
+                ratingSlider.setValue(rating);
+                reactionSpinner.setValue(reactionCount);
+                commentSpinner.setValue(commentCount);
+                dateSpinner.setValue(reviewDate);
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+
+    }
+
+
+    // Method updates the user chosen in the edit feedback table and updates it in the database
+    public void updateUserFeedbackDatabase(int reviewID, int userID, int locationID, float rating, int commentCount, 
+                                           java.sql.Timestamp reviewDate){
+
+
+        // String builder query to create the SELECT statement
+        query.setLength(0);
+        query.append("UPDATE USER_FEEDBACK SET user_id = ?, location_id = ?, rating = ?, comment_count = ?, review_date = ? ");
+        query.append("WHERE review_id = ?; ");
+
+        // Try-catch block to catch any errors with SQL
+        try{
+
+            stmt = conn.prepareStatement(query.toString());
+
+            // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+            stmt.setInt(1, userID);
+            stmt.setInt(2, locationID);
+            stmt.setFloat(3, rating);
+            stmt.setInt(4, commentCount);
+            stmt.setTimestamp(5, reviewDate);
+
+            stmt.setInt(6, reviewID);
+
+            // Update the data to the dataset
+            stmt.executeUpdate();
+
+            System.out.println("DATABASE UPDATED");
+
+            // Update choices
+            updateUserFeedbackOptions();
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+
+    }
+
+
+    // Method deletes the user chosen in the edit feedback table and removes it from the database
+    public void deleteUserFeedbackDatabase(int reviewID){
+
+        // String builder query to create the DELETE statement
+        query.setLength(0);
+        query.append("DELETE FROM USER_FEEDBACK WHERE review_id = ?; ");
+
+
+        // Try-catch block to catch any errors with SQL
+        try{
+
+            stmt = conn.prepareStatement(query.toString());
+
+            // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+            stmt.setInt(1, reviewID);
+
+            // Update the data to the dataset
+            stmt.executeUpdate();
+
+            System.out.println("DATABASE UPDATED");
+
+            // Update choices
+            updateUserFeedbackOptions();
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+
+    // -------------------------------------------------------
 
 
     // Method adds details of user reaction into the database
@@ -160,6 +400,9 @@ public class FeedbackRecord {
             // Insert the data to the dataset
             stmt.executeUpdate();
 
+            // Update choices
+            updateUserReactionOptions();
+
         } catch(SQLException e){
 
             e.printStackTrace();
@@ -171,7 +414,7 @@ public class FeedbackRecord {
 
 
     // Method obtains the infromation from stmt and gets the needed information and adds them to the report model
-    public void loadUserReaction(DefaultTableModel model){
+    public void loadUserReactionTable(DefaultTableModel model){
 
         model.setRowCount(0);
 
@@ -206,6 +449,130 @@ public class FeedbackRecord {
     }
 
 
+    // Method loads the user chosen in the edit feedback table and shows information of them
+    public void loadUserReaction(String userReviewUser, JComboBox<String> reviewBox, JComboBox<String> userBox,
+                                 JComboBox<String> reactionTypeBox, JSpinner dateSpinner){
+
+                                    
+        int userReviewID = Integer.parseInt(userReviewUser.split(" ")[0]);
+
+        // String builder query to create the SELECT statement
+        query.setLength(0);
+        query.append("SELECT ur.*, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, r.reaction_name ");
+        query.append("FROM USER_REACTION ur JOIN user u ON u.user_id = ur.user_id ");
+        query.append("JOIN reaction r ON r.reactiontype_id = ur.reactiontype_id ");
+        query.append("WHERE reaction_id = ?; ");
+
+        // Try-catch block to catch any errors with SQL
+        try{
+
+            stmt = conn.prepareStatement(query.toString());
+
+            // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+            stmt.setInt(1, userReviewID);
+
+            set = stmt.executeQuery();
+
+            if(set.next()){
+
+                // Get information
+                int reviewID = set.getInt("review_id");
+                int userID = set.getInt("user_id");
+                int reactionTypeID = set.getInt("reactiontype_id");
+                Timestamp reviewDate = set.getTimestamp("reaction_date");
+
+                // Information mainly for making comboBox work
+                String fullname = set.getString("full_name");
+                String reactionName = set.getString("reaction_name");
+
+                // Display the results of the query to the input components
+                reviewBox.setSelectedItem(reviewID + " - " + fullname); 
+                userBox.setSelectedItem(userID + " - " + fullname);
+                reactionTypeBox.setSelectedItem(reactionTypeID + " - " + reactionName);
+                dateSpinner.setValue(reviewDate);
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+
+    }
+
+
+    // Method updates the user reaction chosen in the edit user reaction table and updates it in the database
+    public void updateUserReactionDatabase(int reactionID, int reviewID, int userID, int reactionTypeID, java.sql.Timestamp reviewDate){
+
+        // String builder query to create the SELECT statement
+        query.setLength(0);
+        query.append("UPDATE USER_REACTION SET review_id = ?, user_id = ?, reactiontype_id = ?, reaction_date = ? WHERE reaction_id = ?; ");
+
+        // Try-catch block to catch any errors with SQL
+        try{
+
+            stmt = conn.prepareStatement(query.toString());
+
+            // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+            stmt.setInt(1, reviewID);
+            stmt.setInt(2, userID);
+            stmt.setInt(3, reactionTypeID);
+            stmt.setTimestamp(4, reviewDate);
+
+            stmt.setInt(5, reactionID);
+
+            // Update the data to the dataset
+            stmt.executeUpdate();
+
+            System.out.println("DATABASE UPDATED");
+
+            // Update choices
+            updateUserReactionOptions();
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+
+    // Method deletes the user chosen in the edit feedback table and removes it from the database
+    public void deleteUserReactionDatabase(int reactionID){
+
+        // String builder query to create the DELETE statement
+        query.setLength(0);
+        query.append("DELETE FROM USER_REACTION WHERE reaction_id = ?; ");
+
+
+        // Try-catch block to catch any errors with SQL
+        try{
+
+            stmt = conn.prepareStatement(query.toString());
+
+            // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+            stmt.setInt(1, reactionID);
+
+            // Update the data to the dataset
+            stmt.executeUpdate();
+
+            System.out.println("DATABASE UPDATED");
+
+            // Update choices
+            updateUserReactionOptions();
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+    }
+     // -------------------------------------------------------
+
     // Method adds details of reaction into the database
     public void addReaction(String reactionType, JComboBox<String> reactionTypeBox){
 
@@ -231,6 +598,8 @@ public class FeedbackRecord {
 
         }
 
+
+        // Update choices
         updateReactionOptions();
 
         reactionTypeBox.removeAllItems();
@@ -242,7 +611,7 @@ public class FeedbackRecord {
 
 
     // Method obtains the infromation from stmt and gets the needed information and adds them to the review/user_reaction model
-    public void loadReaction(DefaultTableModel model){
+    public void loadReactionTable(DefaultTableModel model){
 
         model.setRowCount(0);
 
@@ -274,7 +643,112 @@ public class FeedbackRecord {
     }
 
 
+    // Method loads the user chosen in the reaction table and shows information of them
+    public void loadReaction(String reactonInfo, JTextField currentNameField){
 
+
+        int reactionTypeID = Integer.parseInt(reactonInfo.split(" ")[0]);
+
+        // String builder query to create the SELECT statement
+        query.setLength(0);
+        query.append("SELECT * FROM REACTION WHERE reactiontype_id = ?; ");
+
+        // Try-catch block to catch any errors with SQL
+        try{
+
+            stmt = conn.prepareStatement(query.toString());
+
+            // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+            stmt.setInt(1, reactionTypeID);
+
+            set = stmt.executeQuery();
+
+            if(set.next()){
+
+                // Get information
+                String reactionName = set.getString("reaction_name");
+    
+                // Display the results of the query to the input components
+                currentNameField.setText(reactionName);
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+
+    // Method updates the reaction chosen in the edit reation table and updates it in the database
+    public void updateReactionDatabase(int reactionTypeID, String newName){
+
+        // String builder query to create the SELECT statement
+        query.setLength(0);
+        query.append("UPDATE REACTION SET reaction_name = ? WHERE reactiontype_id = ?; ");
+
+        // Try-catch block to catch any errors with SQL
+        try{
+
+            stmt = conn.prepareStatement(query.toString());
+
+            // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+            stmt.setString(1, newName);
+
+            stmt.setInt(2, reactionTypeID);
+
+            // Update the data to the dataset
+            stmt.executeUpdate();
+
+            System.out.println("DATABASE UPDATED");
+
+            // Update choices
+            updateReactionOptions();
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+
+    // Method deletes the reaction chosen in the edit reaction table and removes it from the database
+    public void deleteReactionDatabase(int reactionTypeID){
+
+        // String builder query to create the DELETE statement
+        query.setLength(0);
+        query.append("DELETE FROM REACTION WHERE reactiontype_id = ?; ");
+
+
+        // Try-catch block to catch any errors with SQL
+        try{
+
+            stmt = conn.prepareStatement(query.toString());
+
+            // Set the values in the stmt with the parameters and starting values for each of the ? in the query
+            stmt.setInt(1, reactionTypeID);
+
+            // Update the data to the dataset
+            stmt.executeUpdate();
+
+            System.out.println("DATABASE UPDATED");
+
+            // Update choices
+            updateReactionOptions();
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    // -------------------------------------------------------
 
 
     // Method obtains the infromation from stmt and gets the needed information and adds them to the feedback model
@@ -328,30 +802,82 @@ public class FeedbackRecord {
     }
 
 
+    // -------------------------------------------------------
+
     // Methods to obtain fields and update the database
 
     // Methods obtains the different reactions types from the reactions table
-    private void updateReactionOptions(){
+    private void updateUserFeedbackOptions(){
 
-        reactionOptions.clear(); // Resets arrayList in case of updates in Reaction Options
+        // Resets arrayList in case of updates 
+        userFeedbackOptions.clear(); 
+        feedbackLocationIDOptions.clear();
+        feedbackUserIDOptions.clear();
         
         try{
 
             query.setLength(0);
-            query.append("SELECT * FROM Reaction");
-
+            
+            query.append("SELECT CONCAT(u.first_name, ' ' , u.last_name) AS full_name, uf.review_id ");
+            query.append("FROM   USER_FEEDBACK uf ");
+            query.append("JOIN   USER u ON u.user_id = uf.user_id; ");
+            
             stmt = conn.prepareStatement(query.toString());
             set = stmt.executeQuery();
 
             while(set.next()){
 
-                String reactionType = set.getString("Reaction_Name");
+                String userFeedbackOption = set.getInt("uf.review_id") + " - " + set.getString("full_name");
 
-                System.out.println(reactionType);
+                System.out.println(userFeedbackOption);
 
-                reactionOptions.add(reactionType); // Add reaction type to array list
+                userFeedbackOptions.add(userFeedbackOption); // Add reaction type to array list
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
 
 
+        try{
+
+            query.setLength(0);
+            
+            query.append("SELECT * FROM TRAVEL_SPOT;");
+            
+            stmt = conn.prepareStatement(query.toString());
+            set = stmt.executeQuery();
+
+            while(set.next()){
+
+                String getLocationOption = set.getString("location_id") + " - " + set.getString("area");
+                feedbackLocationIDOptions.add(getLocationOption); // Add reaction type to array list
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+
+        try{
+
+            query.setLength(0);
+            
+            query.append("SELECT u.user_id , CONCAT(u.first_name, ' ' , u.last_name) AS full_name FROM USER u; ");
+            
+            stmt = conn.prepareStatement(query.toString());
+            set = stmt.executeQuery();
+
+            while(set.next()){
+
+                String userOption = set.getString("u.user_id") + " - " + set.getString("full_name");
+                feedbackUserIDOptions.add(userOption); // Add reaction type to array list
 
             }
 
@@ -364,7 +890,165 @@ public class FeedbackRecord {
     }
 
 
+    // Methods obtains the different reactions types from the reactions table
+    private void updateUserReactionOptions(){
 
+
+        // Resets arrayList in case of updates 
+        userReactionOptions.clear();
+        userReactionReviewIDOptions.clear();
+        userReactionUserIDOptions.clear();
+        userReactionReactionTypeIDOptions.clear();
+
+        // Create/Update userReactionOptions
+        try{
+
+            query.setLength(0);
+            
+            query.append("SELECT CONCAT(u.first_name, ' ' , u.last_name) AS full_name, ur.reaction_id ");
+            query.append("FROM   USER_REACTION ur ");
+            query.append("JOIN   USER u ON u.user_id = ur.user_id; ");
+            
+            stmt = conn.prepareStatement(query.toString());
+            set = stmt.executeQuery();
+
+            while(set.next()){
+
+                String userReactionOption = set.getInt("ur.reaction_id") + " - " + set.getString("full_name");
+
+                System.out.println(userReactionOption);
+
+                userReactionOptions.add(userReactionOption); 
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+
+        // Create/Update userReactionReviewIDOptions
+        try{
+
+            query.setLength(0);
+            
+            query.append("SELECT CONCAT(u.first_name, ' ' , u.last_name) AS full_name, uf.review_id ");
+            query.append("FROM   USER_FEEDBACK uf ");
+            query.append("JOIN   USER u ON u.user_id = uf.user_id; ");
+            
+            stmt = conn.prepareStatement(query.toString());
+            set = stmt.executeQuery();
+
+            while(set.next()){
+
+                String userReactionReviewIDOption = set.getString("uf.review_id") + " - " + set.getString("full_name");
+                userReactionReviewIDOptions.add(userReactionReviewIDOption); 
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+
+        // Create/Update userReactionUserIDOptions
+        try{
+
+            query.setLength(0);
+            
+            query.append("SELECT CONCAT(u.first_name, ' ' , u.last_name) AS full_name, u.* FROM USER u; ");
+            
+            stmt = conn.prepareStatement(query.toString());
+            set = stmt.executeQuery();
+
+            while(set.next()){
+
+                String userReactionUserIDOption = set.getString("user_id") + " - " + set.getString("full_name");
+                userReactionUserIDOptions.add(userReactionUserIDOption); // Add reaction type to array list
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+
+        // Create/Update userReactionReactionTypeIDOptions
+        try{
+
+            query.setLength(0);
+            
+            query.append("SELECT * FROM REACTION; ");
+            
+            stmt = conn.prepareStatement(query.toString());
+            set = stmt.executeQuery();
+
+            while(set.next()){
+
+                String userReactionReactionTypeIDOption = set.getString("reactiontype_id") + " - " + set.getString("reaction_name");
+                userReactionReactionTypeIDOptions.add(userReactionReactionTypeIDOption); // Add reaction type to array list
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+
+    }
+
+
+
+
+    // Methods obtains the different available user feedbacks
+    private void updateReactionOptions(){
+
+        // Resets arrayLists in case of updates
+        reactionOptions.clear(); 
+        reactionWithIDOptions.clear();
+        
+        try{
+
+            query.setLength(0);
+            query.append("SELECT * FROM Reaction");
+
+            stmt = conn.prepareStatement(query.toString());
+            set = stmt.executeQuery();
+
+            while(set.next()){
+
+                int reactionTypeID = set.getInt("ReactionType_ID");
+                String reactionType = set.getString("Reaction_Name");
+
+                reactionOptions.add(reactionType); // Add reaction type to array list
+
+                reactionWithIDOptions.add(reactionTypeID + " - " + reactionType); // Add id and type to array list
+
+            }
+
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
+
+    }
+
+
+    // -------------------------------------------------------
+
+    // Helper methods
+
+    // Helper method that gets how many users have reacted to a feedback
     private int getReviewCount(int reviewID){
 
         int reviewCount = 0;

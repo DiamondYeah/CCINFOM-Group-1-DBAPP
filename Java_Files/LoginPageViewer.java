@@ -51,7 +51,6 @@ public class LoginPageViewer extends JPanel{
 
     private JTextField firstNameRegisterField;
     private JTextField lastNameRegisterField;
-    private JTextField emailRegisterField;
     private JComboBox<String> nationalityRegisterBox;
     private JPasswordField passwordRegisterField;
 
@@ -101,12 +100,6 @@ public class LoginPageViewer extends JPanel{
     public JTextField getLastNameRegisterField(){
 
         return lastNameRegisterField;
-
-    }
-
-    public JTextField getEmailRegisterField(){
-
-        return emailRegisterField;
 
     }
 
@@ -177,12 +170,6 @@ public class LoginPageViewer extends JPanel{
         lastNameRegisterField.setMaximumSize(new Dimension(250, 50));
         lastNameRegisterField.setPreferredSize(new Dimension(250, 50));
         lastNameRegisterField.setFont(new Font("Arial", Font.PLAIN, 20));
-
-        // Create Email Register Text Field for Feedback
-        emailRegisterField = new JTextField(25);
-        emailRegisterField.setMaximumSize(new Dimension(250, 50));
-        emailRegisterField.setPreferredSize(new Dimension(250, 50));
-        emailRegisterField.setFont(new Font("Arial", Font.PLAIN, 20));
 
         // Create Email Register Text Field for Feedback
         nationalityRegisterBox = new JComboBox<>(controller.getNationalityOptions().toArray(new String[0]));
@@ -313,16 +300,6 @@ public class LoginPageViewer extends JPanel{
         lastNameWrapper.add(lastNameLabel);
         lastNameWrapper.add(lastNameRegisterField);
 
-        // Create label, email register field and Wrapper to combine them in
-        JLabel emailLabel = new JLabel("Email:");
-        emailLabel.setFont(new Font("Arial", Font.BOLD, 35));
-        
-        JPanel emailWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        emailWrapper.setMaximumSize(new Dimension(800, 70));
-        emailWrapper.setPreferredSize(new Dimension(800, 70));
-        emailWrapper.add(emailLabel);
-        emailWrapper.add(emailRegisterField);
-
         // Create label, nationality register box and Wrapper to combine them in
         JLabel nationalityLabel = new JLabel("Nationality:");
         nationalityLabel.setFont(new Font("Arial", Font.BOLD, 35));
@@ -370,7 +347,6 @@ public class LoginPageViewer extends JPanel{
         registerTitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         firstNameWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         lastNameWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
-        emailWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         nationalityWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         passwordWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         buttonWrappers.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -383,8 +359,6 @@ public class LoginPageViewer extends JPanel{
         registerPanel.add(firstNameWrapper);
         registerPanel.add(Box.createVerticalStrut(40));
         registerPanel.add(lastNameWrapper);
-        registerPanel.add(Box.createVerticalStrut(40));
-        registerPanel.add(emailWrapper);
         registerPanel.add(Box.createVerticalStrut(40));
         registerPanel.add(nationalityWrapper);
         registerPanel.add(Box.createVerticalStrut(40));
@@ -410,7 +384,6 @@ public class LoginPageViewer extends JPanel{
 
             firstNameRegisterField.setText("");
             lastNameRegisterField.setText("");
-            emailRegisterField.setText("");
             passwordRegisterField.setText("");
 
         }
@@ -447,21 +420,21 @@ public class LoginPageViewer extends JPanel{
     }
 
 
-    // Method displays non JOptionPane errors depending on passed String
+    // Method displays non JOptionPane messages depending on passed String for Login Page
     public void showMessage(String messageCode){
 
-        String displayError = null;
+        String displayMessage = null;
 
         switch(messageCode){
 
             case REGISTER_SUCCESSFUL:
 
-                displayError = "User has been registered. Please return to log in page to enter.";
+                displayMessage = "User has been registered. Please return to log in page to enter.";
                 break;
 
         }
 
-        JOptionPane.showMessageDialog(this, displayError,"Login Error",JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(this, displayMessage,"Notice",JOptionPane.PLAIN_MESSAGE);
 
     }
 
