@@ -308,7 +308,7 @@ INSERT INTO Region (region_name, country_id) VALUES
 ('Region I', 1),
 ('Region III', 1),
 ('NCR', 1),
-('Kanto Region' 2),
+('Kanto Region' , 2),
 ('California', 3),
 ('Tuscany', 5),
 ('Berlin', 8),
@@ -320,7 +320,7 @@ INSERT INTO City (city_name, region_id) VALUES
 ('Hakone-Machi', 4),
 ('Urdaneta City', 1),
 ('Manila City', 3),
-('Malabon City' 3),
+('Malabon City' , 3 ),
 ('Angeles City', 2),
 ('San Fernando City', 1),
 ('Las Pinas City', 3),
@@ -329,17 +329,64 @@ INSERT INTO City (city_name, region_id) VALUES
 ('Los Angeles', 5),
 ('Siena', 6);
 
-INSERT INTO Category (category_name) VALUES
+INSERT INTO Reaction (Reaction_Name) VALUES
+('Like'),
+('Dislike'),
+('Happy'),
+('Laugh'),
+('Sad'),
+('Angry'),
+('Love'),
+('Crying'),
+('Kiss'),
+('Fire');
+
+-- INSERT INTO Category (category_name) VALUES
 
 -- INSERT INTO Travel_Spot (user_id, spotname, availability, date_shared, city_id, base_price, max_capacity) VALUES
 
 -- INSERT INTO TS_Category (location_id, category_id) VALUES
 
--- INSERT INTO Reaction (Reaction_Name) VALUES
+INSERT INTO Reaction (Reaction_Name) VALUES
+('Like'),
+('Dislike'),
+('Happy'),
+('Laugh'),
+('Sad'),
+('Angry'),
+('Love'),
+('Crying'),
+('Kiss'),
+('Fire');
 
--- INSERT INTO User_Feedback (User_ID, Location_ID, Rating, is_recommendation, Reaction_Count, Comment_Count, Review_Date) VALUES
+-INSERT INTO User_Feedback (User_ID, Location_ID, Rating, is_recommendation, Reaction_Count, Comment_Count, Review_Date) VALUES
+(),
+(),
+(),
+(),
+(),
+(),
+(),
+(),
+(),
+(),
+(),
+();
 
--- INSERT INTO User_Reaction (Review_ID, User_ID, ReactionType_ID, Reaction_Date) VALUES
+INSERT INTO User_Reaction (Review_ID, User_ID, ReactionType_ID, Reaction_Date) VALUES
+(),
+(),
+(),
+(),
+(),
+(),
+(),
+(),
+(),
+(),
+(),
+();
+
 
 -- INSERT INTO Booking (Location_ID, Status, Start_date, End_date, Tax, Gem_price, Organizer_ID, Current_Capacity, Max_Capacity) VALUES
 
