@@ -51,19 +51,16 @@ public class FeedbackRecord {
         userFeedbackOptions = new ArrayList<>();
         feedbackUserIDOptions = new ArrayList<>();
         feedbackLocationIDOptions = new ArrayList<>();
-        updateUserFeedbackOptions();
 
         // Initialize the User Reaction Panel Arraylist Options
         userReactionOptions = new ArrayList<>();
         userReactionReviewIDOptions = new ArrayList<>();
         userReactionUserIDOptions = new ArrayList<>();
         userReactionReactionTypeIDOptions = new ArrayList<>();
-        updateUserReactionOptions();
 
         // Initialize the Reaction Options and Reaction Panel Arraylist Options
         reactionOptions = new ArrayList<>();
         reactionWithIDOptions = new ArrayList<>();
-        updateReactionOptions();
 
     }
 
@@ -807,7 +804,7 @@ public class FeedbackRecord {
     // Methods to obtain fields and update the database
 
     // Methods obtains the different reactions types from the reactions table
-    private void updateUserFeedbackOptions(){
+    public void updateUserFeedbackOptions(){
 
         // Resets arrayList in case of updates 
         userFeedbackOptions.clear(); 
@@ -818,11 +815,30 @@ public class FeedbackRecord {
 
             query.setLength(0);
             
-            query.append("SELECT CONCAT(u.first_name, ' ' , u.last_name) AS full_name, uf.review_id ");
-            query.append("FROM   USER_FEEDBACK uf ");
-            query.append("JOIN   USER u ON u.user_id = uf.user_id; ");
+            // Checks if current user is admin, if not, only show feedback associated with them
+            if(controller.getIsAdmin()){
+
+                query.append("SELECT CONCAT(u.first_name, ' ' , u.last_name) AS full_name, uf.review_id ");
+                query.append("FROM   USER_FEEDBACK uf ");
+                query.append("JOIN   USER u ON u.user_id = uf.user_id; ");
+
+            }
+            else{
+
+                query.append("SELECT CONCAT(u.first_name, ' ' , u.last_name) AS full_name, uf.review_id ");
+                query.append("FROM   USER_FEEDBACK uf ");
+                query.append("JOIN   USER u ON u.user_id = uf.user_id ");  
+                query.append("WHERE  uf.user_id = ?; ");  
+
+            }
+
             
             stmt = conn.prepareStatement(query.toString());
+
+            // Supplies user ID if not admin
+            if(!controller.getIsAdmin())
+                stmt.setInt(1, controller.getCurrentUserID());
+
             set = stmt.executeQuery();
 
             while(set.next()){
@@ -891,7 +907,7 @@ public class FeedbackRecord {
 
 
     // Methods obtains the different reactions types from the reactions table
-    private void updateUserReactionOptions(){
+    public void updateUserReactionOptions(){
 
 
         // Resets arrayList in case of updates 
@@ -905,11 +921,30 @@ public class FeedbackRecord {
 
             query.setLength(0);
             
-            query.append("SELECT CONCAT(u.first_name, ' ' , u.last_name) AS full_name, ur.reaction_id ");
-            query.append("FROM   USER_REACTION ur ");
-            query.append("JOIN   USER u ON u.user_id = ur.user_id; ");
+            // Checks if current user is admin, if not, only show feedback associated with them
+
+            if(controller.getIsAdmin()){
+
+                query.append("SELECT CONCAT(u.first_name, ' ' , u.last_name) AS full_name, ur.reaction_id ");
+                query.append("FROM   USER_REACTION ur ");
+                query.append("JOIN   USER u ON u.user_id = ur.user_id; ");
+
+            }else{
+
+                query.append("SELECT CONCAT(u.first_name, ' ' , u.last_name) AS full_name, ur.reaction_id ");
+                query.append("FROM   USER_REACTION ur ");
+                query.append("JOIN   USER u ON u.user_id = ur.user_id ");
+                query.append("WHERE  ur.user_id = ?; ");
+
+            }
+
             
             stmt = conn.prepareStatement(query.toString());
+
+            // Supplies user ID if not admin
+            if(!controller.getIsAdmin())
+                stmt.setInt(1, controller.getCurrentUserID());
+
             set = stmt.executeQuery();
 
             while(set.next()){
@@ -1009,7 +1044,7 @@ public class FeedbackRecord {
 
 
     // Methods obtains the different available user feedbacks
-    private void updateReactionOptions(){
+    public void updateReactionOptions(){
 
         // Resets arrayLists in case of updates
         reactionOptions.clear(); 
