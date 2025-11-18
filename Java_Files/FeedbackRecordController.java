@@ -125,7 +125,7 @@ public class FeedbackRecordController implements ActionListener{
 
         String userID = view.getUserFeedbackPanelViewer().getUserFeedbackIDField().getText().trim();
         String locationID = view.getUserFeedbackPanelViewer().getLocationIDField().getText().trim();
-        float rating = 1 + (  view.getUserFeedbackPanelViewer().getRatingsSlider().getValue() / 10.0f);
+        float rating = 1.0f + (  view.getUserFeedbackPanelViewer().getRatingsSlider().getValue() / 10.0f);
         
 
         if(!checkFeedbackErrors(new String[] {userID, locationID}, new String[] {"userID", "locationID"})){
@@ -709,7 +709,7 @@ public class FeedbackRecordController implements ActionListener{
             case "Feedback Table":
 
                 resetEditFields();
-                
+
                 view.showPanel(UserFeedbackPanelViewer.FEEDBACK_VIEW_LINK);
                 feedback.loadUserFeedbackTable(view.getUserFeedbackPanelViewer().getFeedbackModel());
                 break;
@@ -767,7 +767,7 @@ public class FeedbackRecordController implements ActionListener{
                 if(view.getUserFeedbackPanelViewer().getFeedbackSelectComboBox().getItemCount() == 0)
                     view.showError(new ArrayList<String>(Arrays.asList(FeedbackRecordViewer.NO_OPTIONS)), 
                                    new ArrayList<String>(Arrays.asList("Feedback Selection")));
-                else if(view.getUserFeedbackPanelViewer().getEditFeedbackLocationIDBox().isEnabled()){
+                else if(view.getUserFeedbackPanelViewer().getEditFeedbackRatingsSlider().isEnabled()){
 
                     updateFeedbackEditUser();
                     view.showMessage(FeedbackRecordViewer.DATA_EDITED); // Show message
@@ -786,7 +786,7 @@ public class FeedbackRecordController implements ActionListener{
                 if(view.getUserFeedbackPanelViewer().getFeedbackSelectComboBox().getItemCount() == 0)
                     view.showError(new ArrayList<String>(Arrays.asList(FeedbackRecordViewer.NO_OPTIONS)), 
                                    new ArrayList<String>(Arrays.asList("Feedback Selection")));
-                if(view.getUserFeedbackPanelViewer().getEditFeedbackLocationIDBox().isEnabled()){
+                if(view.getUserFeedbackPanelViewer().getEditFeedbackRatingsSlider().isEnabled()){
 
                     deleteFeedbackEditUser();
                     view.showMessage(FeedbackRecordViewer.DATA_REMOVED); // Show message
@@ -815,6 +815,22 @@ public class FeedbackRecordController implements ActionListener{
                 view.getUserReactionPanelViewer().getUserReactionIDField().setText("");
                 view.getUserReactionPanelViewer().getUserReactionIDField().setEditable(true);
                 view.getUserReactionPanelViewer().getUserReactionIDField().setEnabled(true);
+
+                // Auto fill User ID field and disalbe to be editable
+
+                // Refresh the reaction select combo box
+                ArrayList<String> reactionOptionsAdmin = feedback.getReactionOptions();
+                JComboBox<String> reactionTypeBoxAdmin = view.getUserReactionPanelViewer().getReactionTypeBox();
+                
+                reactionTypeBoxAdmin.removeAllItems(); // Removes all content to update
+                
+                // For loop to add updates options
+                for(String reaction : reactionOptionsAdmin)
+                    reactionTypeBoxAdmin.addItem(reaction);
+                
+                if(reactionOptionsAdmin.size() > 0)
+                    reactionTypeBoxAdmin.setSelectedIndex(0);
+
 
                 view.showPanel(UserReactionPanelViewer.USER_REACTION_CREATE_LINK);
                 break;
@@ -1038,6 +1054,19 @@ public class FeedbackRecordController implements ActionListener{
                 view.getUserReactionPanelViewer().getUserReactionIDField().setText(String.valueOf(currentUserID));
                 view.getUserReactionPanelViewer().getUserReactionIDField().setEditable(false);
                 view.getUserReactionPanelViewer().getUserReactionIDField().setEnabled(false);
+
+                // Refresh the reaction select combo box
+                ArrayList<String> reactionOptions = feedback.getReactionOptions();
+                JComboBox<String> reactionTypeBox = view.getUserReactionPanelViewer().getReactionTypeBox();
+                
+                reactionTypeBox.removeAllItems(); // Removes all content to update
+                
+                // For loop to add updates options
+                for(String reaction : reactionOptions)
+                    reactionTypeBox.addItem(reaction);
+                
+                if(reactionOptions.size() > 0)
+                    reactionTypeBox.setSelectedIndex(0);
 
                 view.showPanel(UserReactionPanelViewer.USER_REACTION_CREATE_LINK);
 
