@@ -473,6 +473,7 @@ public class MainDBController implements ActionListener{
 
                     loginViewer.clearPageInput("Login"); // Clear login page input
                     appDBViewer.showPanel(MainDBViewer.MAIN_LINK); // Show main page
+                    travelRecord.updateLoggedUser(currentUser.getUserId()); // Gets the user id only AFTER logging in when making a travel spot
 
                 }                    
 

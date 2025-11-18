@@ -24,16 +24,28 @@ public class TravelRecordView extends JPanel{
 
         setLayout(new BorderLayout());
 
-        // Input/Top
-        JPanel topPanel = new JPanel(new GridLayout(10, 2, 5, 5));
-        topPanel.setBorder(BorderFactory.createTitledBorder("Travel Spots"));
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createTitledBorder("Travel Spot Form"));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+
 
         tfLocationId = new JTextField();
         tfLocationId.setEditable(false); // locationId should never be edited
+
         tfUserId = new JTextField();
+        tfUserId.setEditable(false); // UserID comes frm login, no need to be edited
+
         tfSpotname = new JTextField();
+
         tfDateShared = new JTextField();
         tfDateShared.setEditable(false); // Date shared should never be edited
+
         tfBasePrice = new JTextField();
         tfMaxCap = new JTextField();
 
@@ -44,40 +56,23 @@ public class TravelRecordView extends JPanel{
         listCategory = new JList<>();
         listCategory.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane catdropdown = new JScrollPane(listCategory);
-        catdropdown.setPreferredSize(new Dimension(200, 80));
+        //catdropdown.setPreferredSize(new Dimension(200, 80));
 
-        topPanel.add(new JLabel("Location ID (for upd/del):"));
-        topPanel.add(tfLocationId);
+        addRow(formPanel, gbc, "Location ID (For Upd/Del):", tfLocationId);
+        addRow(formPanel, gbc, "User ID:", tfUserId);
+        addRow(formPanel, gbc, "Spot Name:", tfSpotname);
+        addRow(formPanel, gbc, "Date Shared [YYYY-MM-DD]:", tfDateShared);
+        addRow(formPanel, gbc, "Country:", cbCountry);
+        addRow(formPanel, gbc, "Region:", cbRegion);
+        addRow(formPanel, gbc, "City:", cbCity);
+        addRow(formPanel, gbc, "Categories:", catdropdown);
+        addRow(formPanel, gbc, "Base Price:", tfBasePrice);
+        addRow(formPanel, gbc, "Max Capacity:", tfMaxCap);
 
-        topPanel.add(new JLabel("User ID:"));
-        topPanel.add(tfUserId);
-
-        topPanel.add(new JLabel("Spot name:"));
-        topPanel.add(tfSpotname);
-
-        topPanel.add(new JLabel("Date Shared [YYYY-MM-DD]:"));
-        topPanel.add(tfDateShared);
-
-        topPanel.add(new JLabel("City:"));
-        topPanel.add(cbCity);
-
-        topPanel.add(new JLabel("Region:"));
-        topPanel.add(cbRegion);
-
-        topPanel.add(new JLabel("Country:"));
-        topPanel.add(cbCountry);
-
-        topPanel.add(new JLabel("Categories:"));
-        topPanel.add(catdropdown);
+        JScrollPane leftScroll = new JScrollPane(formPanel);
+        leftScroll.setPreferredSize(new Dimension(350, 400)); //400, 600
         
-        topPanel.add(new JLabel("Base Price:"));
-        topPanel.add(tfBasePrice);
-
-        topPanel.add(new JLabel("Max Capacity:"));
-        topPanel.add(tfMaxCap);
-
-        add(topPanel, BorderLayout.NORTH);
-
+        add(leftScroll, BorderLayout.WEST);
 
         // Table
         tableModel = new DefaultTableModel(new String[] {
@@ -88,7 +83,7 @@ public class TravelRecordView extends JPanel{
 
 
         // Buttons
-        JPanel botPanel = new JPanel();
+        JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         bAdd = new JButton("ADD");
         bUpdate = new JButton("UPDATE");
@@ -103,6 +98,14 @@ public class TravelRecordView extends JPanel{
         botPanel.add(bBack);
 
         add(botPanel, BorderLayout.SOUTH);
+    }
+
+    private void addRow(JPanel panel, GridBagConstraints gbc, String labelText, Component comp) {
+        gbc.gridx = 0;
+        panel.add(new JLabel(labelText), gbc);
+        gbc.gridx = 1;
+        panel.add(comp, gbc);
+        gbc.gridy++;
     }
 
     // Getters
