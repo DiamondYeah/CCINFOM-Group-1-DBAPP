@@ -28,6 +28,7 @@ public class FeedbackRecordViewer extends JPanel{
     public static final String INVALID_INPUT = "Input Invalid";
     public static final String EXISTING_RECORD = "Given Already Exists in Database";
     public static final String USER_NOT_LOADED = "User Has Not Been Loaded";
+    public static final String NO_OPTIONS = "No Options Available";
 
     // Constant for different messsage codes
     public static final String DATA_ADDED = "Input has been Added to Database";
@@ -55,11 +56,20 @@ public class FeedbackRecordViewer extends JPanel{
     // Default Table Models to craete the framework and store data; 
     private DefaultTableModel reportModel;
 
+    // Components for the Report View
+    private JComboBox<String> monthFilterBox;
+    private JComboBox<String> yearFilterBox;
+    private JButton filterReportButton;
+
     // Components for DB APP Buttons
     private JButton feedbackViewButton; // Button links to the feedback table view
     private JButton userReactViewButton; // Button links to the reaction table view
     private JButton reactionViewButton; // Button links to the reaction table view
     private JButton reportViewButton; // Button links to the report table view
+    private JButton userFeedbackAddButton; // Button links to the create user feedback view
+    private JButton userFeedbackEditDeleteButton; // Button links to the edit user feedback view
+    private JButton userReactAddButton; // Button links to the create user react view
+    private JButton userReactEditDeleteButton; // Button links to the edit user react view
     private JButton backButton; // Button returns user to main menu
 
 
@@ -118,6 +128,25 @@ public class FeedbackRecordViewer extends JPanel{
     }
 
 
+    public JButton getFilterReportButton(){
+
+        return filterReportButton;
+
+    }
+
+    public JComboBox<String> getMonthFilterBox(){
+
+        return monthFilterBox;
+
+    }
+
+    public JComboBox<String> getYearFilterBox(){
+
+        return yearFilterBox;
+
+    }
+
+
     public JButton getFeedbackViewButton(){
 
         return feedbackViewButton;
@@ -151,7 +180,12 @@ public class FeedbackRecordViewer extends JPanel{
         userReactViewButton.addActionListener(listener);
         reportViewButton.addActionListener(listener);
         backButton.addActionListener(listener);
+        userFeedbackAddButton.addActionListener(listener);
+        userFeedbackEditDeleteButton.addActionListener(listener);
+        userReactAddButton.addActionListener(listener);
+        userReactEditDeleteButton.addActionListener(listener);
         reactionViewButton.addActionListener(listener);
+        filterReportButton.addActionListener(listener);
 
     }
 
@@ -216,6 +250,41 @@ public class FeedbackRecordViewer extends JPanel{
         reportViewButton.setAlignmentX(CENTER_ALIGNMENT);
         reportViewButton.setFocusPainted(false);
 
+
+         // Create User Feedback User Options
+        userFeedbackAddButton = new JButton("Add User Feedback");
+        userFeedbackAddButton.setPreferredSize(new Dimension(250, 50));
+        userFeedbackAddButton.setMaximumSize(new Dimension(250, 50));
+        userFeedbackAddButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        userFeedbackAddButton.setAlignmentX(CENTER_ALIGNMENT);
+        userFeedbackAddButton.setFocusPainted(false);
+
+
+         // Create User Feedback User Options
+        userReactEditDeleteButton = new JButton("Edit and Delete User Reaction");
+        userReactEditDeleteButton.setPreferredSize(new Dimension(250, 50));
+        userReactEditDeleteButton.setMaximumSize(new Dimension(250, 50));
+        userReactEditDeleteButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        userReactEditDeleteButton.setAlignmentX(CENTER_ALIGNMENT);
+        userReactEditDeleteButton.setFocusPainted(false);
+
+         // Create User Reaction User Options
+        userReactAddButton = new JButton("Add User Reaction");
+        userReactAddButton.setPreferredSize(new Dimension(250, 50));
+        userReactAddButton.setMaximumSize(new Dimension(250, 50));
+        userReactAddButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        userReactAddButton.setAlignmentX(CENTER_ALIGNMENT);
+        userReactAddButton.setFocusPainted(false);
+
+
+         // Create User Feedback User Options
+        userFeedbackEditDeleteButton = new JButton("Edit and Delete Feedback");
+        userFeedbackEditDeleteButton.setPreferredSize(new Dimension(250, 50));
+        userFeedbackEditDeleteButton.setMaximumSize(new Dimension(250, 50));
+        userFeedbackEditDeleteButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        userFeedbackEditDeleteButton.setAlignmentX(CENTER_ALIGNMENT);
+        userFeedbackEditDeleteButton.setFocusPainted(false);
+
         // Create Back Record Button and add components
         backButton = new JButton("Back");
         backButton.setPreferredSize(new Dimension(250, 50));
@@ -233,6 +302,14 @@ public class FeedbackRecordViewer extends JPanel{
         panelLeft.add(reactionViewButton);
         panelLeft.add(Box.createVerticalStrut(40));
         panelLeft.add(reportViewButton);
+        panelLeft.add(Box.createVerticalStrut(40));
+        panelLeft.add(userFeedbackAddButton);
+        panelLeft.add(Box.createVerticalStrut(40));
+        panelLeft.add(userFeedbackEditDeleteButton);
+        panelLeft.add(Box.createVerticalStrut(40));
+        panelLeft.add(userReactAddButton);
+        panelLeft.add(Box.createVerticalStrut(40));
+        panelLeft.add(userReactEditDeleteButton);
         panelLeft.add(Box.createVerticalGlue());
         panelLeft.add(backButton);
         panelLeft.add(Box.createVerticalStrut(60));
@@ -278,9 +355,47 @@ public class FeedbackRecordViewer extends JPanel{
         viewReportPanel.setLayout(new BoxLayout(viewReportPanel, BoxLayout.Y_AXIS));
 
         // Create title label
-        JLabel reportTitle = new JLabel("Report Table");
-        reportTitle.setFont(new Font("Arial", Font.BOLD, 50));
+        JLabel reportTitle = new JLabel("Location Reviews Report Table");
+        reportTitle.setFont(new Font("Arial", Font.BOLD, 40));
         reportTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Create filter label
+        JLabel filterLabel = new JLabel("Filter");
+        filterLabel.setFont(new Font("Arial", Font.BOLD, 25));
+        filterLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Create month filter
+        monthFilterBox = new JComboBox<>(new String[]{ "All", "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"});
+        monthFilterBox.setMaximumSize(new Dimension(200, 50));
+        monthFilterBox.setPreferredSize(new Dimension(200, 50));
+        monthFilterBox.setFont(new Font("Arial", Font.PLAIN, 20));
+
+        // Create year filter
+        yearFilterBox = new JComboBox<>(new String[]{ "All", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"});
+        yearFilterBox.setMaximumSize(new Dimension(200, 50));
+        yearFilterBox.setPreferredSize(new Dimension(200, 50));
+        yearFilterBox.setFont(new Font("Arial", Font.PLAIN, 20));
+
+        // Create filter button
+        filterReportButton = new JButton("Filter");
+        filterReportButton.setPreferredSize(new Dimension(250, 50));
+        filterReportButton.setMaximumSize(new Dimension(250, 50));
+        filterReportButton.setFont(new Font("Arial", Font.BOLD, 30));
+        filterReportButton.setFocusPainted(false);
+
+        // Wrapper to combine all filtering components together
+        JPanel filterWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        filterWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
+        filterWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        
+        filterWrapper.add(filterLabel);
+        filterWrapper.add(Box.createHorizontalStrut(15));
+        filterWrapper.add(monthFilterBox);
+        filterWrapper.add(Box.createHorizontalStrut(15));
+        filterWrapper.add(yearFilterBox);
+        filterWrapper.add(Box.createHorizontalStrut(15));
+        filterWrapper.add(filterReportButton);
 
         // Create the table model with the different fields
         reportModel = new DefaultTableModel();
@@ -321,6 +436,8 @@ public class FeedbackRecordViewer extends JPanel{
 
         // Add componenets to panelLeft including Structs to add padding between buttons
         viewReportPanel.add(Box.createVerticalStrut(40));
+        viewReportPanel.add(filterWrapper);
+        viewReportPanel.add(Box.createVerticalStrut(20));
         viewReportPanel.add(reportTitle);
         viewReportPanel.add(Box.createVerticalStrut(20));
         viewReportPanel.add(scroll);
@@ -375,6 +492,11 @@ public class FeedbackRecordViewer extends JPanel{
                 case USER_NOT_LOADED:
                 
                     errorsToDisplay[i] = errorInputs.get(i) + " has not been loaded yet";
+                    break;
+
+                case NO_OPTIONS:
+                
+                    errorsToDisplay[i] = errorInputs.get(i) + " has no available options";
                     break;
 
             }

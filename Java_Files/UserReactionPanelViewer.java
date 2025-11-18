@@ -221,6 +221,7 @@ public class UserReactionPanelViewer {
         buttonWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         buttonWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
 
+
         // Create Enter Button and add components
         createUserReactionLinkButton = new JButton("Add");
         createUserReactionLinkButton.setPreferredSize(new Dimension(250, 50));
