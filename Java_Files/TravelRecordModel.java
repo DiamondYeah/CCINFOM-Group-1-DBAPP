@@ -73,7 +73,7 @@ public class TravelRecordModel {
 
     // Return generated location_id
     public int addTravelSpot(TravelRecord spot, List<Integer> categoryId) throws SQLException {
-        String newSpot = "INSERT INTO Travel_Spot (user_id, spotname, date_shared, city_id, base_price, max_capacity) VALUES (?, ?, ?, ?, ?, ?)";
+        String newSpot = "INSERT INTO Travel_Spot (user_id, spotname, date_shared, city_id, base_price, max_capacity, availability) VALUES (?, ?, ?, ?, ?, ?, ?)";
         boolean auto = connection.getAutoCommit();
         try (PreparedStatement ps = connection.prepareStatement(newSpot, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
@@ -84,6 +84,7 @@ public class TravelRecordModel {
             ps.setInt(4, spot.getCityId());
             ps.setDouble(5, spot.getBasePrice());
             ps.setInt(6, spot.getMaxCap());
+            ps.setString(7, spot.getAvailability());
 
             int result = ps.executeUpdate();
             if (result == 0)
@@ -132,7 +133,8 @@ public class TravelRecordModel {
                         rs.getDate("date_shared"),
                         rs.getInt("city_id"),
                         rs.getDouble("base_price"),
-                        rs.getInt("max_capacity")
+                        rs.getInt("max_capacity"),
+                        rs.getString("availability")
                     );
                 }
             }
@@ -142,7 +144,7 @@ public class TravelRecordModel {
 
     // Update a Travel Spot
     public boolean updTravelSpot(TravelRecord spot) throws SQLException {
-        String sql = "UPDATE travel_spot SET user_id=?, spotname=?, date_shared=?, city_id=?, base_price=?, max_capacity=? WHERE location_id=?";
+        String sql = "UPDATE travel_spot SET user_id=?, spotname=?, date_shared=?, city_id=?, base_price=?, max_capacity=?, availability=? WHERE location_id=?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
         ps.setInt(1, spot.getUserId());
@@ -151,7 +153,8 @@ public class TravelRecordModel {
         ps.setInt(4, spot.getCityId());
         ps.setDouble(5, spot.getBasePrice());
         ps.setInt(6, spot.getMaxCap());
-        ps.setInt(7, spot.getLocationId());
+        ps.setString(7, spot.getAvailability());
+        ps.setInt(8, spot.getLocationId());
 
         return ps.executeUpdate() > 0;
         }
@@ -204,7 +207,7 @@ public class TravelRecordModel {
     public List<Object[]> getAllTravelSpotsDetailed() throws SQLException {
         List<Object[]> rows = new ArrayList<>();
         String sql = 
-            "SELECT ts.location_id, ts.user_id, ts.spotname, ts.date_shared, c.city_name, r.region_name, co.country_name, ts.base_price, ts.max_capacity, " +
+            "SELECT ts.location_id, ts.user_id, ts.spotname, ts.date_shared, c.city_name, r.region_name, co.country_name, ts.base_price, ts.max_capacity, ts.availability, " +
             "GROUP_CONCAT(DISTINCT cat.category_name ORDER BY cat.category_name SEPARATOR ', ') AS categories FROM Travel_Spot AS ts " +
             "JOIN City AS c ON ts.city_id = c.city_id " +
             "JOIN Region AS r ON c.region_id = r.region_id " +
@@ -215,7 +218,7 @@ public class TravelRecordModel {
         try (PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Object[] r = new Object[10];
+                    Object[] r = new Object[11];
                     r[0] = rs.getInt("location_id");
                     r[1] = rs.getInt("user_id");
                     r[2] = rs.getString("spotname");
@@ -225,7 +228,8 @@ public class TravelRecordModel {
                     r[6] = rs.getString("country_name");
                     r[7] = rs.getDouble("base_price");
                     r[8] = rs.getInt("max_capacity");
-                    r[9] = rs.getString("categories");
+                    r[9] = rs.getString("availability");
+                    r[10] = rs.getString("categories");
                     rows.add(r);
                 }
             }
@@ -249,7 +253,8 @@ public class TravelRecordModel {
                     rs.getDate("date_shared"),
                     rs.getInt("city_id"),
                     rs.getDouble("base_price"),
-                    rs.getInt("max_capacity")
+                    rs.getInt("max_capacity"),
+                    rs.getString("availability")
             ));
             }
         }
@@ -269,4 +274,12 @@ public class TravelRecordModel {
         }
         return out;
     }
+
+    /* 
+    public void updateAvailability(int locationId) throws SQLException {
+        String sql = 
+            "UPDATE Travel_Spot ts " +
+            "SET availability = "
+
+    }*/
 }
