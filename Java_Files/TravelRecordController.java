@@ -113,9 +113,12 @@ public class TravelRecordController {
         // ADD
         view.getAddB().addActionListener(e -> {
         try {
-            int userId = Integer.parseInt(view.getUserId()); // temp/placeholder
+            int userId = maincon.getCurrentUser().getUserId();
             String spotname = view.getSpotname();
-            java.sql.Date dateShared = java.sql.Date.valueOf(view.getDateShared());
+
+            java.sql.Date dateShared = new java.sql.Date(System.currentTimeMillis());
+            view.setDateShared(dateShared.toString());
+
             IdName city = (IdName) view.getCitiesCB().getSelectedItem();
             if (city == null)
                 throw new IllegalArgumentException("Please select a city.");
@@ -146,7 +149,7 @@ public class TravelRecordController {
         view.getUpdateB().addActionListener(e -> {
         try {
             int locationId = Integer.parseInt(view.getLocationId());
-            int userId = Integer.parseInt(view.getUserId()); // temp/placeholder
+            int userId = maincon.getCurrentUser().getUserId();
             String spotname = view.getSpotname();
 
             // date shared
@@ -226,6 +229,7 @@ public class TravelRecordController {
         });
     }
 
+    // Refreshing the table
     private void refreshTable() {
         try {
             DefaultTableModel tm = view.getTableModel();
@@ -240,5 +244,10 @@ public class TravelRecordController {
         catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error loading travel spots.");
         }
+    }
+
+    // Getting the userId after a successful login
+    public void updateLoggedUser(int userId) {
+        view.setUserId(String.valueOf(userId));
     }
 }

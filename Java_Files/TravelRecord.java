@@ -14,7 +14,7 @@ public class TravelRecord {
     // Constructors
     public TravelRecord(int location_id, int user_id, String spotname, 
                         java.sql.Date dateShared, int city_id, 
-                        double basePrice, int MaxCap) {
+                        double basePrice, int maxCap) {
         this.location_id = location_id;
         this.user_id = user_id;
         this.spotname = spotname;
@@ -27,7 +27,7 @@ public class TravelRecord {
     // Adding a travel spot, as location_id will increment by itself
     public TravelRecord(int user_id, String spotname, 
                         java.sql.Date dateShared, int city_id, 
-                        double basePrice, int MaxCap) {
+                        double basePrice, int maxCap) {
         this.user_id = user_id;
         this.spotname = spotname;
         this.dateShared = dateShared;
