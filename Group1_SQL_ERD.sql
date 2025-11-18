@@ -291,13 +291,45 @@ INSERT INTO User_Phone (User_ID, Phone_Number) VALUES
 (11, '09493339430'),
 (11, '09214223377');
 
--- INSERT INTO Country (country_name) VALUES
+INSERT INTO Country (country_name) VALUES
+('Philippines'),
+('Japan'),
+('USA'),
+('France'),
+('Italy'),
+('India'),
+('Australia'),
+('Germany'),
+('Spain'),
+('Turkey'),
+('Thailand');
 
--- INSERT INTO Region (region_name, country_id) VALUES
+INSERT INTO Region (region_name, country_id) VALUES
+('Region I', 1),
+('Region III', 1),
+('NCR', 1),
+('Kanto Region' 2),
+('California', 3),
+('Tuscany', 5),
+('Berlin', 8),
+('Hokkaido', 2),
+('Madrid', 9),
+('Istanbul Region', 10);
 
--- INSERT INTO City (city_name, region_id) VALUES
+INSERT INTO City (city_name, region_id) VALUES
+('Hakone-Machi', 4),
+('Urdaneta City', 1),
+('Manila City', 3),
+('Malabon City' 3),
+('Angeles City', 2),
+('San Fernando City', 1),
+('Las Pinas City', 3),
+('Tokyo', 4),
+('Sapporo', 8),
+('Los Angeles', 5),
+('Siena', 6);
 
--- INSERT INTO Category (category_name) VALUES
+INSERT INTO Category (category_name) VALUES
 
 -- INSERT INTO Travel_Spot (user_id, spotname, availability, date_shared, city_id, base_price, max_capacity) VALUES
 
