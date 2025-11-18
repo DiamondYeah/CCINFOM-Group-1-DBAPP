@@ -35,12 +35,26 @@ public class UserRecordController implements ActionListener {
         view.getRemoveEmailButton().addActionListener(this);
         view.getAddPhoneButton().addActionListener(this);
         view.getRemovePhoneButton().addActionListener(this);
+        view.getDeleteAccountButton().addActionListener(this);
         
         view.getUpdateUserButtonUser().addActionListener(this);
         view.getAddEmailButtonUser().addActionListener(this);
         view.getRemoveEmailButtonUser().addActionListener(this);
         view.getAddPhoneButtonUser().addActionListener(this);
         view.getRemovePhoneButtonUser().addActionListener(this);
+        view.getDeleteAccountButtonUser().addActionListener(this);
+        
+        view.getRefreshTiersButton().addActionListener(this);
+        view.getRefreshEmailsButton().addActionListener(this);
+        view.getRefreshPhonesButton().addActionListener(this);
+        view.getInsertUserButton().addActionListener(this);
+        view.getDeleteUserButton().addActionListener(this);
+        view.getInsertTierButton().addActionListener(this);
+        view.getDeleteTierButton().addActionListener(this);
+        view.getInsertEmailButton().addActionListener(this);
+        view.getDeleteEmailButton().addActionListener(this);
+        view.getInsertPhoneButton().addActionListener(this);
+        view.getDeletePhoneButton().addActionListener(this);
     }
 
     @Override
@@ -99,6 +113,54 @@ public class UserRecordController implements ActionListener {
             case "RemovePhone":
                 removePhone();
                 break;
+                
+            case "DeleteAccount":
+                deleteAccount();
+                break;
+                
+            case "RefreshTiers":
+                refreshTiersTable();
+                break;
+                
+            case "RefreshEmails":
+                refreshEmailsTable();
+                break;
+                
+            case "RefreshPhones":
+                refreshPhonesTable();
+                break;
+                
+            case "InsertUser":
+                insertUser();
+                break;
+                
+            case "DeleteUser":
+                deleteUser();
+                break;
+                
+            case "InsertTier":
+                insertTier();
+                break;
+                
+            case "DeleteTier":
+                deleteTier();
+                break;
+                
+            case "InsertEmail":
+                insertEmail();
+                break;
+                
+            case "DeleteEmail":
+                deleteEmail();
+                break;
+                
+            case "InsertPhone":
+                insertPhone();
+                break;
+                
+            case "DeletePhone":
+                deletePhone();
+                break;
         }
     }
     
@@ -125,6 +187,9 @@ public class UserRecordController implements ActionListener {
             if (mainController.verifyPassword(password)) {
                 view.showCard(view.getTableCard());
                 refreshUserTable();
+                refreshTiersTable();
+                refreshEmailsTable();
+                refreshPhonesTable();
             } else {
                 JOptionPane.showMessageDialog(view, "Incorrect password.", 
                     "Authentication Failed", JOptionPane.ERROR_MESSAGE);
@@ -135,6 +200,21 @@ public class UserRecordController implements ActionListener {
     private void refreshUserTable() {
         List<User> users = model.getAllUsers();
         view.updateUserTable(users);
+    }
+    
+    private void refreshTiersTable() {
+        List<PointsTier> tiers = model.getAllTiers();
+        view.updateTiersTable(tiers);
+    }
+    
+    private void refreshEmailsTable() {
+        List<UserEmail> emails = model.getAllEmails();
+        view.updateEmailsTable(emails);
+    }
+    
+    private void refreshPhonesTable() {
+        List<UserPhone> phones = model.getAllPhones();
+        view.updatePhonesTable(phones);
     }
     
     private void showRecommendations() {
@@ -286,7 +366,7 @@ public class UserRecordController implements ActionListener {
             
             if (isDisplayedUserAdmin) {
                 view.getTierLabel().setText("ADMIN");
-                view.getTierLabel().setForeground(Color.decode("#cc0000"));
+                view.getTierLabel().setForeground(Color.RED);
             } else if (currentUser.getPointsTier() != null) {
                 view.getTierLabel().setText(currentUser.getPointsTier().getTierName());
                 view.getTierLabel().setForeground(Color.decode("#0066cc"));
@@ -325,7 +405,7 @@ public class UserRecordController implements ActionListener {
             
             if (isDisplayedUserAdmin) {
                 view.getTierLabelUser().setText("ADMIN");
-                view.getTierLabelUser().setForeground(Color.decode("#cc0000"));
+                view.getTierLabelUser().setForeground(Color.RED);
             } else if (currentUser.getPointsTier() != null) {
                 view.getTierLabelUser().setText(currentUser.getPointsTier().getTierName());
                 view.getTierLabelUser().setForeground(Color.decode("#0066cc"));
@@ -487,8 +567,14 @@ public class UserRecordController implements ActionListener {
             return;
         }
         
-        if (!email.contains("@")) {
-            JOptionPane.showMessageDialog(view, "Please enter a valid email address.", 
+        if (!email.contains("@") || !email.contains(".com")) {
+            JOptionPane.showMessageDialog(view, "Email must contain '@' and '.com'", 
+                "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        if (email.indexOf("@") > email.indexOf(".com")) {
+            JOptionPane.showMessageDialog(view, "Invalid email format. '@' must come before '.com'", 
                 "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -595,6 +681,14 @@ public class UserRecordController implements ActionListener {
             return;
         }
         
+        String digitsOnly = phone.replaceAll("[^0-9]", "");
+        
+        if (digitsOnly.length() < 7 || digitsOnly.length() > 15) {
+            JOptionPane.showMessageDialog(view, "Phone number must contain between 7 and 15 digits.\nCurrent digits: " + digitsOnly.length(), 
+                "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
         boolean success = model.addUserPhone(currentUser.getUserId(), phone);
         
         if (success) {
@@ -660,6 +754,439 @@ public class UserRecordController implements ActionListener {
                     "Error", JOptionPane.ERROR_MESSAGE);
             }
             
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(view, "Please enter a valid Phone ID number.", 
+                "Invalid Input", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void deleteAccount() {
+        if (currentUser == null && !isAdminMode) {
+            JOptionPane.showMessageDialog(view, "No user loaded.", 
+                "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int userToDelete;
+        if (isAdminMode) {
+            String userIdText = view.getUserIdField().getText().trim();
+            if (userIdText.isEmpty()) {
+                JOptionPane.showMessageDialog(view, "Please load a user first.", 
+                    "No User Loaded", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            try {
+                userToDelete = Integer.parseInt(userIdText);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(view, "Invalid User ID.", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } else {
+            userToDelete = currentUser.getUserId();
+        }
+        
+        int confirm = JOptionPane.showConfirmDialog(view, 
+            "Are you sure you want to DELETE this account?\nThis action CANNOT be undone!", 
+            "Confirm Account Deletion", 
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.WARNING_MESSAGE);
+        
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+        
+        JPasswordField passwordField = new JPasswordField();
+        int option = JOptionPane.showConfirmDialog(view, passwordField, 
+            "Enter your password to confirm deletion:", 
+            JOptionPane.OK_CANCEL_OPTION, 
+            JOptionPane.PLAIN_MESSAGE);
+        
+        if (option != JOptionPane.OK_OPTION) {
+            return;
+        }
+        
+        String password = new String(passwordField.getPassword());
+        
+        if (!mainController.verifyPassword(password)) {
+            JOptionPane.showMessageDialog(view, "Incorrect password. Account not deleted.", 
+                "Authentication Failed", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        boolean success = model.deleteUser(userToDelete);
+        
+        if (success) {
+            JOptionPane.showMessageDialog(view, "Account deleted successfully.", 
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+            
+            if (!isAdminMode && userToDelete == mainController.getCurrentUser().getUserId()) {
+                mainController.logout();
+                backToMain();
+            } else {
+                clearEditFields();
+            }
+        } else {
+            JOptionPane.showMessageDialog(view, "Failed to delete account.", 
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void insertUser() {
+        JPanel panel = new JPanel(new GridLayout(7, 2, 5, 5));
+        JTextField firstNameField = new JTextField();
+        JTextField lastNameField = new JTextField();
+        JTextField nationalityField = new JTextField();
+        JTextField pointsField = new JTextField("0");
+        JTextField passwordField = new JTextField();
+        JCheckBox isAdminCheck = new JCheckBox();
+        
+        panel.add(new JLabel("First Name:"));
+        panel.add(firstNameField);
+        panel.add(new JLabel("Last Name:"));
+        panel.add(lastNameField);
+        panel.add(new JLabel("Nationality:"));
+        panel.add(nationalityField);
+        panel.add(new JLabel("Points:"));
+        panel.add(pointsField);
+        panel.add(new JLabel("Password:"));
+        panel.add(passwordField);
+        panel.add(new JLabel("Is Admin:"));
+        panel.add(isAdminCheck);
+        
+        int result = JOptionPane.showConfirmDialog(view, panel, "Insert New User", 
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                String firstName = firstNameField.getText().trim();
+                String lastName = lastNameField.getText().trim();
+                String nationality = nationalityField.getText().trim();
+                int points = Integer.parseInt(pointsField.getText().trim());
+                String password = passwordField.getText().trim();
+                boolean isAdmin = isAdminCheck.isSelected();
+                
+                if (firstName.isEmpty() || lastName.isEmpty() || password.isEmpty()) {
+                    JOptionPane.showMessageDialog(view, "First Name, Last Name, and Password are required.", 
+                        "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                if (password.length() < 4) {
+                    JOptionPane.showMessageDialog(view, "Password must be at least 4 characters long.", 
+                        "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                boolean success = model.insertUser(firstName, lastName, nationality, points, password, isAdmin);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(view, "User inserted successfully!", 
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshUserTable();
+                } else {
+                    JOptionPane.showMessageDialog(view, "Failed to insert user.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(view, "Points must be a valid number.", 
+                    "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void deleteUser() {
+        String userIdText = JOptionPane.showInputDialog(view, "Enter User ID to delete:", 
+            "Delete User", JOptionPane.QUESTION_MESSAGE);
+        
+        if (userIdText == null || userIdText.trim().isEmpty()) {
+            return;
+        }
+        
+        try {
+            int userId = Integer.parseInt(userIdText.trim());
+            
+            int confirm = JOptionPane.showConfirmDialog(view, 
+                "Are you sure you want to delete User ID " + userId + "?\nThis action CANNOT be undone!\n\nThis will also delete:\n- All user emails\n- All user phone numbers\n- All travel spots shared by this user\n- All bookings by this user\n- All feedback from this user", 
+                "Confirm Deletion", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                System.out.println("Attempting to delete user ID: " + userId);
+                boolean success = model.deleteUser(userId);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(view, "User deleted successfully!", 
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshUserTable();
+                    refreshEmailsTable();
+                    refreshPhonesTable();
+                } else {
+                    JOptionPane.showMessageDialog(view, "Failed to delete user. User ID " + userId + " may not exist.\nCheck the console for more details.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(view, "Please enter a valid User ID number.", 
+                "Invalid Input", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void insertTier() {
+        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
+        JTextField tierNameField = new JTextField();
+        JTextField minPointsField = new JTextField();
+        JTextField maxPointsField = new JTextField();
+        
+        panel.add(new JLabel("Tier Name:"));
+        panel.add(tierNameField);
+        panel.add(new JLabel("Min Points:"));
+        panel.add(minPointsField);
+        panel.add(new JLabel("Max Points:"));
+        panel.add(maxPointsField);
+        
+        int result = JOptionPane.showConfirmDialog(view, panel, "Insert New Tier", 
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                String tierName = tierNameField.getText().trim();
+                int minPoints = Integer.parseInt(minPointsField.getText().trim());
+                int maxPoints = Integer.parseInt(maxPointsField.getText().trim());
+                
+                if (tierName.isEmpty()) {
+                    JOptionPane.showMessageDialog(view, "Tier Name is required.", 
+                        "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                if (minPoints > maxPoints) {
+                    JOptionPane.showMessageDialog(view, "Min Points cannot be greater than Max Points.", 
+                        "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                boolean success = model.insertTier(tierName, minPoints, maxPoints);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(view, "Tier inserted successfully!", 
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshTiersTable();
+                } else {
+                    JOptionPane.showMessageDialog(view, "Failed to insert tier.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(view, "Points must be valid numbers.", 
+                    "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void deleteTier() {
+        String tierIdText = JOptionPane.showInputDialog(view, "Enter Tier ID to delete:", 
+            "Delete Tier", JOptionPane.QUESTION_MESSAGE);
+        
+        if (tierIdText == null || tierIdText.trim().isEmpty()) {
+            return;
+        }
+        
+        try {
+            int tierId = Integer.parseInt(tierIdText.trim());
+            
+            int confirm = JOptionPane.showConfirmDialog(view, 
+                "Are you sure you want to delete Tier ID " + tierId + "?\nUsers in this tier will have their Tier_ID set to NULL.", 
+                "Confirm Deletion", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                System.out.println("Attempting to delete tier ID: " + tierId);
+                boolean success = model.deleteTier(tierId);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(view, "Tier deleted successfully!", 
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshTiersTable();
+                    refreshUserTable();
+                } else {
+                    JOptionPane.showMessageDialog(view, "Failed to delete tier. Tier ID " + tierId + " may not exist.\nCheck the console for more details.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(view, "Please enter a valid Tier ID number.", 
+                "Invalid Input", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void insertEmail() {
+        JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
+        JTextField userIdField = new JTextField();
+        JTextField emailField = new JTextField();
+        
+        panel.add(new JLabel("User ID:"));
+        panel.add(userIdField);
+        panel.add(new JLabel("Email:"));
+        panel.add(emailField);
+        
+        int result = JOptionPane.showConfirmDialog(view, panel, "Insert New Email", 
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                int userId = Integer.parseInt(userIdField.getText().trim());
+                String email = emailField.getText().trim();
+                
+                if (email.isEmpty()) {
+                    JOptionPane.showMessageDialog(view, "Email is required.", 
+                        "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                if (!email.contains("@") || !email.contains(".com")) {
+                    JOptionPane.showMessageDialog(view, "Email must contain '@' and '.com'", 
+                        "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                if (email.indexOf("@") > email.indexOf(".com")) {
+                    JOptionPane.showMessageDialog(view, "Invalid email format. '@' must come before '.com'", 
+                        "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                boolean success = model.addUserEmail(userId, email);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(view, "Email inserted successfully!", 
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshEmailsTable();
+                } else {
+                    JOptionPane.showMessageDialog(view, "Failed to insert email. Check if User ID exists.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(view, "User ID must be a valid number.", 
+                    "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void deleteEmail() {
+        String emailIdText = JOptionPane.showInputDialog(view, "Enter Email ID to delete:", 
+            "Delete Email", JOptionPane.QUESTION_MESSAGE);
+        
+        if (emailIdText == null || emailIdText.trim().isEmpty()) {
+            return;
+        }
+        
+        try {
+            int emailId = Integer.parseInt(emailIdText.trim());
+            
+            int confirm = JOptionPane.showConfirmDialog(view, 
+                "Are you sure you want to delete Email ID " + emailId + "?", 
+                "Confirm Deletion", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean success = model.deleteUserEmail(emailId);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(view, "Email deleted successfully!", 
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshEmailsTable();
+                } else {
+                    JOptionPane.showMessageDialog(view, "Failed to delete email. Email ID may not exist.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(view, "Please enter a valid Email ID number.", 
+                "Invalid Input", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void insertPhone() {
+        JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
+        JTextField userIdField = new JTextField();
+        JTextField phoneField = new JTextField();
+        
+        panel.add(new JLabel("User ID:"));
+        panel.add(userIdField);
+        panel.add(new JLabel("Phone Number:"));
+        panel.add(phoneField);
+        
+        int result = JOptionPane.showConfirmDialog(view, panel, "Insert New Phone", 
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                int userId = Integer.parseInt(userIdField.getText().trim());
+                String phone = phoneField.getText().trim();
+                
+                if (phone.isEmpty()) {
+                    JOptionPane.showMessageDialog(view, "Phone number is required.", 
+                        "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                String digitsOnly = phone.replaceAll("[^0-9]", "");
+                
+                if (digitsOnly.length() < 7 || digitsOnly.length() > 15) {
+                    JOptionPane.showMessageDialog(view, "Phone number must contain between 7 and 15 digits.\nCurrent digits: " + digitsOnly.length(), 
+                        "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                boolean success = model.addUserPhone(userId, phone);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(view, "Phone inserted successfully!", 
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshPhonesTable();
+                } else {
+                    JOptionPane.showMessageDialog(view, "Failed to insert phone. Check if User ID exists.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(view, "User ID must be a valid number.", 
+                    "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void deletePhone() {
+        String phoneIdText = JOptionPane.showInputDialog(view, "Enter Phone ID to delete:", 
+            "Delete Phone", JOptionPane.QUESTION_MESSAGE);
+        
+        if (phoneIdText == null || phoneIdText.trim().isEmpty()) {
+            return;
+        }
+        
+        try {
+            int phoneId = Integer.parseInt(phoneIdText.trim());
+            
+            int confirm = JOptionPane.showConfirmDialog(view, 
+                "Are you sure you want to delete Phone ID " + phoneId + "?", 
+                "Confirm Deletion", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean success = model.deleteUserPhone(phoneId);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(view, "Phone deleted successfully!", 
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshPhonesTable();
+                } else {
+                    JOptionPane.showMessageDialog(view, "Failed to delete phone. Phone ID may not exist.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(view, "Please enter a valid Phone ID number.", 
                 "Invalid Input", JOptionPane.ERROR_MESSAGE);
