@@ -19,8 +19,9 @@ public class FeedbackRecordController implements ActionListener{
     private FeedbackRecord feedback;
     private FeedbackRecordViewer view;
     
-    // Boolean checks if current user is an admin or not
-    private boolean isAdmin;
+    // Attributes getting data of current logged in user
+    private boolean isAdmin; // Store if user is admin or not
+    private int currentUserID; // Store ID of current user
 
     // Public constructor
     public FeedbackRecordController(Connection conn, MainDBController mainController, JPanel cardPanel){
@@ -42,12 +43,30 @@ public class FeedbackRecordController implements ActionListener{
 
 
     // Getter method for feedback record
+
+
+    public FeedbackRecord getModel(){
+
+        return feedback;
+
+    }
+    public boolean getIsAdmin(){
+
+        return isAdmin;
+    }
+
+
+    public int getCurrentUserID(){
+
+        return currentUserID;
+
+    }
+
     public FeedbackRecord getFeedbackRecord(){
 
         return feedback;
 
     }
-
 
     public FeedbackRecordViewer getFeedbackRecordViewer(){
 
@@ -65,6 +84,13 @@ public class FeedbackRecordController implements ActionListener{
          
     }
 
+
+    // Setter method gets current user id
+    public void setCurrentUserID(int currentUserID){
+
+        this.currentUserID = currentUserID;
+
+    }
 
     // Method to check whether to display view of admin only buttons for non-admin users
     private void displayAdminButtons(boolean isAdmin){
@@ -103,8 +129,8 @@ public class FeedbackRecordController implements ActionListener{
 
         if(!checkFeedbackErrors(new String[] {userID, locationID}, new String[] {"userID", "locationID"})){
 
-            System.out.println(userID + locationID + rating);
             feedback.addUserFeedback(Integer.valueOf(userID), Integer.valueOf(locationID), rating);
+            view.showMessage(FeedbackRecordViewer.DATA_ADDED); // Show message
 
         }
 
@@ -121,8 +147,8 @@ public class FeedbackRecordController implements ActionListener{
 
         if(!checkFeedbackErrors(new String[] {userID, reviewID}, new String[] {"userID", "reviewID"})){
 
-            System.out.println(userID + reviewID + reactionType);
             feedback.addUserReaction(Integer.valueOf(userID), Integer.valueOf(reviewID), reactionType);
+            view.showMessage(FeedbackRecordViewer.DATA_ADDED); // Show message
 
         }
 
@@ -136,8 +162,13 @@ public class FeedbackRecordController implements ActionListener{
 
         String reactionName = view.getReactionPanelViewer().getReactionNameField().getText().trim();
 
-        if(!checkFeedbackErrors(new String[] {reactionName}, new String[] {"reactionName"}))
+        if(!checkFeedbackErrors(new String[] {reactionName}, new String[] {"reactionName"})){
+
             feedback.addReaction(reactionName, view.getUserReactionPanelViewer().getReactionTypeBox());
+            view.showMessage(FeedbackRecordViewer.DATA_ADDED); // Show message
+
+        }
+
 
         
         
@@ -595,7 +626,6 @@ public class FeedbackRecordController implements ActionListener{
             case UserFeedbackPanelViewer.CREATE_FEEDBACK_USER_LINK:
 
                 storeFeedbackInfo();
-                view.showMessage(FeedbackRecordViewer.DATA_ADDED); // Show message
 
                 break;
 
@@ -606,25 +636,33 @@ public class FeedbackRecordController implements ActionListener{
 
             case UserFeedbackPanelViewer.EDIT_FEEDBACK_USER_LINK:
 
-                if(view.getUserFeedbackPanelViewer().getEditFeedbackLocationIDBox().isEnabled())
+                if(view.getUserFeedbackPanelViewer().getEditFeedbackLocationIDBox().isEnabled()){
+
                     updateFeedbackEditUser();
+                    view.showMessage(FeedbackRecordViewer.DATA_EDITED); // Show message
+                }
                 else
                     view.showError(new ArrayList<String>(Arrays.asList(FeedbackRecordViewer.USER_NOT_LOADED)), 
                                    new ArrayList<String>(Arrays.asList("reviewID")));
 
-                view.showMessage(FeedbackRecordViewer.DATA_EDITED); // Show message
+
 
                 break;
 
             case UserFeedbackPanelViewer.DELETE_FEEDBACK_USER_LINK:
 
-                if(view.getUserFeedbackPanelViewer().getEditFeedbackLocationIDBox().isEnabled())
+                if(view.getUserFeedbackPanelViewer().getEditFeedbackLocationIDBox().isEnabled()){
+
                     deleteFeedbackEditUser();
+                    view.showMessage(FeedbackRecordViewer.DATA_REMOVED); // Show message
+
+                }
+
                 else
                     view.showError(new ArrayList<String>(Arrays.asList(FeedbackRecordViewer.USER_NOT_LOADED)), 
                                    new ArrayList<String>(Arrays.asList("reviewID")));
 
-                view.showMessage(FeedbackRecordViewer.DATA_REMOVED); // Show message
+
 
                 break;
 
@@ -635,6 +673,11 @@ public class FeedbackRecordController implements ActionListener{
                 break;
 
             case UserReactionPanelViewer.USER_REACTION_CREATE_LINK:
+
+                // Auto fill User ID field and disalbe to be editable
+                view.getUserReactionPanelViewer().getUserReactionIDField().setText("");
+                view.getUserReactionPanelViewer().getUserReactionIDField().setEditable(true);
+                view.getUserReactionPanelViewer().getUserReactionIDField().setEnabled(true);
 
                 view.showPanel(UserReactionPanelViewer.USER_REACTION_CREATE_LINK);
                 break;
@@ -664,37 +707,45 @@ public class FeedbackRecordController implements ActionListener{
             case UserReactionPanelViewer.CREATE_USERREACTION_USER_LINK:
 
                 storeUserReactionInfo();
-                view.showMessage(FeedbackRecordViewer.DATA_ADDED); // Show message
 
                 break;
 
             case UserReactionPanelViewer.LOAD_USERREACTION_USER_LINK:
 
                 loadUserReactionEditUser();
+
                 break;
 
             case UserReactionPanelViewer.EDIT_USERREACTION_USER_LINK:
 
             
-                if(view.getUserReactionPanelViewer().getEditUserReactionDateSpinner().isEnabled())
+                if(view.getUserReactionPanelViewer().getEditUserReactionDateSpinner().isEnabled()){
+
                     updateUserReactionEditUser();
+                    view.showMessage(FeedbackRecordViewer.DATA_EDITED); // Show message
+
+                }
+
                 else
                     view.showError(new ArrayList<String>(Arrays.asList(FeedbackRecordViewer.USER_NOT_LOADED)), 
                                    new ArrayList<String>(Arrays.asList("userReactionID")));
 
-                view.showMessage(FeedbackRecordViewer.DATA_EDITED); // Show message
+ 
             
                 break;
 
             case UserReactionPanelViewer.DELETE_USERREACTION_USER_LINK:
 
-                if(view.getUserReactionPanelViewer().getEditUserReactionDateSpinner().isEnabled())
+                if(view.getUserReactionPanelViewer().getEditUserReactionDateSpinner().isEnabled()){
+
                     deleteUserReactionEditUser();
+                    view.showMessage(FeedbackRecordViewer.DATA_REMOVED); // Show message
+
+                }
+
                 else
                     view.showError(new ArrayList<String>(Arrays.asList(FeedbackRecordViewer.USER_NOT_LOADED)), 
                                    new ArrayList<String>(Arrays.asList("userReactionID")));
-
-                view.showMessage(FeedbackRecordViewer.DATA_REMOVED); // Show message
 
                 break;
 
@@ -742,32 +793,104 @@ public class FeedbackRecordController implements ActionListener{
             case ReactionPanelViewer.CREATE_REACTION_USER_LINK:
 
                 storeReactionInfo();
-                view.showMessage(FeedbackRecordViewer.DATA_ADDED); // Show message
 
                 break;     
 
 
             case ReactionPanelViewer.EDIT_REACTION_USER_LINK:
 
-                if(view.getReactionPanelViewer().getNewReactionNameField().isEnabled())
+                if(view.getReactionPanelViewer().getNewReactionNameField().isEnabled()){
+
                     updateReactionEditUser();
+                    view.showMessage(FeedbackRecordViewer.DATA_EDITED); // Show message
+
+                }
+
                 else
                     view.showError(new ArrayList<String>(Arrays.asList(FeedbackRecordViewer.USER_NOT_LOADED)), 
                                    new ArrayList<String>(Arrays.asList("userReactionID")));
 
-                view.showMessage(FeedbackRecordViewer.DATA_EDITED); // Show message
+
 
                 break;
                 
             case ReactionPanelViewer.DELETE_REACTION_USER_LINK:
 
-                if(view.getReactionPanelViewer().getNewReactionNameField().isEnabled())
+                if(view.getReactionPanelViewer().getNewReactionNameField().isEnabled()){
+
                     deleteReactionEditUser();
+                    view.showMessage(FeedbackRecordViewer.DATA_REMOVED); // Show message
+
+                }
                 else
                     view.showError(new ArrayList<String>(Arrays.asList(FeedbackRecordViewer.USER_NOT_LOADED)), 
                                    new ArrayList<String>(Arrays.asList("userReactionID")));
 
-                view.showMessage(FeedbackRecordViewer.DATA_REMOVED); // Show message
+
+
+                break;
+
+            case "Add User Feedback": // Add Feedback User Version
+
+
+                
+                view.showPanel(UserFeedbackPanelViewer.FEEDBACK_CREATE_LINK);
+
+                break;
+
+            case "Edit and Delete Feedback":
+
+                 // Refresh the feedback select combo box
+                ArrayList<String> feedbackSelectUserOptions = feedback.getUserFeedbackOptions();
+                JComboBox<String> feedbackSelectUserBox = view.getUserFeedbackPanelViewer().getFeedbackSelectComboBox();
+                
+                feedbackSelectUserBox.removeAllItems(); // Removes all content to update
+                
+                // For loop to add updates options
+                for(String feedback : feedbackSelectUserOptions)
+                    feedbackSelectUserBox.addItem(feedback);
+                
+                if(feedbackSelectUserOptions.size() > 0)
+                    feedbackSelectUserBox.setSelectedIndex(0);
+
+
+                // Show panel after
+                view.showPanel(UserFeedbackPanelViewer.FEEDBACK_EDIT_LINK);
+
+
+                break;
+
+            case "Add User Reaction": // Add User Reaction User Version
+
+
+                // Auto fill User ID field and disalbe to be editable
+                view.getUserReactionPanelViewer().getUserReactionIDField().setText(String.valueOf(currentUserID));
+                view.getUserReactionPanelViewer().getUserReactionIDField().setEditable(false);
+                view.getUserReactionPanelViewer().getUserReactionIDField().setEnabled(false);
+
+                view.showPanel(UserReactionPanelViewer.USER_REACTION_CREATE_LINK);
+
+                break;
+
+            case "Edit and Delete User Reaction":
+
+                // Refresh the user reaction select combo box
+                ArrayList<String> userReactionSelectUserOptions = feedback.getUserReactionOptions();
+                JComboBox<String> userReactionSelectUserBox = view.getUserReactionPanelViewer().getUserReactionSelectComboBox();
+                
+                userReactionSelectUserBox.removeAllItems(); // Removes all content to update
+                
+                // For loop to add updates options
+                for(String userReaction : userReactionSelectUserOptions)
+                    userReactionSelectUserBox.addItem(userReaction);
+                
+                // Displays first option if there is content to display
+                if(userReactionSelectUserOptions.size() > 0)
+                    userReactionSelectUserBox.setSelectedIndex(0);
+
+
+                // Show panel after
+                view.showPanel(UserReactionPanelViewer.USER_REACTION_EDIT_LINK);
 
                 break;
 
