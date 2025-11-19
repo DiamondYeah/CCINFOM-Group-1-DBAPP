@@ -266,8 +266,8 @@ INSERT INTO User (First_Name, Last_Name, Nationality, Points, Tier_ID, Password,
 ('Ethan', 'Franco', 'Filipino', 8000, 8, '#$21yeSyeS@', FALSE),
 ('Neil Jr.', 'Gutang', 'Filipino', 10000, 9, 'TheSh4DowNeverB3trays!!!', FALSE),
 ('Jakov Benedict', 'Santos', 'Filipino', 23000, 10, 'Cisco123', FALSE),
-('Mariel', 'Yasamuro', 'Japanese', 765, 10, 'ilovefeet', FALSE),
-('Dustine Gian', 'Rivera', 'Puerto Rican', 1999, 10, 'root', FALSE);
+('Mariel', 'Yasamuro', 'Japanese', 765, 4, 'ilovefeet', FALSE),
+('Dustine Gian', 'Rivera', 'Puerto Rican', 1999, 5, 'root', FALSE);
 
 INSERT INTO User_Email (User_ID, Email) VALUES
 (2, 'jorevepangandejesus@gmail.com'),

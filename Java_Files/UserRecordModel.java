@@ -12,7 +12,7 @@ public class UserRecordModel {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, u.Password, " +
-                        "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points, " +
+                        "u.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points, " +
                         "COUNT(DISTINCT ts.Location_ID) as Locations_Shared, " +
                         "COUNT(DISTINCT uf.Review_ID) as Reviews_Made, " +
                         "COUNT(DISTINCT b.Booking_ID) as Bookings_Count " +
@@ -22,7 +22,7 @@ public class UserRecordModel {
                         "LEFT JOIN User_Feedback uf ON u.User_ID = uf.User_ID " +
                         "LEFT JOIN Booking b ON u.User_ID = b.Organizer_ID " +
                         "GROUP BY u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, u.Password, " +
-                        "pt.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
+                        "u.Tier_ID, pt.Tier_Name, pt.Min_Points, pt.Max_Points " +
                         "ORDER BY u.User_ID";
 
         try (PreparedStatement pstmt = conn.prepareStatement(query);
