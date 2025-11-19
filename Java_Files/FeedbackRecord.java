@@ -765,7 +765,7 @@ public class FeedbackRecord {
             query.append("LEFT JOIN User_reaction ur ON uf.Review_ID = ur.Review_ID ");
             query.append("LEFT JOIN Reaction r ON ur.ReactionType_ID = r.ReactionType_ID ");
             query.append("GROUP BY review_id, full_name, tier_name, ts.spotname, uf.rating, Review_Month_Year ");
-            query.append("ORDER BY pt.tier_id DESC, uf.rating DESC; ");
+            query.append("ORDER BY COALESCE(pt.tier_id, 0) DESC, uf.rating DESC;  ");
 
             stmt = conn.prepareStatement(query.toString());
             set = stmt.executeQuery();
@@ -829,13 +829,13 @@ public class FeedbackRecord {
                 else if(!month.equals("All"))
                     query.append("MONTHNAME(uf.Review_Date) = ? ");
                 else if(!year.equals("All"))
-                    query.append("YEAR(uf.Review_Date) = ?");
+                    query.append("YEAR(uf.Review_Date) = ? ");
 
             }
 
             // Add the rest of the query
-            query.append("GROUP BY review_id, full_name, tier_name, ts.spotname, uf.rating, Review_Month_Year ");
-            query.append("ORDER BY pt.tier_id DESC, uf.rating DESC; ");
+            query.append(" GROUP BY review_id, full_name, tier_name, ts.spotname, uf.rating, Review_Month_Year ");
+            query.append(" ORDER BY COALESCE(pt.tier_id, 0) DESC, uf.rating DESC;  ");
 
             stmt = conn.prepareStatement(query.toString());
 
@@ -1203,3 +1203,4 @@ public class FeedbackRecord {
 
     
 }
+
