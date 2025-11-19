@@ -116,7 +116,7 @@ public class TravelRecordView extends JPanel{
         }, 0);
         table = new JTable(tableModel);
         JScrollPane tableScroll = new JScrollPane(table);
-        //tableScroll.getViewport().setBackground(Color.decode("#bfbfb2"));
+        tableScroll.getViewport().setBackground(Color.decode("#bfbfb2"));
         add(tableScroll, BorderLayout.CENTER);
 
         // Back button
