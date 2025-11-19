@@ -105,7 +105,6 @@ public class UserRecordViewer extends JPanel {
     }
     
     private void initialization() {
-        // LEFT PANEL - matching Booking Records style
         JPanel panelWest = new JPanel(new GridBagLayout());
         panelWest.setBackground(Color.GRAY);
         
@@ -138,7 +137,6 @@ public class UserRecordViewer extends JPanel {
 
         this.add(panelWest, BorderLayout.WEST);
 
-        // RIGHT PANEL
         rightCardLayout = new CardLayout();
         rightPanel = new JPanel(rightCardLayout);
         rightPanel.setBackground(Color.decode("#bfbfb2"));
@@ -175,7 +173,6 @@ public class UserRecordViewer extends JPanel {
 
         JTabbedPane tabbedPane = new JTabbedPane();
         
-        // User Table Tab
         JPanel userTablePanel = new JPanel(new BorderLayout(5, 5));
         userTablePanel.setBackground(Color.decode("#bfbfb2"));
         String[] userColumns = {"User ID", "First Name", "Last Name", "Nationality", "Points", "Tier", 
@@ -208,7 +205,6 @@ public class UserRecordViewer extends JPanel {
         
         tabbedPane.addTab("Users", userTablePanel);
         
-        // Tiers Table Tab
         JPanel tiersTablePanel = new JPanel(new BorderLayout(5, 5));
         tiersTablePanel.setBackground(Color.decode("#bfbfb2"));
         String[] tierColumns = {"Tier ID", "Tier Name", "Min Points", "Max Points"};
@@ -240,7 +236,6 @@ public class UserRecordViewer extends JPanel {
         
         tabbedPane.addTab("Points Tiers", tiersTablePanel);
         
-        // Emails Table Tab - Updated with Date Added column
         JPanel emailsTablePanel = new JPanel(new BorderLayout(5, 5));
         emailsTablePanel.setBackground(Color.decode("#bfbfb2"));
         String[] emailColumns = {"Email ID", "User ID", "Email", "Date Added"};
@@ -272,7 +267,6 @@ public class UserRecordViewer extends JPanel {
         
         tabbedPane.addTab("User Emails", emailsTablePanel);
         
-        // Phones Table Tab - Updated with Date Added column
         JPanel phonesTablePanel = new JPanel(new BorderLayout(5, 5));
         phonesTablePanel.setBackground(Color.decode("#bfbfb2"));
         String[] phoneColumns = {"Phone ID", "User ID", "Phone Number", "Date Added"};
@@ -319,7 +313,6 @@ public class UserRecordViewer extends JPanel {
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(titleLabel, BorderLayout.NORTH);
 
-        // Updated columns to include Date and Time
         String[] columns = {"Location ID", "Spot Name", "City", "Region", "Country", 
                            "Points Tier", "Recommendations Count", "Date", "Time"};
         recommendationsTableModel = new DefaultTableModel(columns, 0) {
@@ -347,546 +340,514 @@ public class UserRecordViewer extends JPanel {
         return panel;
     }
 
-    // Replace createEditPanelAdmin() method with this:
-private JPanel createEditPanelAdmin() {
-    JPanel panel = new JPanel(new GridBagLayout());
-    panel.setBackground(Color.decode("#bfbfb2"));
+    private JPanel createEditPanelAdmin() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(Color.decode("#bfbfb2"));
     
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(10, 10, 10, 10);
-    gbc.anchor = GridBagConstraints.WEST;
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
     
-    int row = 0;
+        int row = 0;
     
-    // Title
-    gbc.gridx = 0; gbc.gridy = row++; gbc.gridwidth = 2;
-    gbc.anchor = GridBagConstraints.CENTER;
-    JLabel titleLabel = new JLabel("Edit User Information (Admin)");
-    titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-    panel.add(titleLabel, gbc);
+        gbc.gridx = 0; gbc.gridy = row++; gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JLabel titleLabel = new JLabel("Edit User Information (Admin)");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        panel.add(titleLabel, gbc);
     
-    gbc.anchor = GridBagConstraints.WEST;
-    gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridwidth = 1;
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel userIdLabel = new JLabel("User ID:");
+        userIdLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(userIdLabel, gbc);
     
-    // User ID with Load Button
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel userIdLabel = new JLabel("User ID:");
-    userIdLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(userIdLabel, gbc);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel userIdPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        userIdPanel.setBackground(Color.decode("#bfbfb2"));
+        userIdFieldAdmin = new JTextField(15);
+        loadUserButtonAdmin = new JButton("Load User");
+        loadUserButtonAdmin.setActionCommand("LoadUser");
+        userIdPanel.add(userIdFieldAdmin);
+        userIdPanel.add(loadUserButtonAdmin);
+        panel.add(userIdPanel, gbc);
     
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    JPanel userIdPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-    userIdPanel.setBackground(Color.decode("#bfbfb2"));
-    userIdFieldAdmin = new JTextField(15);
-    loadUserButtonAdmin = new JButton("Load User");
-    loadUserButtonAdmin.setActionCommand("LoadUser");
-    userIdPanel.add(userIdFieldAdmin);
-    userIdPanel.add(loadUserButtonAdmin);
-    panel.add(userIdPanel, gbc);
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel firstNameLabel = new JLabel("First Name:");
+        firstNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(firstNameLabel, gbc);
     
-    // First Name
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel firstNameLabel = new JLabel("First Name:");
-    firstNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(firstNameLabel, gbc);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        firstNameFieldAdmin = new JTextField(20);
+        panel.add(firstNameFieldAdmin, gbc);
     
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    firstNameFieldAdmin = new JTextField(20);
-    panel.add(firstNameFieldAdmin, gbc);
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel lastNameLabel = new JLabel("Last Name:");
+        lastNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(lastNameLabel, gbc);
     
-    // Last Name
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel lastNameLabel = new JLabel("Last Name:");
-    lastNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(lastNameLabel, gbc);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        lastNameFieldAdmin = new JTextField(20);
+        panel.add(lastNameFieldAdmin, gbc);
     
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    lastNameFieldAdmin = new JTextField(20);
-    panel.add(lastNameFieldAdmin, gbc);
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel nationalityLabel = new JLabel("Nationality:");
+        nationalityLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(nationalityLabel, gbc);
     
-    // Nationality
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel nationalityLabel = new JLabel("Nationality:");
-    nationalityLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(nationalityLabel, gbc);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        nationalityFieldAdmin = new JTextField(20);
+        panel.add(nationalityFieldAdmin, gbc);
     
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    nationalityFieldAdmin = new JTextField(20);
-    panel.add(nationalityFieldAdmin, gbc);
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel pointsLabel = new JLabel("Points:");
+        pointsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(pointsLabel, gbc);
     
-    // Points
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel pointsLabel = new JLabel("Points:");
-    pointsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(pointsLabel, gbc);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        pointsFieldAdmin = new JTextField(20);
+        panel.add(pointsFieldAdmin, gbc);
     
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    pointsFieldAdmin = new JTextField(20);
-    panel.add(pointsFieldAdmin, gbc);
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel tierTextLabel = new JLabel("Current Tier:");
+        tierTextLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(tierTextLabel, gbc);
     
-    // Current Tier
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel tierTextLabel = new JLabel("Current Tier:");
-    tierTextLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(tierTextLabel, gbc);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        tierLabelAdmin = new JLabel("N/A");
+        tierLabelAdmin.setFont(new Font("Arial", Font.BOLD, 14));
+        tierLabelAdmin.setForeground(Color.decode("#0066cc"));
+        panel.add(tierLabelAdmin, gbc);
     
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    tierLabelAdmin = new JLabel("N/A");
-    tierLabelAdmin.setFont(new Font("Arial", Font.BOLD, 14));
-    tierLabelAdmin.setForeground(Color.decode("#0066cc"));
-    panel.add(tierLabelAdmin, gbc);
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel passwordLabel = new JLabel("New Password:");
+        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(passwordLabel, gbc);
     
-    // New Password
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel passwordLabel = new JLabel("New Password:");
-    passwordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(passwordLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    passwordFieldAdmin = new JTextField(20);
-    panel.add(passwordFieldAdmin, gbc);
-    
-    // Emails Section
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel emailSectionLabel = new JLabel("Emails:");
-    emailSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(emailSectionLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    emailDisplayAreaAdmin = new JTextArea(3, 20);
-    emailDisplayAreaAdmin.setEditable(false);
-    emailDisplayAreaAdmin.setBackground(Color.WHITE);
-    JScrollPane emailScroll = new JScrollPane(emailDisplayAreaAdmin);
-    panel.add(emailScroll, gbc);
-    
-    // Add Email
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel newEmailLabel = new JLabel("New Email:");
-    newEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(newEmailLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-    emailPanel.setBackground(Color.decode("#bfbfb2"));
-    emailFieldAdmin = new JTextField(15);
-    addEmailButtonAdmin = new JButton("Add");
-    addEmailButtonAdmin.setActionCommand("AddEmail");
-    emailPanel.add(emailFieldAdmin);
-    emailPanel.add(addEmailButtonAdmin);
-    panel.add(emailPanel, gbc);
-    
-    // Remove Email
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel removeEmailLabel = new JLabel("Email ID to Remove:");
-    removeEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(removeEmailLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    JPanel removeEmailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-    removeEmailPanel.setBackground(Color.decode("#bfbfb2"));
-    emailIdToRemoveFieldAdmin = new JTextField(15);
-    removeEmailButtonAdmin = new JButton("Remove");
-    removeEmailButtonAdmin.setActionCommand("RemoveEmail");
-    removeEmailPanel.add(emailIdToRemoveFieldAdmin);
-    removeEmailPanel.add(removeEmailButtonAdmin);
-    panel.add(removeEmailPanel, gbc);
-    
-    // Phones Section
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel phoneSectionLabel = new JLabel("Phone Numbers:");
-    phoneSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(phoneSectionLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    phoneDisplayAreaAdmin = new JTextArea(3, 20);
-    phoneDisplayAreaAdmin.setEditable(false);
-    phoneDisplayAreaAdmin.setBackground(Color.WHITE);
-    JScrollPane phoneScroll = new JScrollPane(phoneDisplayAreaAdmin);
-    panel.add(phoneScroll, gbc);
-    
-    // Add Phone
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel newPhoneLabel = new JLabel("New Phone:");
-    newPhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(newPhoneLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-    phonePanel.setBackground(Color.decode("#bfbfb2"));
-    phoneFieldAdmin = new JTextField(15);
-    addPhoneButtonAdmin = new JButton("Add");
-    addPhoneButtonAdmin.setActionCommand("AddPhone");
-    phonePanel.add(phoneFieldAdmin);
-    phonePanel.add(addPhoneButtonAdmin);
-    panel.add(phonePanel, gbc);
-    
-    // Remove Phone
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel removePhoneLabel = new JLabel("Phone ID to Remove:");
-    removePhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(removePhoneLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    JPanel removePhonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-    removePhonePanel.setBackground(Color.decode("#bfbfb2"));
-    phoneIdToRemoveFieldAdmin = new JTextField(15);
-    removePhoneButtonAdmin = new JButton("Remove");
-    removePhoneButtonAdmin.setActionCommand("RemovePhone");
-    removePhonePanel.add(phoneIdToRemoveFieldAdmin);
-    removePhonePanel.add(removePhoneButtonAdmin);
-    panel.add(removePhonePanel, gbc);
-    
-    // Buttons at bottom
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.gridwidth = 2;
-    gbc.anchor = GridBagConstraints.CENTER;
-    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-    buttonPanel.setBackground(Color.decode("#bfbfb2"));
-    
-    updateUserButtonAdmin = new JButton("Update User");
-    updateUserButtonAdmin.setActionCommand("UpdateUser");
-    updateUserButtonAdmin.setFont(new Font("Arial", Font.PLAIN, 14));
-    
-    deleteAccountButtonAdmin = new JButton("Delete Account");
-    deleteAccountButtonAdmin.setActionCommand("DeleteAccount");
-    deleteAccountButtonAdmin.setFont(new Font("Arial", Font.PLAIN, 14));
-    deleteAccountButtonAdmin.setForeground(Color.RED);
-    
-    buttonPanel.add(updateUserButtonAdmin);
-    buttonPanel.add(deleteAccountButtonAdmin);
-    panel.add(buttonPanel, gbc);
-    
-    return panel;
-}
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        passwordFieldAdmin = new JTextField(20);
+        panel.add(passwordFieldAdmin, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel emailSectionLabel = new JLabel("Emails:");
+        emailSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(emailSectionLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        emailDisplayAreaAdmin = new JTextArea(3, 20);
+        emailDisplayAreaAdmin.setEditable(false);
+        emailDisplayAreaAdmin.setBackground(Color.WHITE);
+        JScrollPane emailScroll = new JScrollPane(emailDisplayAreaAdmin);
+        panel.add(emailScroll, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel newEmailLabel = new JLabel("New Email:");
+        newEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(newEmailLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        emailPanel.setBackground(Color.decode("#bfbfb2"));
+        emailFieldAdmin = new JTextField(15);
+        addEmailButtonAdmin = new JButton("Add");
+        addEmailButtonAdmin.setActionCommand("AddEmail");
+        emailPanel.add(emailFieldAdmin);
+        emailPanel.add(addEmailButtonAdmin);
+        panel.add(emailPanel, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel removeEmailLabel = new JLabel("Email ID to Remove:");
+        removeEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(removeEmailLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel removeEmailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        removeEmailPanel.setBackground(Color.decode("#bfbfb2"));
+        emailIdToRemoveFieldAdmin = new JTextField(15);
+        removeEmailButtonAdmin = new JButton("Remove");
+        removeEmailButtonAdmin.setActionCommand("RemoveEmail");
+        removeEmailPanel.add(emailIdToRemoveFieldAdmin);
+        removeEmailPanel.add(removeEmailButtonAdmin);
+        panel.add(removeEmailPanel, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel phoneSectionLabel = new JLabel("Phone Numbers:");
+        phoneSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(phoneSectionLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        phoneDisplayAreaAdmin = new JTextArea(3, 20);
+        phoneDisplayAreaAdmin.setEditable(false);
+        phoneDisplayAreaAdmin.setBackground(Color.WHITE);
+        JScrollPane phoneScroll = new JScrollPane(phoneDisplayAreaAdmin);
+        panel.add(phoneScroll, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel newPhoneLabel = new JLabel("New Phone:");
+        newPhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(newPhoneLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        phonePanel.setBackground(Color.decode("#bfbfb2"));
+        phoneFieldAdmin = new JTextField(15);
+        addPhoneButtonAdmin = new JButton("Add");
+        addPhoneButtonAdmin.setActionCommand("AddPhone");
+        phonePanel.add(phoneFieldAdmin);
+        phonePanel.add(addPhoneButtonAdmin);
+        panel.add(phonePanel, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel removePhoneLabel = new JLabel("Phone ID to Remove:");
+        removePhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(removePhoneLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel removePhonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        removePhonePanel.setBackground(Color.decode("#bfbfb2"));
+        phoneIdToRemoveFieldAdmin = new JTextField(15);
+        removePhoneButtonAdmin = new JButton("Remove");
+        removePhoneButtonAdmin.setActionCommand("RemovePhone");
+        removePhonePanel.add(phoneIdToRemoveFieldAdmin);
+        removePhonePanel.add(removePhoneButtonAdmin);
+        panel.add(removePhonePanel, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.setBackground(Color.decode("#bfbfb2"));
+        
+        updateUserButtonAdmin = new JButton("Update User");
+        updateUserButtonAdmin.setActionCommand("UpdateUser");
+        updateUserButtonAdmin.setFont(new Font("Arial", Font.PLAIN, 14));
+        
+        deleteAccountButtonAdmin = new JButton("Delete Account");
+        deleteAccountButtonAdmin.setActionCommand("DeleteAccount");
+        deleteAccountButtonAdmin.setFont(new Font("Arial", Font.PLAIN, 14));
+        deleteAccountButtonAdmin.setForeground(Color.RED);
+        
+        buttonPanel.add(updateUserButtonAdmin);
+        buttonPanel.add(deleteAccountButtonAdmin);
+        panel.add(buttonPanel, gbc);
+        
+        return panel;
+    }
 
-// Replace createEditPanelUser() method with this:
-private JPanel createEditPanelUser() {
-    JPanel panel = new JPanel(new GridBagLayout());
-    panel.setBackground(Color.decode("#bfbfb2"));
-    
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(10, 10, 10, 10);
-    gbc.anchor = GridBagConstraints.WEST;
-    
-    int row = 0;
-    
-    // Title
-    gbc.gridx = 0; gbc.gridy = row++; gbc.gridwidth = 2;
-    gbc.anchor = GridBagConstraints.CENTER;
-    JLabel titleLabel = new JLabel("Edit My Information");
-    titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-    panel.add(titleLabel, gbc);
-    
-    gbc.anchor = GridBagConstraints.WEST;
-    gbc.gridwidth = 1;
-    
-    // First Name
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel firstNameLabel = new JLabel("First Name:");
-    firstNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(firstNameLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    firstNameFieldUser = new JTextField(20);
-    panel.add(firstNameFieldUser, gbc);
-    
-    // Last Name
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel lastNameLabel = new JLabel("Last Name:");
-    lastNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(lastNameLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    lastNameFieldUser = new JTextField(20);
-    panel.add(lastNameFieldUser, gbc);
-    
-    // Nationality
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel nationalityLabel = new JLabel("Nationality:");
-    nationalityLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(nationalityLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    nationalityFieldUser = new JTextField(20);
-    panel.add(nationalityFieldUser, gbc);
-    
-    // Points (read-only)
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel pointsLabel = new JLabel("Points:");
-    pointsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(pointsLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    pointsFieldUser = new JTextField(20);
-    pointsFieldUser.setEditable(false);
-    pointsFieldUser.setBackground(Color.LIGHT_GRAY);
-    panel.add(pointsFieldUser, gbc);
-    
-    // Current Tier
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel tierTextLabel = new JLabel("Current Tier:");
-    tierTextLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(tierTextLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    tierLabelUser = new JLabel("N/A");
-    tierLabelUser.setFont(new Font("Arial", Font.BOLD, 14));
-    tierLabelUser.setForeground(Color.decode("#0066cc"));
-    panel.add(tierLabelUser, gbc);
-    
-    // New Password
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel passwordLabel = new JLabel("New Password:");
-    passwordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(passwordLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    passwordFieldUser = new JTextField(20);
-    panel.add(passwordFieldUser, gbc);
-    
-    // Emails Section
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel emailSectionLabel = new JLabel("Emails:");
-    emailSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(emailSectionLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    emailDisplayAreaUser = new JTextArea(3, 20);
-    emailDisplayAreaUser.setEditable(false);
-    emailDisplayAreaUser.setBackground(Color.WHITE);
-    JScrollPane emailScroll = new JScrollPane(emailDisplayAreaUser);
-    panel.add(emailScroll, gbc);
-    
-    // Add Email
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel newEmailLabel = new JLabel("New Email:");
-    newEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(newEmailLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-    emailPanel.setBackground(Color.decode("#bfbfb2"));
-    emailFieldUser = new JTextField(15);
-    addEmailButtonUser = new JButton("Add");
-    addEmailButtonUser.setActionCommand("AddEmail");
-    emailPanel.add(emailFieldUser);
-    emailPanel.add(addEmailButtonUser);
-    panel.add(emailPanel, gbc);
-    
-    // Remove Email
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel removeEmailLabel = new JLabel("Email ID to Remove:");
-    removeEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(removeEmailLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    JPanel removeEmailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-    removeEmailPanel.setBackground(Color.decode("#bfbfb2"));
-    emailIdToRemoveFieldUser = new JTextField(15);
-    removeEmailButtonUser = new JButton("Remove");
-    removeEmailButtonUser.setActionCommand("RemoveEmail");
-    removeEmailPanel.add(emailIdToRemoveFieldUser);
-    removeEmailPanel.add(removeEmailButtonUser);
-    panel.add(removeEmailPanel, gbc);
-    
-    // Phones Section
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel phoneSectionLabel = new JLabel("Phone Numbers:");
-    phoneSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(phoneSectionLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    phoneDisplayAreaUser = new JTextArea(3, 20);
-    phoneDisplayAreaUser.setEditable(false);
-    phoneDisplayAreaUser.setBackground(Color.WHITE);
-    JScrollPane phoneScroll = new JScrollPane(phoneDisplayAreaUser);
-    panel.add(phoneScroll, gbc);
-    
-    // Add Phone
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel newPhoneLabel = new JLabel("New Phone:");
-    newPhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(newPhoneLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-    phonePanel.setBackground(Color.decode("#bfbfb2"));
-    phoneFieldUser = new JTextField(15);
-    addPhoneButtonUser = new JButton("Add");
-    addPhoneButtonUser.setActionCommand("AddPhone");
-    phonePanel.add(phoneFieldUser);
-    phonePanel.add(addPhoneButtonUser);
-    panel.add(phonePanel, gbc);
-    
-    // Remove Phone
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.anchor = GridBagConstraints.EAST;
-    JLabel removePhoneLabel = new JLabel("Phone ID to Remove:");
-    removePhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-    panel.add(removePhoneLabel, gbc);
-    
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.anchor = GridBagConstraints.WEST;
-    JPanel removePhonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-    removePhonePanel.setBackground(Color.decode("#bfbfb2"));
-    phoneIdToRemoveFieldUser = new JTextField(15);
-    removePhoneButtonUser = new JButton("Remove");
-    removePhoneButtonUser.setActionCommand("RemovePhone");
-    removePhonePanel.add(phoneIdToRemoveFieldUser);
-    removePhonePanel.add(removePhoneButtonUser);
-    panel.add(removePhonePanel, gbc);
-    
-    // Buttons at bottom
-    gbc.gridy = row++;
-    gbc.gridx = 0;
-    gbc.gridwidth = 2;
-    gbc.anchor = GridBagConstraints.CENTER;
-    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-    buttonPanel.setBackground(Color.decode("#bfbfb2"));
-    
-    updateUserButtonUser = new JButton("Update User");
-    updateUserButtonUser.setActionCommand("UpdateUser");
-    updateUserButtonUser.setFont(new Font("Arial", Font.PLAIN, 14));
-    
-    deleteAccountButtonUser = new JButton("Delete Account");
-    deleteAccountButtonUser.setActionCommand("DeleteAccount");
-    deleteAccountButtonUser.setFont(new Font("Arial", Font.PLAIN, 14));
-    deleteAccountButtonUser.setForeground(Color.RED);
-    
-    buttonPanel.add(updateUserButtonUser);
-    buttonPanel.add(deleteAccountButtonUser);
-    panel.add(buttonPanel, gbc);
-    
-    return panel;
-}  
+    private JPanel createEditPanelUser() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(Color.decode("#bfbfb2"));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        
+        int row = 0;
+        
+        gbc.gridx = 0; gbc.gridy = row++; gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JLabel titleLabel = new JLabel("Edit My Information");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        panel.add(titleLabel, gbc);
+        
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridwidth = 1;
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel firstNameLabel = new JLabel("First Name:");
+        firstNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(firstNameLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        firstNameFieldUser = new JTextField(20);
+        panel.add(firstNameFieldUser, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel lastNameLabel = new JLabel("Last Name:");
+        lastNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(lastNameLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        lastNameFieldUser = new JTextField(20);
+        panel.add(lastNameFieldUser, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel nationalityLabel = new JLabel("Nationality:");
+        nationalityLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(nationalityLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        nationalityFieldUser = new JTextField(20);
+        panel.add(nationalityFieldUser, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel pointsLabel = new JLabel("Points:");
+        pointsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(pointsLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        pointsFieldUser = new JTextField(20);
+        pointsFieldUser.setEditable(false);
+        pointsFieldUser.setBackground(Color.LIGHT_GRAY);
+        panel.add(pointsFieldUser, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel tierTextLabel = new JLabel("Current Tier:");
+        tierTextLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(tierTextLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        tierLabelUser = new JLabel("N/A");
+        tierLabelUser.setFont(new Font("Arial", Font.BOLD, 14));
+        tierLabelUser.setForeground(Color.decode("#0066cc"));
+        panel.add(tierLabelUser, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel passwordLabel = new JLabel("New Password:");
+        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(passwordLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        passwordFieldUser = new JTextField(20);
+        panel.add(passwordFieldUser, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel emailSectionLabel = new JLabel("Emails:");
+        emailSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(emailSectionLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        emailDisplayAreaUser = new JTextArea(3, 20);
+        emailDisplayAreaUser.setEditable(false);
+        emailDisplayAreaUser.setBackground(Color.WHITE);
+        JScrollPane emailScroll = new JScrollPane(emailDisplayAreaUser);
+        panel.add(emailScroll, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel newEmailLabel = new JLabel("New Email:");
+        newEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(newEmailLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        emailPanel.setBackground(Color.decode("#bfbfb2"));
+        emailFieldUser = new JTextField(15);
+        addEmailButtonUser = new JButton("Add");
+        addEmailButtonUser.setActionCommand("AddEmail");
+        emailPanel.add(emailFieldUser);
+        emailPanel.add(addEmailButtonUser);
+        panel.add(emailPanel, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel removeEmailLabel = new JLabel("Email ID to Remove:");
+        removeEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(removeEmailLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel removeEmailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        removeEmailPanel.setBackground(Color.decode("#bfbfb2"));
+        emailIdToRemoveFieldUser = new JTextField(15);
+        removeEmailButtonUser = new JButton("Remove");
+        removeEmailButtonUser.setActionCommand("RemoveEmail");
+        removeEmailPanel.add(emailIdToRemoveFieldUser);
+        removeEmailPanel.add(removeEmailButtonUser);
+        panel.add(removeEmailPanel, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel phoneSectionLabel = new JLabel("Phone Numbers:");
+        phoneSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(phoneSectionLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        phoneDisplayAreaUser = new JTextArea(3, 20);
+        phoneDisplayAreaUser.setEditable(false);
+        phoneDisplayAreaUser.setBackground(Color.WHITE);
+        JScrollPane phoneScroll = new JScrollPane(phoneDisplayAreaUser);
+        panel.add(phoneScroll, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel newPhoneLabel = new JLabel("New Phone:");
+        newPhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(newPhoneLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        phonePanel.setBackground(Color.decode("#bfbfb2"));
+        phoneFieldUser = new JTextField(15);
+        addPhoneButtonUser = new JButton("Add");
+        addPhoneButtonUser.setActionCommand("AddPhone");
+        phonePanel.add(phoneFieldUser);
+        phonePanel.add(addPhoneButtonUser);
+        panel.add(phonePanel, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel removePhoneLabel = new JLabel("Phone ID to Remove:");
+        removePhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(removePhoneLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel removePhonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        removePhonePanel.setBackground(Color.decode("#bfbfb2"));
+        phoneIdToRemoveFieldUser = new JTextField(15);
+        removePhoneButtonUser = new JButton("Remove");
+        removePhoneButtonUser.setActionCommand("RemovePhone");
+        removePhonePanel.add(phoneIdToRemoveFieldUser);
+        removePhonePanel.add(removePhoneButtonUser);
+        panel.add(removePhonePanel, gbc);
+        
+        gbc.gridy = row++;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.setBackground(Color.decode("#bfbfb2"));
+        
+        updateUserButtonUser = new JButton("Update User");
+        updateUserButtonUser.setActionCommand("UpdateUser");
+        updateUserButtonUser.setFont(new Font("Arial", Font.PLAIN, 14));
+        
+        deleteAccountButtonUser = new JButton("Delete Account");
+        deleteAccountButtonUser.setActionCommand("DeleteAccount");
+        deleteAccountButtonUser.setFont(new Font("Arial", Font.PLAIN, 14));
+        deleteAccountButtonUser.setForeground(Color.RED);
+        
+        buttonPanel.add(updateUserButtonUser);
+        buttonPanel.add(deleteAccountButtonUser);
+        panel.add(buttonPanel, gbc);
+        
+        return panel;
+    }  
 
-    // Getter methods
     public JButton getViewUserButton() { return viewUserButton; }
     public JButton getViewRecommendedButton() { return viewRecommendedButton; }
     public JButton getEditInfoButton() { return editInfoButton; }

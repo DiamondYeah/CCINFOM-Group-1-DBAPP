@@ -69,94 +69,94 @@ public class UserRecordModel {
     }
 
     public List<UserEmail> getUserEmails(int userId) {
-    List<UserEmail> emails = new ArrayList<>();
-    String query = "SELECT Email_ID, User_ID, Email, Date_Added FROM User_Email WHERE User_ID = ? ORDER BY Date_Added DESC";
+        List<UserEmail> emails = new ArrayList<>();
+        String query = "SELECT Email_ID, User_ID, Email, Date_Added FROM User_Email WHERE User_ID = ? ORDER BY Date_Added DESC";
 
-    try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-        pstmt.setInt(1, userId);
-        ResultSet rs = pstmt.executeQuery();
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
 
-        while (rs.next()) {
-            emails.add(new UserEmail(
-                rs.getInt("Email_ID"),
-                rs.getInt("User_ID"),
-                rs.getString("Email"),
-                rs.getTimestamp("Date_Added")
-            ));
+            while (rs.next()) {
+                emails.add(new UserEmail(
+                    rs.getInt("Email_ID"),
+                    rs.getInt("User_ID"),
+                    rs.getString("Email"),
+                    rs.getTimestamp("Date_Added")
+                ));
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error fetching emails.\n");
         }
-    } catch (SQLException e) {
-        System.out.printf("Error fetching emails.\n");
+
+        return emails;
     }
 
-    return emails;
-}
+    public List<UserPhone> getUserPhones(int userId) {
+        List<UserPhone> phones = new ArrayList<>();
+        String query = "SELECT Phone_ID, User_ID, Phone_Number, Date_Added FROM User_Phone WHERE User_ID = ? ORDER BY Date_Added DESC";
 
-public List<UserPhone> getUserPhones(int userId) {
-    List<UserPhone> phones = new ArrayList<>();
-    String query = "SELECT Phone_ID, User_ID, Phone_Number, Date_Added FROM User_Phone WHERE User_ID = ? ORDER BY Date_Added DESC";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
 
-    try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-        pstmt.setInt(1, userId);
-        ResultSet rs = pstmt.executeQuery();
-
-        while (rs.next()) {
-            phones.add(new UserPhone(
-                rs.getInt("Phone_ID"),
-                rs.getInt("User_ID"),
-                rs.getString("Phone_Number"),
-                rs.getTimestamp("Date_Added")
-            ));
+            while (rs.next()) {
+                phones.add(new UserPhone(
+                    rs.getInt("Phone_ID"),
+                    rs.getInt("User_ID"),
+                    rs.getString("Phone_Number"),
+                    rs.getTimestamp("Date_Added")
+                ));
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error fetching phones.\n");
         }
-    } catch (SQLException e) {
-        System.out.printf("Error fetching phones.\n");
+
+        return phones;
     }
 
-    return phones;
-}
+    public List<UserEmail> getAllEmails() {
+        List<UserEmail> emails = new ArrayList<>();
+        String query = "SELECT Email_ID, User_ID, Email, Date_Added FROM User_Email ORDER BY User_ID, Date_Added DESC";
 
-public List<UserEmail> getAllEmails() {
-    List<UserEmail> emails = new ArrayList<>();
-    String query = "SELECT Email_ID, User_ID, Email, Date_Added FROM User_Email ORDER BY User_ID, Date_Added DESC";
+        try (PreparedStatement pstmt = conn.prepareStatement(query);
+            ResultSet rs = pstmt.executeQuery()) {
 
-    try (PreparedStatement pstmt = conn.prepareStatement(query);
-         ResultSet rs = pstmt.executeQuery()) {
-
-        while (rs.next()) {
-            emails.add(new UserEmail(
-                rs.getInt("Email_ID"),
-                rs.getInt("User_ID"),
-                rs.getString("Email"),
-                rs.getTimestamp("Date_Added")
-            ));
+            while (rs.next()) {
+                emails.add(new UserEmail(
+                    rs.getInt("Email_ID"),
+                    rs.getInt("User_ID"),
+                    rs.getString("Email"),
+                    rs.getTimestamp("Date_Added")
+                ));
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error fetching all emails.\n");
         }
-    } catch (SQLException e) {
-        System.out.printf("Error fetching all emails.\n");
+
+        return emails;
     }
 
-    return emails;
-}
+    public List<UserPhone> getAllPhones() {
+        List<UserPhone> phones = new ArrayList<>();
+        String query = "SELECT Phone_ID, User_ID, Phone_Number, Date_Added FROM User_Phone ORDER BY User_ID, Date_Added DESC";
 
-public List<UserPhone> getAllPhones() {
-    List<UserPhone> phones = new ArrayList<>();
-    String query = "SELECT Phone_ID, User_ID, Phone_Number, Date_Added FROM User_Phone ORDER BY User_ID, Date_Added DESC";
+        try (PreparedStatement pstmt = conn.prepareStatement(query);
+            ResultSet rs = pstmt.executeQuery()) {
 
-    try (PreparedStatement pstmt = conn.prepareStatement(query);
-         ResultSet rs = pstmt.executeQuery()) {
-
-        while (rs.next()) {
-            phones.add(new UserPhone(
-                rs.getInt("Phone_ID"),
-                rs.getInt("User_ID"),
-                rs.getString("Phone_Number"),
-                rs.getTimestamp("Date_Added")
-            ));
+            while (rs.next()) {
+                phones.add(new UserPhone(
+                    rs.getInt("Phone_ID"),
+                    rs.getInt("User_ID"),
+                    rs.getString("Phone_Number"),
+                    rs.getTimestamp("Date_Added")
+                ));
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error fetching all phones.\n");
         }
-    } catch (SQLException e) {
-        System.out.printf("Error fetching all phones.\n");
-    }
 
-    return phones;
-}
+        return phones;
+    }
 
     public User getUserById(int userId) {
         String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +

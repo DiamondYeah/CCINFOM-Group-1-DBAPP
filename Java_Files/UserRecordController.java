@@ -28,7 +28,6 @@ public class UserRecordController implements ActionListener {
         view.getBackButton().addActionListener(this);
         view.getRefreshTableButton().addActionListener(this);
         view.getRefreshRecommendationsButton().addActionListener(this);
-        // Removed getFilterRecommendationsButton - no longer exists in view
         
         view.getUpdateUserButton().addActionListener(this);
         view.getLoadUserButton().addActionListener(this);
@@ -58,7 +57,6 @@ public class UserRecordController implements ActionListener {
         view.getDeletePhoneButton().addActionListener(this);
     }
 
-    // Getter method
     public UserRecordModel getUserRecordModel(){
         return model;
     }
@@ -440,7 +438,6 @@ public class UserRecordController implements ActionListener {
             view.getPhoneDisplayAreaUser().setText(phoneText.toString());
         }
     }
-    
     
     private void updateUser() {
         if (currentUser == null) {
