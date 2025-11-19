@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.time.LocalDate;
 import javax.swing.table.DefaultTableModel;
 
 public class BookingModel {
@@ -249,8 +250,10 @@ public class BookingModel {
         return model;
     }
 
-    /** Get bookings for a specific user with price information */
+    /** Get bookings for a specific user with price information and auto-update status */
     public DefaultTableModel getBookingsForUser(int userId) {
+        updateBookingStatuses(); // Auto-update statuses first
+        
         DefaultTableModel model = new DefaultTableModel();
         model.setColumnIdentifiers(new String[]{"Booking ID", "Location ID", "Start Date", "End Date", 
                                                 "Pax", "Base Price", "Tax", "Total Price", "Status"});
@@ -357,26 +360,67 @@ public class BookingModel {
         return model;
     }
 
-    /** Booking records with optional date filter */
-    public DefaultTableModel getBookingRecords(String dateInput) {
+    /** Update booking statuses based on end date */
+    private void updateBookingStatuses() {
+        LocalDate today = LocalDate.now();
+        String sql = "UPDATE Booking SET Status = 'Completed' WHERE End_date < ? AND Status = 'Booked'";
+        
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, java.sql.Date.valueOf(today));
+            int updated = stmt.executeUpdate();
+            if (updated > 0) {
+                System.out.println("Updated " + updated + " bookings to 'Completed' status.");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /** Booking records with optional date filter and auto-update status */
+    public DefaultTableModel getBookingRecords(String dateInput, String filterType, String filterValue) {
+        updateBookingStatuses(); // Auto-update statuses first
+        
         String[] columns = { "Booking ID", "Organizer ID", "Location ID", "Price", "Current Capacity", "Max Capacity", "Start Date", "End Date", "Status" };
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
-        String sql;
-        if (dateInput == null || dateInput.equals("ALL")) {
-            sql = "SELECT Booking_ID, Organizer_ID, Location_ID, Price, Current_Capacity, Max_Capacity, Start_date, End_date, Status FROM Booking";
-        } else if (dateInput.contains("-")) {
-            sql = "SELECT Booking_ID, Organizer_ID, Location_ID, Price, Current_Capacity, Max_Capacity, Start_date, End_date, Status " +
-                  "FROM Booking WHERE DATE_FORMAT(Start_date, '%Y-%m') = ?";
-        } else {
-            sql = "SELECT Booking_ID, Organizer_ID, Location_ID, Price, Current_Capacity, Max_Capacity, Start_date, End_date, Status " +
-                  "FROM Booking WHERE YEAR(Start_date) = ?";
+        StringBuilder sqlBuilder = new StringBuilder(
+            "SELECT Booking_ID, Organizer_ID, Location_ID, Price, Current_Capacity, Max_Capacity, Start_date, End_date, Status FROM Booking WHERE 1=1"
+        );
+
+        // Add date filter
+        if (dateInput != null && !dateInput.equals("ALL")) {
+            if (dateInput.contains("-")) {
+                sqlBuilder.append(" AND DATE_FORMAT(Start_date, '%Y-%m') = ?");
+            } else {
+                sqlBuilder.append(" AND YEAR(Start_date) = ?");
+            }
         }
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        // Add location filter
+        if ("LOCATION".equals(filterType) && filterValue != null && !filterValue.trim().isEmpty()) {
+            sqlBuilder.append(" AND Location_ID = ?");
+        }
+
+        // Add user filter
+        if ("USER".equals(filterType) && filterValue != null && !filterValue.trim().isEmpty()) {
+            sqlBuilder.append(" AND Organizer_ID = ?");
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement(sqlBuilder.toString())) {
+            int paramIndex = 1;
+            
+            // Set date parameter
             if (dateInput != null && !dateInput.equals("ALL")) {
-                stmt.setString(1, dateInput);
+                stmt.setString(paramIndex++, dateInput);
             }
+
+            // Set filter parameter
+            if (filterValue != null && !filterValue.trim().isEmpty()) {
+                if ("LOCATION".equals(filterType) || "USER".equals(filterType)) {
+                    stmt.setInt(paramIndex++, Integer.parseInt(filterValue.trim()));
+                }
+            }
+
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 model.addRow(new Object[] {
@@ -389,6 +433,38 @@ public class BookingModel {
                     rs.getDate("Start_date"),
                     rs.getDate("End_date"),
                     rs.getString("Status")
+                });
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch (NumberFormatException ex) {
+            System.out.println("Invalid filter value: " + filterValue);
+        }
+
+        return model;
+    }
+
+    /** Get parties filtered by location ID */
+    public DefaultTableModel getPartiesByLocation(int locationId) {
+        String[] columns = { "User Booking ID", "Booking ID", "User ID", "Role" };
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        
+        String sql = "SELECT ub.User_Booking_ID, ub.Booking_ID, ub.User_ID, ub.Role " +
+                     "FROM User_Booking ub " +
+                     "INNER JOIN Booking b ON ub.Booking_ID = b.Booking_ID " +
+                     "WHERE b.Location_ID = ? " +
+                     "ORDER BY ub.Booking_ID, ub.Role DESC, ub.User_ID";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, locationId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                model.addRow(new Object[] {
+                    rs.getInt("User_Booking_ID"),
+                    rs.getInt("Booking_ID"),
+                    rs.getInt("User_ID"),
+                    rs.getString("Role")
                 });
             }
         } catch (SQLException ex) {
@@ -448,46 +524,53 @@ public class BookingModel {
         }
     }
 
-    /** Delete a booking by ID */
+    /** Delete a booking by ID - now deletes related User_Booking entries first */
     public boolean deleteBooking(int bookingID) {
-        int locationId = -1;
-        String getLocSql = "SELECT Location_ID FROM Booking WHERE Booking_ID = ?";
-        try (PreparedStatement getStmt = conn.prepareStatement(getLocSql)) {
-            getStmt.setInt(1, bookingID);
-            ResultSet rs = getStmt.executeQuery();
-            if (rs.next())
-                locationId = rs.getInt("Location_ID");
-
-        }
-        catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        String checkSql = "SELECT COUNT(*) FROM User_Booking WHERE Booking_ID = ?";
-        try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
-            checkStmt.setInt(1, bookingID);
-            ResultSet rs = checkStmt.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
-                return false;
+        try {
+            // Start transaction
+            conn.setAutoCommit(false);
+            
+            // First delete all User_Booking entries for this booking
+            String deleteUserBookingsSql = "DELETE FROM User_Booking WHERE Booking_ID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteUserBookingsSql)) {
+                stmt.setInt(1, bookingID);
+                stmt.executeUpdate();
+            }
+            
+            // Then delete the booking itself
+            String deleteBookingSql = "DELETE FROM Booking WHERE Booking_ID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteBookingSql)) {
+                stmt.setInt(1, bookingID);
+                int rowsAffected = stmt.executeUpdate();
+                
+                if (rowsAffected > 0) {
+                    conn.commit();
+                    conn.setAutoCommit(true);
+                    return true;
+                } else {
+                    conn.rollback();
+                    conn.setAutoCommit(true);
+                    return false;
+                }
             }
         } catch (SQLException ex) {
+            try {
+                conn.rollback();
+                conn.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             ex.printStackTrace();
             return false;
         }
+    }
 
-        String deleteSql = "DELETE FROM Booking WHERE Booking_ID = ?";
-        try (PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
-            deleteStmt.setInt(1, bookingID);
-            int rowsAffected = deleteStmt.executeUpdate();
-
-            if (rowsAffected > 0 && locationId != -1) {
-                try {
-                    travelModel.updateAvailability(locationId);
-                } catch (SQLException ex) {
-                    System.err.println("Warning: Failed to update availability: " + ex.getMessage());
-                }
-            }
-
+    /** Cancel a booking by ID */
+    public boolean cancelBooking(int bookingID) {
+        String sql = "UPDATE Booking SET Status = 'Cancelled' WHERE Booking_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, bookingID);
+            int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -584,6 +667,39 @@ public class BookingModel {
             ex.printStackTrace();
         }
         return false;
+    }
+
+    /** Update party record */
+    public boolean updatePartyRecord(int userBookingId, int bookingId, int userId, String role) {
+        // Validate organizer constraint
+        if ("Organizer".equalsIgnoreCase(role)) {
+            String checkSql = "SELECT COUNT(*) FROM User_Booking WHERE Booking_ID = ? AND Role = 'Organizer' AND User_Booking_ID != ?";
+            try (PreparedStatement stmt = conn.prepareStatement(checkSql)) {
+                stmt.setInt(1, bookingId);
+                stmt.setInt(2, userBookingId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    System.out.println("Cannot have multiple organizers for one booking");
+                    return false;
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }
+        
+        String sql = "UPDATE User_Booking SET Booking_ID = ?, User_ID = ?, Role = ? WHERE User_Booking_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, bookingId);
+            stmt.setInt(2, userId);
+            stmt.setString(3, role);
+            stmt.setInt(4, userBookingId);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
     }
 
     /** Inner class to hold Travel Spot details */

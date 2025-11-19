@@ -8,7 +8,7 @@ public class BookingRecordViewer extends JPanel {
     // --- Buttons ---
     private JButton viewBookingBtn, createBookingBtn, backBtn, saveCreateBtn, saveEditBtn,
             partyBtn, viewPartiesBtn, viewYourPartiesBtn, mostVisitedBtn, viewBookingRecordsBtn, 
-            editBookingBtn, deleteBookingBtn, leavePartyBtn;
+            editBookingBtn, deleteBookingBtn, leavePartyBtn, cancelBookingBtn, editPartyRecordBtn;
 
     // --- Text Fields for CREATE panel ---
     private JTextField createLocIDField, createPaxField, createSDateField, createEDateField;
@@ -53,10 +53,12 @@ public class BookingRecordViewer extends JPanel {
         leavePartyBtn = new JButton("Leave Party");
         viewYourPartiesBtn = new JButton("View Your Parties");
         viewPartiesBtn = new JButton("View All Parties");
+        editPartyRecordBtn = new JButton("Edit Party Record");
         viewBookingBtn = new JButton("View Your Bookings");
         createBookingBtn = new JButton("Create Booking");
         mostVisitedBtn = new JButton("See Most Visited Locations");
         editBookingBtn = new JButton("Edit Booking");
+        cancelBookingBtn = new JButton("Cancel Booking");
         viewBookingRecordsBtn = new JButton("View Booking Records");
         deleteBookingBtn = new JButton("Delete Booking");
 
@@ -73,10 +75,12 @@ public class BookingRecordViewer extends JPanel {
         panelWest.add(leavePartyBtn, gbc); gbc.gridy = ++row;
         panelWest.add(viewYourPartiesBtn, gbc); gbc.gridy = ++row;
         panelWest.add(viewPartiesBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(editPartyRecordBtn, gbc); gbc.gridy = ++row;
         panelWest.add(viewBookingBtn, gbc); gbc.gridy = ++row;
         panelWest.add(createBookingBtn, gbc); gbc.gridy = ++row;
         panelWest.add(viewBookingRecordsBtn, gbc); gbc.gridy = ++row;
         panelWest.add(editBookingBtn, gbc); gbc.gridy = ++row;
+        panelWest.add(cancelBookingBtn, gbc); gbc.gridy = ++row;
         panelWest.add(deleteBookingBtn, gbc); gbc.gridy = ++row;
         panelWest.add(backBtn, gbc);
 
@@ -297,6 +301,8 @@ public class BookingRecordViewer extends JPanel {
         editBookingBtn.addActionListener(listener);
         deleteBookingBtn.addActionListener(listener);
         leavePartyBtn.addActionListener(listener);
+        cancelBookingBtn.addActionListener(listener);
+        editPartyRecordBtn.addActionListener(listener);
     }
 
     // --- Getters ---
@@ -313,6 +319,8 @@ public class BookingRecordViewer extends JPanel {
     public JButton getEditBookingBtn() { return editBookingBtn; }
     public JButton getDeleteBookingButton() { return deleteBookingBtn; }
     public JButton getLeavePartyButton() { return leavePartyBtn; }
+    public JButton getCancelBookingButton() { return cancelBookingBtn; }
+    public JButton getEditPartyRecordButton() { return editPartyRecordBtn; }
 
     // Getters for CREATE fields
     public JTextField getLocIDField() { return createLocIDField; }
