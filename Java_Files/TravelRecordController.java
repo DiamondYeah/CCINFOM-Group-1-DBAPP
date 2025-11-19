@@ -20,6 +20,7 @@ public class TravelRecordController {
         addListeners();
         loadInitData();
         refreshTable();
+        //view.setUserId(String.valueOf(maincon.getCurrentUser().getUserId()));
     }
 
     private void loadInitData() {
@@ -113,7 +114,7 @@ public class TravelRecordController {
         // ADD
         view.getAddB().addActionListener(e -> {
         try {
-            int userId = maincon.getCurrentUser().getUserId();
+            int userId = maincon.getCurrentUser().getUserId(); //Integer.parseInt(view.getUserId()); //maincon.getCurrentUser().getUserId();
             String spotname = view.getSpotname();
 
             java.sql.Date dateShared = new java.sql.Date(System.currentTimeMillis());
@@ -206,6 +207,18 @@ public class TravelRecordController {
         // Refresh
         view.getRefreshB().addActionListener(e -> refreshTable());
 
+        // gem popularity report
+        view.getPopularityReportB().addActionListener(e -> showPopularityReport());
+
+        // Your Posts
+        view.getYourPostsB().addActionListener(e -> showYourPosts());
+        
+        // View Poster Info
+        view.getViewPosterB().addActionListener(e -> showPosterInfo());
+        
+        // View Spot Ratings
+        view.getViewSpotRatingsB().addActionListener(e -> showSpotRatings());
+
         // auto fill fields
         view.getTable().getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -223,7 +236,6 @@ public class TravelRecordController {
                     view.setMaxCap(view.getTable().getValueAt(row, 8).toString());
                     view.setAvailability(view.getTable().getValueAt(row, 9).toString());
 
-                    // load and selecting categories
                     int locationId = Integer.parseInt(view.getTable().getValueAt(row, 0).toString());
                     try {
                         List<Integer> catIds = model.getCategoryOfSpot(locationId);
@@ -240,6 +252,152 @@ public class TravelRecordController {
             maincon.getMainDBViewer().showPanel(MainDBViewer.MAIN_LINK);
         });
     }
+
+    // Report methods
+    private void showPopularityReport() {
+        JPanel panel = new JPanel(new java.awt.GridLayout(3, 2, 5, 5));
+        JTextField tfMonth = new JTextField();
+        JTextField tfYear = new JTextField();
+        
+        panel.add(new JLabel("Month (1-12):"));
+        panel.add(tfMonth);
+        panel.add(new JLabel("Year (e.g., 2025):"));
+        panel.add(tfYear);
+        
+        int result = JOptionPane.showConfirmDialog(null, panel, "Enter Month and Year", JOptionPane.OK_CANCEL_OPTION);
+        
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                int month = Integer.parseInt(tfMonth.getText());
+                int year = Integer.parseInt(tfYear.getText());
+                
+                if (month < 1 || month > 12) {
+                    JOptionPane.showMessageDialog(null, "Month must be between 1 and 12.");
+                    return;
+                }
+                
+                List<Object[]> reportData = model.getPopularityReport(month, year);
+                
+                // Create popup window with report
+                JFrame reportFrame = new JFrame("Hidden Gem Popularity Report - " + month + "/" + year);
+                reportFrame.setSize(900, 500);
+                reportFrame.setLocationRelativeTo(null);
+                
+                String[] columns = {"Location ID", "Spot Name", "Total Bookings", "Avg Rating", "Likes", "Dislikes", "Popularity Score"};
+                DefaultTableModel reportModel = new DefaultTableModel(columns, 0);
+                
+                for (Object[] row : reportData) {
+                    reportModel.addRow(row);
+                }
+                
+                JTable reportTable = new JTable(reportModel);
+                JScrollPane scrollPane = new JScrollPane(reportTable);
+                reportFrame.add(scrollPane);
+                reportFrame.setVisible(true);
+                
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Please enter valid numbers for month and year.");
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Error loading popularity report: " + ex.getMessage());
+            }
+        }
+    }
+    
+    private void showYourPosts() {
+        try {
+            int userId = maincon.getCurrentUser().getUserId();
+            List<Object[]> userSpots = model.getUserPostedSpots(userId);
+            
+            DefaultTableModel tm = view.getTableModel();
+            tm.setRowCount(0);
+            
+            for (Object[] r : userSpots) {
+                tm.addRow(new Object[] {
+                    r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10]
+                });
+            }
+            
+            JOptionPane.showMessageDialog(null, "Showing only your posted spots. Click REFRESH to see all spots.");
+            
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error loading your posts: " + ex.getMessage());
+        }
+    }
+    
+    private void showPosterInfo() {
+        try {
+            int row = view.getTable().getSelectedRow();
+            if (row < 0) {
+                JOptionPane.showMessageDialog(null, "Please select a travel spot first.");
+                return;
+            }
+            
+            int userId = Integer.parseInt(view.getTable().getValueAt(row, 1).toString());
+            Object[] posterInfo = model.getPosterInfo(userId);
+            
+            if (posterInfo != null) {
+                String message = String.format(
+                    "Poster Information:\n\n" +
+                    "User ID: %d\n" +
+                    "Name: %s %s\n" +
+                    "Points: %d",
+                    posterInfo[0], posterInfo[1], posterInfo[2], posterInfo[3]
+                );
+                
+                JOptionPane.showMessageDialog(null, message, "Poster Info", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "User information not found.");
+            }
+            
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error loading poster info: " + ex.getMessage());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Please select a valid travel spot.");
+        }
+    }
+    
+    private void showSpotRatings() {
+        try {
+            int row = view.getTable().getSelectedRow();
+            if (row < 0) {
+                JOptionPane.showMessageDialog(null, "Please select a travel spot first.");
+                return;
+            }
+            
+            int locationId = Integer.parseInt(view.getTable().getValueAt(row, 0).toString());
+            String spotName = view.getTable().getValueAt(row, 2).toString();
+            
+            // Get ratings
+            List<Object[]> ratings = model.getSpotRatings(locationId);
+            
+            // popup window
+            JFrame ratingsFrame = new JFrame("Ratings for: " + spotName);
+            ratingsFrame.setSize(900, 400);
+            ratingsFrame.setLocationRelativeTo(null);
+            ratingsFrame.setLayout(new java.awt.BorderLayout());
+            
+            JTabbedPane tabbedPane = new JTabbedPane();
+            
+            // Ratings tab
+            String[] ratingColumns = {"Review ID", "Reviewer", "Rating", "Recommended", "Review Date", "Likes", "Dislikes"};
+            DefaultTableModel ratingModel = new DefaultTableModel(ratingColumns, 0);
+            for (Object[] r : ratings) {
+                ratingModel.addRow(r);
+            }
+            JTable ratingTable = new JTable(ratingModel);
+            JScrollPane ratingScroll = new JScrollPane(ratingTable);
+            tabbedPane.addTab("Ratings & Reviews", ratingScroll);
+            
+            ratingsFrame.add(ratingScroll, java.awt.BorderLayout.CENTER);
+            ratingsFrame.setVisible(true);
+            
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error loading spot ratings: " + ex.getMessage());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Please select a valid travel spot.");
+        }
+    }
+
 
     // Refreshing the table
     private void refreshTable() {

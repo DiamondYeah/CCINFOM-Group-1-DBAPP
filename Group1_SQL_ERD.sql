@@ -341,21 +341,41 @@ INSERT INTO Category (category_name) VALUES
 ('Service'),
 ('Leisure'),
 ('Historical Landmark'),
-('Religion'),
+('Religion');
 
-INSERT INTO Travel_Spot (user_id, spotname, date_shared, city_id, base_price, max_capacity, availability,) VALUES
-(6, 'Urdaneta Church', '2024-06-29', 2, 100.00, 50, 'Available'),       -- Location 1
-(6, 'Calle Cafe Taft', '2025-04-18', 3, 0.0, 50, 'Available'),           -- Location 2
-(8, 'HalfHalf Malabon', '2025-11-19', 4, 200.00, 25, 'Available'),    -- Location 3
-(8, 'Afternoon Cafe Malabon', '2025-11-19', 4, 150.00, 20, 'Available'),         -- Location 4
-(8, 'Studio 819 Self-Photo Studio', '2025-11-19', 4, 300.00, 15, 'Available'),      -- Location 5
-(5, 'Hakone Open Air Museum', '2024-12-17', 1, 0.0, 150, 'Available'), -- Location 6
-(11, 'Paya St. Coffee', '2025-03-05', 5, 150.00, 25, 'Available'),    -- Location 7
---(9, 'Tokyo Anime Experience', 'Available', '2024-12-22', 8, 3000.00, 50),        -- Location 8
---(10, 'Sapporo Snow Festival Grounds', 'Available', '2024-12-25', 9, 5000.00, 60),-- Location 9
---(11, 'Los Angeles Film Studio Tour', 'Available', '2024-12-28', 10, 7000.00, 25);-- Location 10
+INSERT INTO Travel_Spot (user_id, spotname, date_shared, city_id, base_price, max_capacity, availability) VALUES
+(6,  'Urdaneta Church',                 '2024-06-29', 2, 100.00, 50,  'Available'), -- 1
+(6,  'Calle Cafe Taft',                 '2025-04-18', 3, 0.00,   50,  'Available'), -- 2
+(8,  'HalfHalf Malabon',                '2025-11-19', 4, 200.00, 25,  'Available'), -- 3
+(8,  'Afternoon Cafe Malabon',          '2025-11-19', 4, 150.00, 20,  'Available'), -- 4
+(8,  'Studio 819 Self-Photo Studio',    '2025-11-19', 4, 300.00, 15,  'Available'), -- 5
+(5,  'Hakone Open Air Museum',          '2024-12-17', 1, 0.00,  150,  'Available'), -- 6
+(11, 'Paya St. Coffee',                 '2025-03-05', 5, 150.00, 25,  'Available'), -- 7
+(3,  'MLDB Cafe',                       '2025-11-19', 4, 200.00, 30,  'Available'), -- 8
+(13, 'SM City San Lazaro',              '2025-11-19', 3, 0.00,  2000, 'Available'), -- 9
+(13, 'Manna Mall',                      '2025-11-19', 6, 0.00,  500,  'Available'); -- 10
 
 INSERT INTO TS_Category (location_id, category_id) VALUES
+-- Urdaneta Church
+(1, 8), (1, 9),
+-- Calle Cafe Taft
+(2, 3), (2, 5),
+-- HalfHalf Malabon
+(3, 3),
+-- Afternoon Cafe
+(4, 3),
+-- Studio 819 Self Photo
+(5, 7), (5, 5),
+-- Hakone Open Air Museum
+(6, 1), (6, 7),
+-- Paya St Coffee
+(7, 3),
+-- MLDB Cafe
+(8, 3), (8, 7),
+-- SM San Lazaro
+(9, 5), (9, 7),
+-- Manna Mall
+(10, 5), (10, 7);
 
 INSERT INTO Reaction (Reaction_Name) VALUES
 ('Like'),

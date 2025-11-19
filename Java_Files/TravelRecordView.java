@@ -12,6 +12,7 @@ public class TravelRecordView extends JPanel{
 
     // Buttons
     private JButton bAdd, bUpdate, bDelete, bRefresh, bBack;
+    private JButton bPopularityReport, bYourPosts, bViewPoster, bViewSpotRatings;
 
     // Table
     private JTable table;
@@ -23,9 +24,12 @@ public class TravelRecordView extends JPanel{
 
         setLayout(new BorderLayout());
 
+        // Left buttons
+        JPanel leftPanel = new JPanel(new BorderLayout());
+
+        // Form panel
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new GridBagLayout());
-
         formPanel.setBorder(BorderFactory.createTitledBorder("Travel Spot Form"));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -72,40 +76,52 @@ public class TravelRecordView extends JPanel{
         addRow(formPanel, gbc, "Max Capacity:", tfMaxCap);
         addRow(formPanel, gbc, "Status:", tfStatus);
 
-        JScrollPane leftScroll = new JScrollPane(formPanel);
-        leftScroll.setPreferredSize(new Dimension(350, 400)); //400, 600
+        JScrollPane formScroll = new JScrollPane(formPanel);
+        formScroll.setPreferredSize(new Dimension(350, 450)); //400, 600
         formPanel.setBackground(Color.GRAY);
-        
-        add(leftScroll, BorderLayout.WEST);
 
-        // Table
-        tableModel = new DefaultTableModel(new String[] {
-            "ID", "User", "Spotname", "Date", "City", "Region", "Country", "Base Price", "Max Cap", "Status", "Categories"
-        }, 0);
-        table = new JTable(tableModel);
-        JScrollPane tableScroll = new JScrollPane(table);
-        tableScroll.getViewport().setBackground(Color.decode("#bfbfb2"));
-        add(tableScroll, BorderLayout.CENTER);
+        leftPanel.add(formScroll, BorderLayout.CENTER);
 
-        table.getTableHeader().setBackground(Color.decode("#bfbfb2"));
-        table.getTableHeader().setOpaque(true);
-
-
-        // Buttons
-        JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // Button Panel (Left Side)
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(8, 1, 5, 5));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         bAdd = new JButton("ADD");
         bUpdate = new JButton("UPDATE");
         bDelete = new JButton("DELETE");
         bRefresh = new JButton("REFRESH");
+        bPopularityReport = new JButton("POPULARITY REPORT");
+        bYourPosts = new JButton("YOUR POSTS");
+        bViewPoster = new JButton("VIEW POSTER INFO");
+        bViewSpotRatings = new JButton("VIEW SPOT RATINGS");
         bBack = new JButton("BACK");
 
-        botPanel.add(bAdd);
-        botPanel.add(bUpdate);
-        botPanel.add(bDelete);
-        botPanel.add(bRefresh);
-        botPanel.add(bBack);
+        buttonPanel.add(bAdd);
+        buttonPanel.add(bUpdate);
+        buttonPanel.add(bDelete);
+        buttonPanel.add(bRefresh);
+        buttonPanel.add(bPopularityReport);
+        buttonPanel.add(bYourPosts);
+        buttonPanel.add(bViewPoster);
+        buttonPanel.add(bViewSpotRatings);
 
+        leftPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        add(leftPanel, BorderLayout.WEST);
+
+        // Table Center
+        tableModel = new DefaultTableModel(new String[] {
+            "ID", "User", "Spotname", "Date", "City", "Region", "Country", "Base Price", "Max Cap", "Status", "Categories"
+        }, 0);
+        table = new JTable(tableModel);
+        JScrollPane tableScroll = new JScrollPane(table);
+        //tableScroll.getViewport().setBackground(Color.decode("#bfbfb2"));
+        add(tableScroll, BorderLayout.CENTER);
+
+        // Back button
+        JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        botPanel.add(bBack);
         add(botPanel, BorderLayout.SOUTH);
     }
 
@@ -113,11 +129,11 @@ public class TravelRecordView extends JPanel{
         gbc.gridx = 0;
         JLabel label = new JLabel(labelText);
         label.setForeground(Color.WHITE);
-        label.setFont(new Font("Arial", Font.BOLD, 14));
+        label.setFont(new Font("Arial", Font.BOLD, 12));
         panel.add(label, gbc);
 
         gbc.gridx = 1;
-        comp.setFont(new Font("Arial", Font.PLAIN, 14));
+        comp.setFont(new Font("Arial", Font.PLAIN, 12));
         panel.add(comp, gbc);
 
         gbc.gridy++;
@@ -147,6 +163,11 @@ public class TravelRecordView extends JPanel{
     public JButton getDeleteB() { return bDelete;}
     public JButton getRefreshB() {return bRefresh;}
     public JButton getBackB() {return bBack;}
+    public JButton getPopularityReportB() {return bPopularityReport;}
+    public JButton getYourPostsB() {return bYourPosts;}
+    public JButton getViewPosterB() {return bViewPoster;}
+    public JButton getViewSpotRatingsB() {return bViewSpotRatings;}
+
     public JTable getTable() {return table;}
 
     // User Input
