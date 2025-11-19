@@ -212,76 +212,75 @@ public class FeedbackRecordViewer extends JPanel{
          // Create JPanel and its different componeents
         panelLeft = new JPanel();
         panelLeft.setLayout(new BoxLayout(panelLeft, BoxLayout.Y_AXIS));
-        panelLeft.setMaximumSize(new Dimension(375, 920));
-        panelLeft.setPreferredSize(new Dimension(375, 920));
-        panelLeft.setBorder(BorderFactory.createLineBorder(Color.BLACK, 8));
-        panelLeft.setBackground(new Color(211, 211, 211));
+        panelLeft.setMaximumSize(new Dimension(300, 920));
+        panelLeft.setPreferredSize(new Dimension(300, 920));
+        panelLeft.setBackground(new Color(128, 128, 128));
 
 
         // Create User Record Button and add components
         feedbackViewButton = new JButton("Feedback Table");
-        feedbackViewButton.setPreferredSize(new Dimension(250, 50));
-        feedbackViewButton.setMaximumSize(new Dimension(250, 50));
-        feedbackViewButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        feedbackViewButton.setPreferredSize(new Dimension(200, 25));
+        feedbackViewButton.setMaximumSize(new Dimension(200, 25));
+        feedbackViewButton.setFont(new Font("Arial", Font.PLAIN, 12));
         feedbackViewButton.setAlignmentX(CENTER_ALIGNMENT);
         feedbackViewButton.setFocusPainted(false);
 
         // Create User Record Button and add components
         userReactViewButton = new JButton("User Reaction Table");
-        userReactViewButton.setPreferredSize(new Dimension(250, 50));
-        userReactViewButton.setMaximumSize(new Dimension(250, 50));
-        userReactViewButton.setFont(new Font("Arial", Font.PLAIN, 18));
+        userReactViewButton.setPreferredSize(new Dimension(200, 25));
+        userReactViewButton.setMaximumSize(new Dimension(200, 25));
+        userReactViewButton.setFont(new Font("Arial", Font.PLAIN, 12));
         userReactViewButton.setAlignmentX(CENTER_ALIGNMENT);
         userReactViewButton.setFocusPainted(false);
 
         // Create View Reaction Button and add components
         reactionViewButton = new JButton("Reaction Table");
-        reactionViewButton.setPreferredSize(new Dimension(250, 50));
-        reactionViewButton.setMaximumSize(new Dimension(250, 50));
-        reactionViewButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        reactionViewButton.setPreferredSize(new Dimension(200, 25));
+        reactionViewButton.setMaximumSize(new Dimension(200, 25));
+        reactionViewButton.setFont(new Font("Arial", Font.PLAIN, 12));
         reactionViewButton.setAlignmentX(CENTER_ALIGNMENT);
         reactionViewButton.setFocusPainted(false);
 
         // Create User Record Button and add components
         reportViewButton = new JButton("Feedback Report");
-        reportViewButton.setPreferredSize(new Dimension(250, 50));
-        reportViewButton.setMaximumSize(new Dimension(250, 50));
-        reportViewButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        reportViewButton.setPreferredSize(new Dimension(200, 25));
+        reportViewButton.setMaximumSize(new Dimension(200, 25));
+        reportViewButton.setFont(new Font("Arial", Font.PLAIN, 12));
         reportViewButton.setAlignmentX(CENTER_ALIGNMENT);
         reportViewButton.setFocusPainted(false);
 
 
          // Create User Feedback User Options
         userFeedbackAddButton = new JButton("Add User Feedback");
-        userFeedbackAddButton.setPreferredSize(new Dimension(250, 50));
-        userFeedbackAddButton.setMaximumSize(new Dimension(250, 50));
-        userFeedbackAddButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        userFeedbackAddButton.setPreferredSize(new Dimension(200, 25));
+        userFeedbackAddButton.setMaximumSize(new Dimension(200, 25));
+        userFeedbackAddButton.setFont(new Font("Arial", Font.PLAIN, 12));
         userFeedbackAddButton.setAlignmentX(CENTER_ALIGNMENT);
         userFeedbackAddButton.setFocusPainted(false);
 
 
          // Create User Feedback User Options
         userReactEditDeleteButton = new JButton("Edit and Delete User Reaction");
-        userReactEditDeleteButton.setPreferredSize(new Dimension(250, 50));
-        userReactEditDeleteButton.setMaximumSize(new Dimension(250, 50));
-        userReactEditDeleteButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        userReactEditDeleteButton.setPreferredSize(new Dimension(200, 25));
+        userReactEditDeleteButton.setMaximumSize(new Dimension(200, 25));
+        userReactEditDeleteButton.setFont(new Font("Arial", Font.PLAIN, 12));
         userReactEditDeleteButton.setAlignmentX(CENTER_ALIGNMENT);
         userReactEditDeleteButton.setFocusPainted(false);
 
          // Create User Reaction User Options
         userReactAddButton = new JButton("Add User Reaction");
-        userReactAddButton.setPreferredSize(new Dimension(250, 50));
-        userReactAddButton.setMaximumSize(new Dimension(250, 50));
-        userReactAddButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        userReactAddButton.setPreferredSize(new Dimension(200, 25));
+        userReactAddButton.setMaximumSize(new Dimension(200, 25));
+        userReactAddButton.setFont(new Font("Arial", Font.PLAIN, 12));
         userReactAddButton.setAlignmentX(CENTER_ALIGNMENT);
         userReactAddButton.setFocusPainted(false);
 
 
          // Create User Feedback User Options
         userFeedbackEditDeleteButton = new JButton("Edit and Delete Feedback");
-        userFeedbackEditDeleteButton.setPreferredSize(new Dimension(250, 50));
-        userFeedbackEditDeleteButton.setMaximumSize(new Dimension(250, 50));
-        userFeedbackEditDeleteButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        userFeedbackEditDeleteButton.setPreferredSize(new Dimension(200, 25));
+        userFeedbackEditDeleteButton.setMaximumSize(new Dimension(200, 25));
+        userFeedbackEditDeleteButton.setFont(new Font("Arial", Font.PLAIN, 12));
         userFeedbackEditDeleteButton.setAlignmentX(CENTER_ALIGNMENT);
         userFeedbackEditDeleteButton.setFocusPainted(false);
 
@@ -326,6 +325,7 @@ public class FeedbackRecordViewer extends JPanel{
 
         cardLayout = new CardLayout();
         panelRight = new JPanel(cardLayout);
+        panelRight.setBackground(new Color(191, 191, 178));
 
         // Initialize objects and call methods to create the different panels for transactions and reports
 
@@ -353,41 +353,43 @@ public class FeedbackRecordViewer extends JPanel{
         // Create create feedback panel
         viewReportPanel = new JPanel();
         viewReportPanel.setLayout(new BoxLayout(viewReportPanel, BoxLayout.Y_AXIS));
+        viewReportPanel.setBackground(new Color(191, 191, 178));
 
         // Create title label
         JLabel reportTitle = new JLabel("Location Reviews Report Table");
-        reportTitle.setFont(new Font("Arial", Font.BOLD, 40));
+        reportTitle.setFont(new Font("Arial", Font.BOLD, 25));
         reportTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Create filter label
         JLabel filterLabel = new JLabel("Filter");
-        filterLabel.setFont(new Font("Arial", Font.BOLD, 25));
+        filterLabel.setFont(new Font("Arial", Font.BOLD, 15));
         filterLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Create month filter
         monthFilterBox = new JComboBox<>(new String[]{ "All", "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"});
-        monthFilterBox.setMaximumSize(new Dimension(200, 50));
-        monthFilterBox.setPreferredSize(new Dimension(200, 50));
-        monthFilterBox.setFont(new Font("Arial", Font.PLAIN, 20));
+        monthFilterBox.setMaximumSize(new Dimension(200, 25));
+        monthFilterBox.setPreferredSize(new Dimension(200, 25));
+        monthFilterBox.setFont(new Font("Arial", Font.PLAIN, 15));
 
         // Create year filter
         yearFilterBox = new JComboBox<>(new String[]{ "All", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"});
-        yearFilterBox.setMaximumSize(new Dimension(200, 50));
-        yearFilterBox.setPreferredSize(new Dimension(200, 50));
-        yearFilterBox.setFont(new Font("Arial", Font.PLAIN, 20));
+        yearFilterBox.setMaximumSize(new Dimension(200, 25));
+        yearFilterBox.setPreferredSize(new Dimension(200, 25));
+        yearFilterBox.setFont(new Font("Arial", Font.PLAIN, 15));
 
         // Create filter button
         filterReportButton = new JButton("Filter");
-        filterReportButton.setPreferredSize(new Dimension(250, 50));
-        filterReportButton.setMaximumSize(new Dimension(250, 50));
-        filterReportButton.setFont(new Font("Arial", Font.BOLD, 30));
+        filterReportButton.setPreferredSize(new Dimension(250, 25));
+        filterReportButton.setMaximumSize(new Dimension(250, 25));
+        filterReportButton.setFont(new Font("Arial", Font.BOLD, 15));
         filterReportButton.setFocusPainted(false);
 
         // Wrapper to combine all filtering components together
         JPanel filterWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         filterWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         filterWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        filterWrapper.setBackground(new Color(191, 191, 178));
         
         filterWrapper.add(filterLabel);
         filterWrapper.add(Box.createHorizontalStrut(15));
@@ -398,21 +400,31 @@ public class FeedbackRecordViewer extends JPanel{
         filterWrapper.add(filterReportButton);
 
         // Create the table model with the different fields
-        reportModel = new DefaultTableModel();
+        reportModel = new DefaultTableModel(){
+            @Override
+            public boolean isCellEditable(int row, int column){
+                return false;
+            }
+        };
+        
         reportModel.addColumn("Review_ID");
         reportModel.addColumn("Full_Name");
         reportModel.addColumn("Tier_Name");
         reportModel.addColumn("Area");
         reportModel.addColumn("Rating");
-        reportModel.addColumn("Likes");
-        reportModel.addColumn("Dislikes");
+        reportModel.addColumn("Positive_Reactions");
+        reportModel.addColumn("Positive_Reactions");
         reportModel.addColumn("Review_Month_Year");
 
         // Create actual visual studio and change its components
-        JTable reportTable =  new JTable(reportModel);
+        JTable reportTable = new JTable(reportModel);
         reportTable.setFont(new Font("Arial", Font.PLAIN, 20));
+        reportTable.setFillsViewportHeight(false);
         reportTable.setRowHeight(30);
         JScrollPane scroll = new JScrollPane(reportTable); // Scroll to allow navigation vertically
+        scroll.setBorder(null);
+        scroll.setBackground(new Color(191, 191, 178));
+        scroll.getViewport().setBackground(new Color(191, 191, 178));
 
         // Adjusts the column sizes of the fields in default table model
         TableColumnModel columnModel = reportTable.getColumnModel();
@@ -435,11 +447,11 @@ public class FeedbackRecordViewer extends JPanel{
 
 
         // Add componenets to panelLeft including Structs to add padding between buttons
-        viewReportPanel.add(Box.createVerticalStrut(40));
-        viewReportPanel.add(filterWrapper);
-        viewReportPanel.add(Box.createVerticalStrut(20));
+        viewReportPanel.add(Box.createVerticalStrut(10));
         viewReportPanel.add(reportTitle);
-        viewReportPanel.add(Box.createVerticalStrut(20));
+        viewReportPanel.add(Box.createVerticalStrut(10));
+        viewReportPanel.add(filterWrapper);
+        viewReportPanel.add(Box.createVerticalStrut(10));
         viewReportPanel.add(scroll);
 
 

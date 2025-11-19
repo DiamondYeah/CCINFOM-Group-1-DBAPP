@@ -1,4 +1,4 @@
-import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -79,8 +79,11 @@ public class UserFeedbackPanelViewer{
     private JButton feedbackConfirmDeleteButton;
     private JButton loadFeedbackButton;
 
-    private SpinnerNumberModel editFeedbackReactionModel;
-    private JSpinner editFeedbackReactionSpinner;
+    private SpinnerNumberModel editFeedbackPositiveReactionModel;
+    private JSpinner editFeedbackPositiveReactionSpinner;
+
+    private SpinnerNumberModel editFeedbackNegativeReactionModel;
+    private JSpinner editFeedbackNegativeReactionSpinner;
     
     private SpinnerDateModel editFeedbackDateModel;
     private JSpinner editFeedbackDateSpinner;
@@ -165,9 +168,15 @@ public class UserFeedbackPanelViewer{
 
     }
 
-    public JSpinner getEditFeedbackReactionSpinner(){
+    public JSpinner getEditFeedbackPositiveReactionSpinner(){
 
-        return editFeedbackReactionSpinner;
+        return editFeedbackPositiveReactionSpinner;
+
+    }
+
+    public JSpinner getEditFeedbackNegativeReactionSpinner(){
+
+        return editFeedbackNegativeReactionSpinner;
 
     }
 
@@ -223,6 +232,9 @@ public class UserFeedbackPanelViewer{
         ratingsSlider.setSnapToTicks(true);
         ratingsSlider.setPaintTicks(false);
         ratingsSlider.setPaintLabels(false);
+        ratingsSlider.setBackground(new Color(191, 191, 178));  
+        ratingsSlider.setOpaque(true);  
+        
 
         // Add a label for rating slider
         ratingValueLabel = new JLabel("1");
@@ -242,30 +254,33 @@ public class UserFeedbackPanelViewer{
         // Create create feedback panel
         viewFeedbackPanel = new JPanel();
         viewFeedbackPanel.setLayout(new BoxLayout(viewFeedbackPanel, BoxLayout.Y_AXIS));
+        viewFeedbackPanel.setBackground(new Color(191, 191, 178));
 
         // Create title label
         JLabel feedbackTitle = new JLabel("User_Feedback Table");
-        feedbackTitle.setFont(new Font("Arial", Font.BOLD, 40));
+        feedbackTitle.setFont(new Font("Arial", Font.BOLD, 25));
         feedbackTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Create panel wrapper to combine all 3 buttons together
-        JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 20));
+        JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         buttonWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         buttonWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        buttonWrapper.setBackground(new Color(191, 191, 178));
+        
 
         // Create Enter Button and add components
         createFeedbackLinkButton = new JButton("Add");
-        createFeedbackLinkButton.setPreferredSize(new Dimension(250, 50));
-        createFeedbackLinkButton.setMaximumSize(new Dimension(250, 50));
-        createFeedbackLinkButton.setFont(new Font("Arial", Font.BOLD, 30));
+        createFeedbackLinkButton.setPreferredSize(new Dimension(200, 25));
+        createFeedbackLinkButton.setMaximumSize(new Dimension(200, 25));
+        createFeedbackLinkButton.setFont(new Font("Arial", Font.BOLD, 15));
         createFeedbackLinkButton.setFocusPainted(false);
         createFeedbackLinkButton.setActionCommand(FEEDBACK_CREATE_LINK);
 
         // Create Enter Button and add components
         editAndDeleteFeedbackLinkButton = new JButton("Edit and Delete");
-        editAndDeleteFeedbackLinkButton.setPreferredSize(new Dimension(250, 50));
-        editAndDeleteFeedbackLinkButton.setMaximumSize(new Dimension(250, 50));
-        editAndDeleteFeedbackLinkButton.setFont(new Font("Arial", Font.BOLD, 20));
+        editAndDeleteFeedbackLinkButton.setPreferredSize(new Dimension(200, 25));
+        editAndDeleteFeedbackLinkButton.setMaximumSize(new Dimension(200, 25));
+        editAndDeleteFeedbackLinkButton.setFont(new Font("Arial", Font.BOLD, 15));
         editAndDeleteFeedbackLinkButton.setFocusPainted(false);
         editAndDeleteFeedbackLinkButton.setActionCommand(FEEDBACK_EDIT_LINK);
 
@@ -286,15 +301,21 @@ public class UserFeedbackPanelViewer{
         feedbackModel.addColumn("User_ID");
         feedbackModel.addColumn("Location_ID");
         feedbackModel.addColumn("Rating");
-        feedbackModel.addColumn("Reaction_Count");
+        feedbackModel.addColumn("Positive_Reactions");
+        feedbackModel.addColumn("Negative_Reactions");
         feedbackModel.addColumn("Comment_Count");
         feedbackModel.addColumn("Review_Date");
 
         // Create actual visual studio and change its components
-        JTable feedbackTable =  new JTable(feedbackModel);
+        JTable feedbackTable = new JTable(feedbackModel);
+        feedbackTable.setFillsViewportHeight(false);
         feedbackTable.setFont(new Font("Arial", Font.PLAIN, 20));
         feedbackTable.setRowHeight(30);
         JScrollPane scroll = new JScrollPane(feedbackTable); // Scroll to allow navigation vertically
+
+        scroll.setBorder(null);
+        scroll.setBackground(new Color(191, 191, 178));
+        scroll.getViewport().setBackground(new Color(191, 191, 178));
 
         // Adjusts the column sizes of the fields in default table model
         TableColumnModel columnModel = feedbackTable.getColumnModel();
@@ -305,7 +326,8 @@ public class UserFeedbackPanelViewer{
         columnModel.getColumn(3).setPreferredWidth(25);
         columnModel.getColumn(4).setPreferredWidth(25);
         columnModel.getColumn(5).setPreferredWidth(25);
-        columnModel.getColumn(6).setPreferredWidth(250);
+        columnModel.getColumn(6).setPreferredWidth(25);
+        columnModel.getColumn(7).setPreferredWidth(250);
 
         // Adjusts the content inside of the table so that it aligns to the center of each cell
         DefaultTableCellRenderer cellCenter = new DefaultTableCellRenderer();
@@ -314,13 +336,14 @@ public class UserFeedbackPanelViewer{
         for(int i = 0; i < feedbackTable.getColumnCount(); i++)
             feedbackTable.getColumnModel().getColumn(i).setCellRenderer(cellCenter);
 
+        buttonWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add componenets to panelLeft including Structs to add padding between buttons
-        viewFeedbackPanel.add(Box.createVerticalStrut(40));
-        viewFeedbackPanel.add(buttonWrapper);
-        viewFeedbackPanel.add(Box.createVerticalStrut(40));
+        viewFeedbackPanel.add(Box.createVerticalStrut(10));
         viewFeedbackPanel.add(feedbackTitle);
-        viewFeedbackPanel.add(Box.createVerticalStrut(20));
+        viewFeedbackPanel.add(Box.createVerticalStrut(10));
+        viewFeedbackPanel.add(buttonWrapper);
+        viewFeedbackPanel.add(Box.createVerticalStrut(10));
         viewFeedbackPanel.add(scroll);
 
 
@@ -338,7 +361,8 @@ public class UserFeedbackPanelViewer{
         // Create create feedback panel
         createFeedbackPanel = new JPanel();
         createFeedbackPanel.setLayout(new BoxLayout(createFeedbackPanel, BoxLayout.Y_AXIS));
-
+        createFeedbackPanel.setBackground(new Color(191, 191, 178));
+        
         // Create title label
         JLabel feedbackTitle = new JLabel("Create Feedback");
         feedbackTitle.setFont(new Font("Arial", Font.BOLD, 80));
@@ -353,6 +377,7 @@ public class UserFeedbackPanelViewer{
         userIDWrapper.setPreferredSize(new Dimension(800, 70));
         userIDWrapper.add(userIDLabel);
         userIDWrapper.add(userFeedbackIDField);
+        userIDWrapper.setBackground(new Color(191, 191, 178));
         
 
         // Create label, Location Text Field and Wrapper to combine them in
@@ -364,6 +389,7 @@ public class UserFeedbackPanelViewer{
         locationIDWrapper.setPreferredSize(new Dimension(800, 70));
         locationIDWrapper.add(locationIDLabel);
         locationIDWrapper.add(locationIDField);
+        locationIDWrapper.setBackground(new Color(191, 191, 178));
 
 
         // Create label, Ratings Slider and Wrapper to combine them in
@@ -373,9 +399,12 @@ public class UserFeedbackPanelViewer{
         JPanel ratingsWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
         ratingsWrapper.setMaximumSize(new Dimension(800, 70));
         ratingsWrapper.setPreferredSize(new Dimension(800, 70));
+        ratingsWrapper.setBackground(new Color(191, 191, 178));
+
         ratingsWrapper.add(ratingsLabel);
         ratingsWrapper.add(ratingsSlider);
         ratingsWrapper.add(ratingValueLabel);
+  
 
         // Create Enter Button and add components
         enterFeedbackButton = new JButton("Enter");
@@ -418,6 +447,7 @@ public class UserFeedbackPanelViewer{
 
         editAndDeleteFeedbackPanel = new JPanel();
         editAndDeleteFeedbackPanel.setLayout(new BoxLayout(editAndDeleteFeedbackPanel, BoxLayout.Y_AXIS));
+        editAndDeleteFeedbackPanel.setBackground(new Color(191, 191, 178));
 
         JLabel editFeedbackTitle = new JLabel("Edit Feedback Table");
         editFeedbackTitle.setFont(new Font("Arial", Font.BOLD, 50));
@@ -438,6 +468,7 @@ public class UserFeedbackPanelViewer{
         JPanel selectWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         selectWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         selectWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        selectWrapper.setBackground(new Color(191, 191, 178));
 
         selectWrapper.add(feedbackSelectComboBox);
         selectWrapper.add(loadFeedbackButton);
@@ -456,6 +487,7 @@ public class UserFeedbackPanelViewer{
         JPanel userIDWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         userIDWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         userIDWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        userIDWrapper.setBackground(new Color(191, 191, 178));
 
         userIDWrapper.add(userIDLabel);
         userIDWrapper.add(editFeedbackUserIDBox);
@@ -474,6 +506,7 @@ public class UserFeedbackPanelViewer{
         JPanel locationIDWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         locationIDWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         locationIDWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        locationIDWrapper.setBackground(new Color(191, 191, 178));
 
         locationIDWrapper.add(locationIDLabel);
         locationIDWrapper.add(editFeedbackLocationIDBox);
@@ -486,13 +519,18 @@ public class UserFeedbackPanelViewer{
         editFeedbackRatingsSlider = new JSlider(JSlider.HORIZONTAL, 0, 40, 1);
         editFeedbackRatingsSlider.setMaximumSize(new Dimension(250, 50));
         editFeedbackRatingsSlider.setPreferredSize(new Dimension(250, 50));
+        ratingsSlider.setMajorTickSpacing(1);
+        ratingsSlider.setSnapToTicks(true);
         editFeedbackRatingsSlider.setPaintTicks(false);
         editFeedbackRatingsSlider.setPaintLabels(false);
         editFeedbackRatingsSlider.setEnabled(false);
+        editFeedbackRatingsSlider.setBackground(new Color(191, 191, 178));  
+        editFeedbackRatingsSlider.setOpaque(true);  
 
         JPanel ratingWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         ratingWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         ratingWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        ratingWrapper.setBackground(new Color(191, 191, 178));
 
         // Add a display for edit rating slider
         editRatingValueLabel = new JLabel("1");
@@ -508,24 +546,45 @@ public class UserFeedbackPanelViewer{
         ratingWrapper.add(editRatingValueLabel);
 
 
-        JLabel reactionCountLabel = new JLabel("Reaction Count:");
+        JLabel reactionCountLabel = new JLabel("Positive Reaction Count:");
         reactionCountLabel.setFont(new Font("Arial", Font.BOLD, 20));
         
-        editFeedbackReactionModel = new SpinnerNumberModel(0, 0, 999 ,1);
-        editFeedbackReactionSpinner = new JSpinner(editFeedbackReactionModel);
-        editFeedbackReactionSpinner.setMaximumSize(new Dimension(250, 50));
-        editFeedbackReactionSpinner.setPreferredSize(new Dimension(250, 50));
-        editFeedbackReactionSpinner.setFont(new Font("Arial", Font.BOLD, 20));
-        editFeedbackReactionSpinner.setEnabled(false); // Disable at start
-        editFeedbackReactionSpinner.setEnabled(false);
+        editFeedbackPositiveReactionModel = new SpinnerNumberModel(0, 0, 999 ,1);
+        editFeedbackPositiveReactionSpinner = new JSpinner(editFeedbackPositiveReactionModel);
+        editFeedbackPositiveReactionSpinner.setMaximumSize(new Dimension(250, 50));
+        editFeedbackPositiveReactionSpinner.setPreferredSize(new Dimension(250, 50));
+        editFeedbackPositiveReactionSpinner.setFont(new Font("Arial", Font.BOLD, 20));
+        editFeedbackPositiveReactionSpinner.setEnabled(false); // Disable at start
+        editFeedbackPositiveReactionSpinner.setEnabled(false);
 
-        JPanel reactionCountWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
-        reactionCountWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
-        reactionCountWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        JPanel positiveReactionCountWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
+        positiveReactionCountWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
+        positiveReactionCountWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        positiveReactionCountWrapper.setBackground(new Color(191, 191, 178));
 
-        reactionCountWrapper.add(reactionCountLabel);
-        reactionCountWrapper.add(editFeedbackReactionSpinner);
+        positiveReactionCountWrapper.add(reactionCountLabel);
+        positiveReactionCountWrapper.add(editFeedbackPositiveReactionSpinner);
 
+
+        JLabel negativeCountLabel = new JLabel("Negative Reaction Count:");
+        negativeCountLabel.setFont(new Font("Arial", Font.BOLD, 20));
+
+        editFeedbackNegativeReactionModel = new SpinnerNumberModel(0, 0, 999 ,1);
+        editFeedbackNegativeReactionSpinner = new JSpinner(editFeedbackNegativeReactionModel);
+        editFeedbackNegativeReactionSpinner.setMaximumSize(new Dimension(250, 50));
+        editFeedbackNegativeReactionSpinner.setPreferredSize(new Dimension(250, 50));
+        editFeedbackNegativeReactionSpinner.setFont(new Font("Arial", Font.BOLD, 20));
+        editFeedbackNegativeReactionSpinner.setEnabled(false); // Disable at start
+        editFeedbackNegativeReactionSpinner.setEnabled(false);
+
+
+        JPanel negativeReactionCountWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
+        negativeReactionCountWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
+        negativeReactionCountWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        negativeReactionCountWrapper.setBackground(new Color(191, 191, 178));
+
+        negativeReactionCountWrapper.add(negativeCountLabel);
+        negativeReactionCountWrapper.add(editFeedbackNegativeReactionSpinner);
 
 
         JLabel commentCountLabel = new JLabel("Comment Count:");
@@ -541,6 +600,7 @@ public class UserFeedbackPanelViewer{
         JPanel commentCountWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         commentCountWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         commentCountWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        commentCountWrapper.setBackground(new Color(191, 191, 178));
 
         commentCountWrapper.add(commentCountLabel);
         commentCountWrapper.add(editFeedbackCommentSpinner);
@@ -562,6 +622,7 @@ public class UserFeedbackPanelViewer{
         JPanel dateWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         dateWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         dateWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        dateWrapper.setBackground(new Color(191, 191, 178));
 
         dateWrapper.add(dateLabel);
         dateWrapper.add(editFeedbackDateSpinner);
@@ -584,6 +645,7 @@ public class UserFeedbackPanelViewer{
         JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         buttonWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         buttonWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        buttonWrapper.setBackground(new Color(191, 191, 178));
 
         buttonWrapper.add(feedbackConfirmEditButton);
         buttonWrapper.add(feedbackConfirmDeleteButton);
@@ -593,7 +655,8 @@ public class UserFeedbackPanelViewer{
         userIDWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         locationIDWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         ratingWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
-        reactionCountWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
+        negativeReactionCountWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
+        positiveReactionCountWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         commentCountWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         dateWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         buttonWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -609,7 +672,9 @@ public class UserFeedbackPanelViewer{
         editAndDeleteFeedbackPanel.add(Box.createVerticalStrut(15));
         editAndDeleteFeedbackPanel.add(ratingWrapper);
         editAndDeleteFeedbackPanel.add(Box.createVerticalStrut(15));
-        editAndDeleteFeedbackPanel.add(reactionCountWrapper);
+        editAndDeleteFeedbackPanel.add(positiveReactionCountWrapper);
+        editAndDeleteFeedbackPanel.add(Box.createVerticalStrut(15));
+        editAndDeleteFeedbackPanel.add(negativeReactionCountWrapper);
         editAndDeleteFeedbackPanel.add(Box.createVerticalStrut(15));
         editAndDeleteFeedbackPanel.add(commentCountWrapper);
         editAndDeleteFeedbackPanel.add(Box.createVerticalStrut(15));

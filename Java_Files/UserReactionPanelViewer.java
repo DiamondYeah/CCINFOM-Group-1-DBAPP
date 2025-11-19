@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -210,31 +211,33 @@ public class UserReactionPanelViewer {
         // Create create feedback panel
         viewUserReactionPanel = new JPanel();
         viewUserReactionPanel.setLayout(new BoxLayout(viewUserReactionPanel, BoxLayout.Y_AXIS));
+        viewUserReactionPanel.setBackground(new Color(191, 191, 178));
 
         // Create title label
         JLabel reactionTitle = new JLabel("User_Reaction Table");
-        reactionTitle.setFont(new Font("Arial", Font.BOLD, 40));
+        reactionTitle.setFont(new Font("Arial", Font.BOLD, 25));
         reactionTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Create panel wrapper to combine all 3 buttons together
-        JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 20));
+        JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         buttonWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         buttonWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        buttonWrapper.setBackground(new Color(191, 191, 178));
 
 
         // Create Enter Button and add components
         createUserReactionLinkButton = new JButton("Add");
-        createUserReactionLinkButton.setPreferredSize(new Dimension(250, 50));
-        createUserReactionLinkButton.setMaximumSize(new Dimension(250, 50));
-        createUserReactionLinkButton.setFont(new Font("Arial", Font.BOLD, 30));
+        createUserReactionLinkButton.setPreferredSize(new Dimension(200, 25));
+        createUserReactionLinkButton.setMaximumSize(new Dimension(200, 25));
+        createUserReactionLinkButton.setFont(new Font("Arial", Font.BOLD, 15));
         createUserReactionLinkButton.setFocusPainted(false);
         createUserReactionLinkButton.setActionCommand(USER_REACTION_CREATE_LINK);
 
         // Create Enter Button and add components
         editAndDeleteUserReactionLinkButton = new JButton("Edit and Delete");
-        editAndDeleteUserReactionLinkButton.setPreferredSize(new Dimension(250, 50));
-        editAndDeleteUserReactionLinkButton.setMaximumSize(new Dimension(250, 50));
-        editAndDeleteUserReactionLinkButton.setFont(new Font("Arial", Font.BOLD, 20));
+        editAndDeleteUserReactionLinkButton.setPreferredSize(new Dimension(200, 25));
+        editAndDeleteUserReactionLinkButton.setMaximumSize(new Dimension(200, 25));
+        editAndDeleteUserReactionLinkButton.setFont(new Font("Arial", Font.BOLD, 15));
         editAndDeleteUserReactionLinkButton.setFocusPainted(false);
         editAndDeleteUserReactionLinkButton.setActionCommand(USER_REACTION_EDIT_LINK);
 
@@ -258,10 +261,14 @@ public class UserReactionPanelViewer {
         reviewModel.addColumn("Reaction_Date");
 
         // Create actual visual studio and change its components
-        JTable userReactionTable =  new JTable(reviewModel);
+        JTable userReactionTable = new JTable(reviewModel);
         userReactionTable.setFont(new Font("Arial", Font.PLAIN, 20));
         userReactionTable.setRowHeight(30);
         JScrollPane scroll = new JScrollPane(userReactionTable); // Scroll to allow navigation vertically
+
+        scroll.setBorder(null);
+        scroll.setBackground(new Color(191, 191, 178));
+        scroll.getViewport().setBackground(new Color(191, 191, 178));
 
         // Adjusts the column sizes of the fields in default table model
         TableColumnModel columnModel = userReactionTable.getColumnModel();
@@ -279,13 +286,14 @@ public class UserReactionPanelViewer {
         for(int i = 0; i < userReactionTable.getColumnCount(); i++)
             userReactionTable.getColumnModel().getColumn(i).setCellRenderer(cellCenter);
 
+        buttonWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add componenets to panelLeft including Structs to add padding between buttons
-        viewUserReactionPanel.add(Box.createVerticalStrut(40));
-        viewUserReactionPanel.add(buttonWrapper);
-        viewUserReactionPanel.add(Box.createVerticalStrut(40));
+        viewUserReactionPanel.add(Box.createVerticalStrut(10));
         viewUserReactionPanel.add(reactionTitle);
-        viewUserReactionPanel.add(Box.createVerticalStrut(20));
+        viewUserReactionPanel.add(Box.createVerticalStrut(10));
+        viewUserReactionPanel.add(buttonWrapper);
+        viewUserReactionPanel.add(Box.createVerticalStrut(10));
         viewUserReactionPanel.add(scroll);
 
 
@@ -303,21 +311,25 @@ public class UserReactionPanelViewer {
         // Create create feedback panel
         createUserReactionPanel = new JPanel();
         createUserReactionPanel.setLayout(new BoxLayout(createUserReactionPanel, BoxLayout.Y_AXIS));
+        createUserReactionPanel.setBackground(new Color(191, 191, 178));
 
         // Create title label
         JLabel createReactionTitle = new JLabel("Create User Reaction");
         createReactionTitle.setFont(new Font("Arial", Font.BOLD, 80));
 
 
-        // Create label, and Wrapper to combine label and user text field in
+        // Create label, and Wrapper to combine label and text field in
         JLabel userIDLabel = new JLabel("User ID:");
         userIDLabel.setFont(new Font("Arial", Font.BOLD, 35));
         
         JPanel userIDWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
         userIDWrapper.setMaximumSize(new Dimension(800, 70));
         userIDWrapper.setPreferredSize(new Dimension(800, 70));
+        userIDWrapper.setBackground(new Color(191, 191, 178));
+
         userIDWrapper.add(userIDLabel);
         userIDWrapper.add(userReactionIDField);
+
 
 
         // Create label, ID Text Field and Wrapper to combine them in
@@ -327,11 +339,13 @@ public class UserReactionPanelViewer {
         JPanel reviewIDPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         reviewIDPanel.setMaximumSize(new Dimension(800, 70));
         reviewIDPanel.setPreferredSize(new Dimension(800, 70));
+        reviewIDPanel.setBackground(new Color(191, 191, 178));
+
         reviewIDPanel.add(reviewIDLabel);
         reviewIDPanel.add(reviewIDField);
 
 
-        // Create label, Ratings Slider and Wrapper to combine them in
+        // Create label, reaction box and Wrapper to combine them in
         JLabel reactionLabel = new JLabel("Reaction:");
         reactionLabel.setFont(new Font("Arial", Font.BOLD, 35));
 
@@ -340,6 +354,7 @@ public class UserReactionPanelViewer {
         reactionWrapper.setPreferredSize(new Dimension(800, 70));
         reactionWrapper.add(reactionLabel);
         reactionWrapper.add(reactionTypeBox);
+        reactionWrapper.setBackground(new Color(191, 191, 178));
 
 
         // Create Enter Button and add components
@@ -383,6 +398,7 @@ public class UserReactionPanelViewer {
 
         editAndDeleteUserReactionPanel = new JPanel();
         editAndDeleteUserReactionPanel.setLayout(new BoxLayout(editAndDeleteUserReactionPanel, BoxLayout.Y_AXIS));
+        editAndDeleteUserReactionPanel.setBackground(new Color(191, 191, 178));
 
 
         JLabel editUserReactionTitle = new JLabel("Edit User Reaction Table");
@@ -403,6 +419,7 @@ public class UserReactionPanelViewer {
         JPanel selectWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         selectWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         selectWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        selectWrapper.setBackground(new Color(191, 191, 178));
 
         selectWrapper.add(userReactionSelectComboBox);
         selectWrapper.add(loadUserReactionButton);
@@ -421,6 +438,7 @@ public class UserReactionPanelViewer {
         JPanel reviewIDWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         reviewIDWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         reviewIDWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        reviewIDWrapper.setBackground(new Color(191, 191, 178));
 
         reviewIDWrapper.add(reviewIDLabel);
         reviewIDWrapper.add(editUserReactionReviewIDBox);
@@ -439,6 +457,7 @@ public class UserReactionPanelViewer {
         JPanel userIDWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         userIDWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         userIDWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        userIDWrapper.setBackground(new Color(191, 191, 178));
 
         userIDWrapper.add(userIDLabel);
         userIDWrapper.add(editUserReactionUserIDBox);
@@ -457,6 +476,7 @@ public class UserReactionPanelViewer {
         JPanel reactionTypeIDWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         reactionTypeIDWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         reactionTypeIDWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        reactionTypeIDWrapper.setBackground(new Color(191, 191, 178));
 
         reactionTypeIDWrapper.add(reactionTypeIDLabel);
         reactionTypeIDWrapper.add(editUserReactionReactionTypeIDBox);
@@ -479,6 +499,7 @@ public class UserReactionPanelViewer {
         JPanel dateWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         dateWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         dateWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        dateWrapper.setBackground(new Color(191, 191, 178));
 
         dateWrapper.add(dateLabel);
         dateWrapper.add(editUserReactionDateSpinner);
@@ -502,6 +523,7 @@ public class UserReactionPanelViewer {
         JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         buttonWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         buttonWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        buttonWrapper.setBackground(new Color(191, 191, 178));
 
         buttonWrapper.add(userReactionConfirmEditButton);
         buttonWrapper.add(userReactionConfirmDeleteButton);

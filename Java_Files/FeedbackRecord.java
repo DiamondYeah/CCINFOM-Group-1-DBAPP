@@ -177,8 +177,16 @@ public class FeedbackRecord {
 
         try{
 
+            // Modified query fields and create extra fields for positive and negative counts
             query.setLength(0);
-            query.append("SELECT * FROM User_Feedback");
+            query.append("SELECT uf.*, ");
+            query.append("COUNT(CASE WHEN r.Is_Positive = TRUE THEN 1 END) AS positive_count, ");
+            query.append("COUNT(CASE WHEN r.Is_Positive = FALSE THEN 1 END) AS negative_count ");
+            query.append("FROM User_Feedback uf ");
+            query.append("LEFT JOIN User_Reaction ur ON ur.review_id = uf.review_id ");
+            query.append("LEFT JOIN Reaction r ON r.reactiontype_id = ur.reactiontype_id ");
+            query.append("GROUP BY uf.review_id; ");
+
 
             stmt = conn.prepareStatement(query.toString());
             set = stmt.executeQuery();
@@ -188,13 +196,14 @@ public class FeedbackRecord {
                 int reviewID = set.getInt("Review_ID");
                 int userID = set.getInt("User_ID");
                 int locationID = set.getInt("Location_ID");
-                double rating = set.getDouble("Rating");
-                int reactionCount = getReviewCount(reviewID);
+                float rating = set.getFloat("Rating");
+                int positiveCount = set.getInt("Positive_Count");
+                int negativeCount = set.getInt("Negative_Count");
                 int commentCount = set.getInt("Comment_Count");
                 Timestamp reviewDate = set.getTimestamp("Review_Date");
 
                 model.addRow(new Object[]{
-                    reviewID, userID, locationID, rating, reactionCount, commentCount, reviewDate
+                    reviewID, userID, locationID, rating, positiveCount, negativeCount, commentCount, reviewDate
                 });
 
             }
@@ -209,18 +218,24 @@ public class FeedbackRecord {
 
 
     // Method loads the user chosen in the edit feedback table and shows information of them
-    public void loadUserFeedback(String feedbackUser, JComboBox<String> userBox, JComboBox<String> locationBox,
-                                 JSlider ratingSlider, JSpinner reactionSpinner, JSpinner commentSpinner, JSpinner dateSpinner){
+    public void loadUserFeedback(String feedbackUser, JComboBox<String> userBox, JComboBox<String> locationBox, JSlider ratingSlider,
+                                JSpinner negativeSpinner, JSpinner positiveSpinner, JSpinner commentSpinner, JSpinner dateSpinner){
 
         int reviewID = Integer.parseInt(feedbackUser.split(" ")[0]);
+            query.setLength(0);
 
         // String builder query to create the SELECT statement
         query.setLength(0);
-        query.append("SELECT uf.*, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, ts.spotname ");
+        query.append("SELECT uf.*, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, ts.spotname, ");
+        query.append("COUNT(CASE WHEN r.Is_Positive = TRUE THEN 1 END) AS positive_count, ");
+        query.append("COUNT(CASE WHEN r.Is_Positive = FALSE THEN 1 END) AS negative_count ");
         query.append("FROM USER_FEEDBACK uf JOIN user u ON u.user_id = uf.user_id ");
         query.append("JOIN travel_spot ts ON ts.location_id = uf.location_id ");
-        query.append("WHERE review_id = ?; ");
-
+        query.append("LEFT JOIN User_Reaction ur ON ur.review_id = uf.review_id ");
+        query.append("LEFT JOIN Reaction r ON r.reactiontype_id = ur.reactiontype_id ");
+        query.append("WHERE uf.review_id = ? ");
+        query.append("GROUP BY uf.review_id; ");
+        
         // Try-catch block to catch any errors with SQL
         try{
 
@@ -237,7 +252,8 @@ public class FeedbackRecord {
                 int userID = set.getInt("User_ID");
                 int locationID = set.getInt("Location_ID");
                 float rating = set.getFloat("Rating");
-                int reactionCount = getReviewCount(set.getInt("Review_ID"));
+                int positiveCount = set.getInt("Positive_Count");
+                int negativeCount = set.getInt("Negative_Count");
                 int commentCount = set.getInt("Comment_Count");
                 Timestamp reviewDate = set.getTimestamp("Review_Date");
 
@@ -247,13 +263,11 @@ public class FeedbackRecord {
 
                 // Display the results of the query to the input components
                 
-                System.out.println(reactionCount);
-                System.out.println(commentCount); 
-
                 userBox.setSelectedItem(userID + " - " + fullname);
                 locationBox.setSelectedItem(locationID + " - " + spotName);
                 ratingSlider.setValue(Math.round((rating - 1.0f) * 10));
-                reactionSpinner.setValue(reactionCount);
+                positiveSpinner.setValue(positiveCount);
+                negativeSpinner.setValue(negativeCount);
                 commentSpinner.setValue(commentCount);
                 dateSpinner.setValue(reviewDate);
 
@@ -756,8 +770,8 @@ public class FeedbackRecord {
 
             // Query that will generate the report
             query.append("SELECT uf.review_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.spotname, uf.rating, ");
-            query.append("COUNT(CASE WHEN r.Reaction_Name = 'LIKE' THEN 1 END) AS likes, ");
-            query.append("COUNT(CASE WHEN r.Reaction_Name = 'DISLIKE' THEN 1 END) AS dislikes, ");
+            query.append("COUNT(CASE WHEN r.Is_Positive = TRUE THEN 1 END) AS positive_count, ");
+            query.append("COUNT(CASE WHEN r.Is_Positive = FALSE THEN 1 END) AS negative_count, ");
             query.append("DATE_FORMAT(uf.Review_Date, '%M %Y') AS Review_Month_Year ");
             query.append("FROM User_feedback uf JOIN User u ON uf.User_ID = u.User_ID ");
             query.append("LEFT JOIN Points_tier pt ON u.Tier_ID = pt.Tier_ID ");
@@ -777,12 +791,12 @@ public class FeedbackRecord {
                 String tierName = set.getString("Tier_Name");
                 String spotName = set.getString("Spotname");
                 double rating = set.getDouble("Rating");
-                int likes = set.getInt("Likes");
-                int dislikes = set.getInt("Dislikes");
+                int positiveCount = set.getInt("positive_count");
+                int negativeCount = set.getInt("negative_count");
                 String reviewMonthYear = set.getString("Review_Month_Year");
                 
                 model.addRow(new Object[]{
-                    reviewID, fullName, tierName, spotName, rating, likes, dislikes, reviewMonthYear
+                    reviewID, fullName, tierName, spotName, rating, positiveCount, negativeCount, reviewMonthYear
                 });
 
             }
@@ -807,8 +821,8 @@ public class FeedbackRecord {
 
             // Query that will generate the report
             query.append("SELECT uf.review_id, CONCAT(u.first_name, ' ' , u.last_name) AS full_name, pt.tier_name, ts.spotname, uf.rating, ");
-            query.append("COUNT(CASE WHEN r.Reaction_Name = 'LIKE' THEN 1 END) AS likes, ");
-            query.append("COUNT(CASE WHEN r.Reaction_Name = 'DISLIKE' THEN 1 END) AS dislikes, ");
+            query.append("COUNT(CASE WHEN r.Is_Positive = TRUE THEN 1 END) AS positive_count, ");
+            query.append("COUNT(CASE WHEN r.Is_Positive = FALSE THEN 1 END) AS negative_count, ");
             query.append("DATE_FORMAT(uf.Review_Date, '%M %Y') AS Review_Month_Year ");
             query.append("FROM User_feedback uf JOIN User u ON uf.User_ID = u.User_ID ");
             query.append("LEFT JOIN Points_tier pt ON u.Tier_ID = pt.Tier_ID ");
@@ -863,12 +877,12 @@ public class FeedbackRecord {
                 String tierName = set.getString("Tier_Name");
                 String spotName = set.getString("spotname");
                 double rating = set.getDouble("Rating");
-                int likes = set.getInt("Likes");
-                int dislikes = set.getInt("Dislikes");
+                int positiveCount = set.getInt("Positive_Count");
+                int negativeCount = set.getInt("Negative_count");
                 String reviewMonthYear = set.getString("Review_Month_Year");
                 
                 model.addRow(new Object[]{
-                    reviewID, fullName, tierName, spotName, rating, likes, dislikes, reviewMonthYear
+                    reviewID, fullName, tierName, spotName, rating, positiveCount, negativeCount, reviewMonthYear
                 });
 
             }
@@ -1163,44 +1177,6 @@ public class FeedbackRecord {
 
     // -------------------------------------------------------
 
-    // Helper methods
-
-    // Helper method that gets how many users have reacted to a feedback
-    private int getReviewCount(int reviewID){
-
-        int reviewCount = 0;
-
-        PreparedStatement reviewSTMT; // Seperate PreparedStatement to avoid interfering with the global PreparedStatement
-        ResultSet reviewSet; // Seperate ResultSet to avoid interfering with the global Resultset
-
-        try{
-
-            query.setLength(0);
-            query.append("SELECT COUNT(*) AS review_count FROM User_Reaction WHERE Review_ID = ?");
-
-            reviewSTMT = conn.prepareStatement(query.toString());
-
-            // Set the values in the stmt with the parameters and starting values for each of the ? in the query
-            reviewSTMT.setInt(1, reviewID);
-
-            reviewSet = reviewSTMT.executeQuery();
-
-            // Checks if ID exists
-            if(reviewSet.next())
-                reviewCount = reviewSet.getInt("review_count");
-
-
-        } catch(SQLException e){
-
-            e.printStackTrace();
-
-        }  
-        
-
-        return reviewCount;
-
-    }
-
-    
+   
 }
 

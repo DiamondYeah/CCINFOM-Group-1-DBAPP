@@ -145,6 +145,7 @@ CREATE TABLE Reaction(
 
 	ReactionType_ID 	INT AUTO_INCREMENT NOT NULL,
 	Reaction_Name		VARCHAR(50) NOT NULL,
+    Is_Positive         BOOLEAN DEFAULT FALSE,
     
     CONSTRAINT Reaction_pk PRIMARY KEY (ReactionType_ID)
         
@@ -158,7 +159,8 @@ CREATE TABLE User_Feedback(
     Location_ID 		INT NOT NULL,
     Rating 		        DECIMAL(2, 1) CHECK(Rating BETWEEN 1 AND 5),
     is_recommendation   BOOLEAN DEFAULT FALSE,
-    Reaction_Count 		INT DEFAULT 0,
+    Positive_Reactions 		INT DEFAULT 0,
+    Negative_Reactions 		INT DEFAULT 0,
     Comment_Count 		INT DEFAULT 0,
     Review_Date 		DATETIME DEFAULT CURRENT_TIMESTAMP,
     
@@ -195,11 +197,11 @@ CREATE TABLE User_Reaction(
                 
 );
 
-
 CREATE TABLE Booking(
     Booking_ID INT AUTO_INCREMENT PRIMARY KEY,
     Location_ID INT NOT NULL,
     Status VARCHAR(50) NOT NULL,
+    Date_Book DATETIME DEFAULT CURRENT_TIMESTAMP,
     Start_date DATE NOT NULL,
     End_date DATE NOT NULL,
     Booking_Dates VARCHAR(100) AS (CONCAT(Start_date, ' to ', End_date)) STORED,
@@ -209,16 +211,10 @@ CREATE TABLE Booking(
     Organizer_ID INT NOT NULL,
     Current_Capacity INT NOT NULL DEFAULT 0,
     Max_Capacity INT NOT NULL,
-    
-    CONSTRAINT fk_booking_location
-        FOREIGN KEY (Location_ID)
-        REFERENCES travel_spot(Location_ID)
+    FOREIGN KEY (Location_ID) REFERENCES Travel_Spot(Location_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    
-    CONSTRAINT fk_booking_organizer
-        FOREIGN KEY (Organizer_ID)
-        REFERENCES User(User_ID)
+    FOREIGN KEY (Organizer_ID) REFERENCES User(User_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -377,17 +373,17 @@ INSERT INTO TS_Category (location_id, category_id) VALUES
 -- Manna Mall
 (10, 5), (10, 7);
 
-INSERT INTO Reaction (Reaction_Name) VALUES
-('Like'),
-('Dislike'),
-('Happy'),
-('Laugh'),
-('Sad'),
-('Angry'),
-('Love'),
-('Crying'),
-('Kiss'),
-('Fire');
+INSERT INTO Reaction (Reaction_Name, Is_Positive) VALUES
+('Like', TRUE),
+('Dislike', FALSE),
+('Happy', TRUE),
+('Laugh', TRUE),
+('Sad', FALSE),
+('Angry', FALSE),
+('Love', TRUE),
+('Crying', FALSE),
+('Kiss', TRUE),
+('Fire', TRUE);
 
 INSERT INTO User_Feedback (User_ID, Location_ID, Rating, is_recommendation, Comment_Count, Review_Date) VALUES
 (1, 1, 4.6, TRUE, 0, CURRENT_TIMESTAMP),

@@ -187,7 +187,8 @@ public class FeedbackRecordController implements ActionListener{
         
         JSlider ratingSlider = view.getUserFeedbackPanelViewer().getEditFeedbackRatingsSlider();
 
-        JSpinner reactionSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackReactionSpinner();
+        JSpinner positiveReactionSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackPositiveReactionSpinner();
+        JSpinner negativeReactionSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackNegativeReactionSpinner();
         JSpinner commentSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackCommentSpinner();
         JSpinner dateSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackDateSpinner();
 
@@ -215,7 +216,7 @@ public class FeedbackRecordController implements ActionListener{
        commentSpinner.setEnabled(true);
        dateSpinner.setEnabled(true);
 
-       feedback.loadUserFeedback(feedbackUser, userBox, locationBox, ratingSlider, reactionSpinner, commentSpinner,
+       feedback.loadUserFeedback(feedbackUser, userBox, locationBox, ratingSlider, positiveReactionSpinner, negativeReactionSpinner, commentSpinner,
                                   dateSpinner);
 
         // Checks if current user is admin, if not disable some fields from edit
@@ -283,7 +284,8 @@ public class FeedbackRecordController implements ActionListener{
         JComboBox<String> userIDBox = view.getUserFeedbackPanelViewer().getEditFeedbackUserIDBox();
         JComboBox<String> locationIDBox = view.getUserFeedbackPanelViewer().getEditFeedbackLocationIDBox();
         JSlider ratingSlider = view.getUserFeedbackPanelViewer().getEditFeedbackRatingsSlider();
-        JSpinner reactionSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackReactionSpinner();
+        JSpinner positiveReactionSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackPositiveReactionSpinner();
+        JSpinner negativeReactionSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackNegativeReactionSpinner();
         JSpinner commentSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackCommentSpinner();
         JSpinner dateSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackDateSpinner();
 
@@ -311,8 +313,8 @@ public class FeedbackRecordController implements ActionListener{
 
             userFeedbackSelectBox.setSelectedIndex(0);
 
-            feedback.loadUserFeedback(userFeedbackSelectOptions.get(0), userIDBox, locationIDBox, 
-                                      ratingSlider, reactionSpinner, commentSpinner, dateSpinner);
+            feedback.loadUserFeedback(userFeedbackSelectOptions.get(0), userIDBox, locationIDBox, ratingSlider,
+                                       positiveReactionSpinner, negativeReactionSpinner, commentSpinner, dateSpinner);
 
         }
         else
@@ -570,7 +572,8 @@ public class FeedbackRecordController implements ActionListener{
         JComboBox<String> userIDBox = view.getUserFeedbackPanelViewer().getEditFeedbackUserIDBox();
         JComboBox<String> locationIDBox = view.getUserFeedbackPanelViewer().getEditFeedbackLocationIDBox();
         JSlider ratingSlider = view.getUserFeedbackPanelViewer().getEditFeedbackRatingsSlider();
-        JSpinner reactionSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackReactionSpinner();
+        JSpinner positiveReactionSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackPositiveReactionSpinner();
+        JSpinner negativeReactionSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackNegativeReactionSpinner();
         JSpinner commentSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackCommentSpinner();
         JSpinner dateSpinner = view.getUserFeedbackPanelViewer().getEditFeedbackDateSpinner();
 
@@ -589,13 +592,15 @@ public class FeedbackRecordController implements ActionListener{
         userIDBox.removeAllItems();
         locationIDBox.removeAllItems();
         ratingSlider.setValue(0);
-        reactionSpinner.setValue(0);       
+        positiveReactionSpinner.setValue(0); 
+        negativeReactionSpinner.setValue(0);        
         commentSpinner.setValue(0);
         dateSpinner.setValue(new java.util.Date());
         userIDBox.setEnabled(false);
         locationIDBox.setEnabled(false);
         ratingSlider.setEnabled(false);
-        reactionSpinner.setEnabled(false);       
+        positiveReactionSpinner.setEnabled(false);  
+        negativeReactionSpinner.setEnabled(false);     
         commentSpinner.setEnabled(false);
         dateSpinner.setEnabled(false);
 
