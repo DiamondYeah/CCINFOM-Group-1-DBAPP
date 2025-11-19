@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;  
+import java.text.SimpleDateFormat;
 
 public class UserRecordController implements ActionListener {
     
@@ -27,7 +28,7 @@ public class UserRecordController implements ActionListener {
         view.getBackButton().addActionListener(this);
         view.getRefreshTableButton().addActionListener(this);
         view.getRefreshRecommendationsButton().addActionListener(this);
-        view.getFilterRecommendationsButton().addActionListener(this);
+        // Removed getFilterRecommendationsButton - no longer exists in view
         
         view.getUpdateUserButton().addActionListener(this);
         view.getLoadUserButton().addActionListener(this);
@@ -59,11 +60,8 @@ public class UserRecordController implements ActionListener {
 
     // Getter method
     public UserRecordModel getUserRecordModel(){
-
         return model;
-
     }
-
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -92,10 +90,6 @@ public class UserRecordController implements ActionListener {
                 
             case "RefreshRecommendations":
                 refreshRecommendations();
-                break;
-                
-            case "FilterRecommendations":
-                filterRecommendations();
                 break;
                 
             case "LoadUser":
@@ -231,26 +225,14 @@ public class UserRecordController implements ActionListener {
     }
     
     private void refreshRecommendations() {
-        String monthStr = (String) view.getMonthComboBox().getSelectedItem();
-        String yearStr = (String) view.getYearComboBox().getSelectedItem();
+        List<Object[]> recommendations = model.getRecommendationsByTierAndDate();
+        view.updateRecommendationsTable(recommendations);
         
-        if (monthStr != null && yearStr != null) {
-            int month = Integer.parseInt(monthStr.substring(0, 2));
-            int year = Integer.parseInt(yearStr);
-            
-            List<Object[]> recommendations = model.getRecommendationsByTierAndDate(month, year);
-            view.updateRecommendationsTable(recommendations);
-            
-            if (recommendations.isEmpty()) {
-                JOptionPane.showMessageDialog(view, 
-                    "No recommendations found for " + monthStr + " " + year, 
-                    "No Data", JOptionPane.INFORMATION_MESSAGE);
-            }
+        if (recommendations.isEmpty()) {
+            JOptionPane.showMessageDialog(view, 
+                "No recommendations found.", 
+                "No Data", JOptionPane.INFORMATION_MESSAGE);
         }
-    }
-    
-    private void filterRecommendations() {
-        refreshRecommendations();
     }
     
     private void showEditPanel() {
@@ -364,6 +346,7 @@ public class UserRecordController implements ActionListener {
     
     private void displayUserInfo() {
         boolean isDisplayedUserAdmin = currentUser.isAdmin();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         
         if (isAdminMode) {
             view.getFirstNameField().setText(currentUser.getFirstName());
@@ -387,7 +370,10 @@ public class UserRecordController implements ActionListener {
             if (currentUser.getEmails() != null && !currentUser.getEmails().isEmpty()) {
                 for (UserEmail email : currentUser.getEmails()) {
                     emailText.append("ID: ").append(email.getEmailId())
-                            .append(" - ").append(email.getEmail()).append("\n");
+                            .append(" - ").append(email.getEmail())
+                            .append(" (Added: ").append(email.getDateAdded() != null ? 
+                                dateFormat.format(email.getDateAdded()) : "N/A")
+                            .append(")\n");
                 }
             } else {
                 emailText.append("No emails found");
@@ -398,7 +384,10 @@ public class UserRecordController implements ActionListener {
             if (currentUser.getPhones() != null && !currentUser.getPhones().isEmpty()) {
                 for (UserPhone phone : currentUser.getPhones()) {
                     phoneText.append("ID: ").append(phone.getPhoneId())
-                            .append(" - ").append(phone.getPhoneNumber()).append("\n");
+                            .append(" - ").append(phone.getPhoneNumber())
+                            .append(" (Added: ").append(phone.getDateAdded() != null ? 
+                                dateFormat.format(phone.getDateAdded()) : "N/A")
+                            .append(")\n");
                 }
             } else {
                 phoneText.append("No phone numbers found");
@@ -426,7 +415,10 @@ public class UserRecordController implements ActionListener {
             if (currentUser.getEmails() != null && !currentUser.getEmails().isEmpty()) {
                 for (UserEmail email : currentUser.getEmails()) {
                     emailText.append("ID: ").append(email.getEmailId())
-                            .append(" - ").append(email.getEmail()).append("\n");
+                            .append(" - ").append(email.getEmail())
+                            .append(" (Added: ").append(email.getDateAdded() != null ? 
+                                dateFormat.format(email.getDateAdded()) : "N/A")
+                            .append(")\n");
                 }
             } else {
                 emailText.append("No emails found");
@@ -437,7 +429,10 @@ public class UserRecordController implements ActionListener {
             if (currentUser.getPhones() != null && !currentUser.getPhones().isEmpty()) {
                 for (UserPhone phone : currentUser.getPhones()) {
                     phoneText.append("ID: ").append(phone.getPhoneId())
-                            .append(" - ").append(phone.getPhoneNumber()).append("\n");
+                            .append(" - ").append(phone.getPhoneNumber())
+                            .append(" (Added: ").append(phone.getDateAdded() != null ? 
+                                dateFormat.format(phone.getDateAdded()) : "N/A")
+                            .append(")\n");
                 }
             } else {
                 phoneText.append("No phone numbers found");
@@ -445,6 +440,7 @@ public class UserRecordController implements ActionListener {
             view.getPhoneDisplayAreaUser().setText(phoneText.toString());
         }
     }
+    
     
     private void updateUser() {
         if (currentUser == null) {

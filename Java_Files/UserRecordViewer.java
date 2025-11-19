@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
+import java.text.SimpleDateFormat;
 
 public class UserRecordViewer extends JPanel {
     private JPanel rightPanel;
@@ -32,10 +33,6 @@ public class UserRecordViewer extends JPanel {
     private JTable recommendationsTable;
     private DefaultTableModel recommendationsTableModel;
     private JScrollPane recommendationsScrollPane;
-    
-    private JComboBox<String> monthComboBox;
-    private JComboBox<String> yearComboBox;
-    private JButton filterRecommendationsButton;
 
     private JTextField userIdFieldAdmin;
     private JTextField firstNameFieldAdmin;
@@ -100,9 +97,7 @@ public class UserRecordViewer extends JPanel {
 
     public UserRecordViewer(JPanel cardPanel) {
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(1500, 920));
-        setMaximumSize(new Dimension(1500, 920));
-        setMinimumSize(new Dimension(1500, 920));
+        setBackground(Color.decode("#bfbfb2"));
 
         initialization();
 
@@ -110,48 +105,43 @@ public class UserRecordViewer extends JPanel {
     }
     
     private void initialization() {
-        JPanel panelLeft = new JPanel();
-        panelLeft.setLayout(new GridBagLayout());
+        // LEFT PANEL - matching Booking Records style
+        JPanel panelWest = new JPanel(new GridBagLayout());
+        panelWest.setBackground(Color.GRAY);
+        
         GridBagConstraints gbc = new GridBagConstraints();
-
-        gbc.gridx = 0;
-        gbc.gridy = GridBagConstraints.RELATIVE; 
-        gbc.insets = new Insets(10, 10, 10, 10); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.CENTER;
-
-        Dimension buttonSize = new Dimension(200, 100);
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
 
         viewUserButton = new JButton("View User Table");
-        viewUserButton.setPreferredSize(buttonSize);
-        viewUserButton.setFont(new Font("Arial", Font.PLAIN, 15));
-        viewUserButton.setActionCommand("ViewUserTable");
-        panelLeft.add(viewUserButton, gbc);
-        
         viewRecommendedButton = new JButton("View Recommendations");
-        viewRecommendedButton.setPreferredSize(buttonSize);
-        viewRecommendedButton.setFont(new Font("Arial", Font.PLAIN, 15));
-        viewRecommendedButton.setActionCommand("ViewRecommendations");
-        panelLeft.add(viewRecommendedButton, gbc);
-
         editInfoButton = new JButton("Edit User Information");
-        editInfoButton.setPreferredSize(buttonSize);
-        editInfoButton.setFont(new Font("Arial", Font.PLAIN, 15));
-        editInfoButton.setActionCommand("EditUserInfo");
-        panelLeft.add(editInfoButton, gbc);
-
-        gbc.insets = new Insets(50, 10, 10, 10);
-
         backButton = new JButton("Back");
-        backButton.setPreferredSize(buttonSize);
-        backButton.setFont(new Font("Arial", Font.PLAIN, 30));
-        backButton.setActionCommand("BackToMain");
-        panelLeft.add(backButton, gbc);
 
-        this.add(panelLeft, BorderLayout.WEST);
+        viewUserButton.setActionCommand("ViewUserTable");
+    viewRecommendedButton.setActionCommand("ViewRecommendations");
+    editInfoButton.setActionCommand("EditUserInfo");
+    backButton.setActionCommand("BackToMain");
 
+        int row = 0;
+        gbc.gridy = row++;
+        panelWest.add(viewUserButton, gbc);
+        gbc.gridy = row++;
+        panelWest.add(viewRecommendedButton, gbc);
+        gbc.gridy = row++;
+        panelWest.add(editInfoButton, gbc);
+        
+        gbc.insets = new Insets(50, 10, 10, 10);
+        gbc.gridy = row++;
+        panelWest.add(backButton, gbc);
+
+        this.add(panelWest, BorderLayout.WEST);
+
+        // RIGHT PANEL
         rightCardLayout = new CardLayout();
         rightPanel = new JPanel(rightCardLayout);
+        rightPanel.setBackground(Color.decode("#bfbfb2"));
         
         rightPanel.add(createEmptyPanel(), EMPTY_CARD);
         rightPanel.add(createTablePanel(), TABLE_CARD);
@@ -164,6 +154,7 @@ public class UserRecordViewer extends JPanel {
 
     private JPanel createEmptyPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(Color.decode("#bfbfb2"));
         JLabel label = new JLabel("Select an option from the left menu");
         label.setFont(new Font("Arial", Font.PLAIN, 30));
         label.setForeground(Color.GRAY);
@@ -174,6 +165,7 @@ public class UserRecordViewer extends JPanel {
 
     private JPanel createTablePanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(Color.decode("#bfbfb2"));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel titleLabel = new JLabel("User Records (Admin Only)");
@@ -183,7 +175,9 @@ public class UserRecordViewer extends JPanel {
 
         JTabbedPane tabbedPane = new JTabbedPane();
         
+        // User Table Tab
         JPanel userTablePanel = new JPanel(new BorderLayout(5, 5));
+        userTablePanel.setBackground(Color.decode("#bfbfb2"));
         String[] userColumns = {"User ID", "First Name", "Last Name", "Nationality", "Points", "Tier", 
                                 "Password", "Is Admin", "Locations Shared", "Reviews Made", "Bookings Count"};
         userTableModel = new DefaultTableModel(userColumns, 0) {
@@ -200,14 +194,12 @@ public class UserRecordViewer extends JPanel {
         userTablePanel.add(userScrollPane, BorderLayout.CENTER);
         
         JPanel userButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        userButtonPanel.setBackground(Color.decode("#bfbfb2"));
         refreshTableButton = new JButton("Refresh");
-        refreshTableButton.setFont(new Font("Arial", Font.PLAIN, 12));
         refreshTableButton.setActionCommand("RefreshUserTable");
         insertUserButton = new JButton("Insert User");
-        insertUserButton.setFont(new Font("Arial", Font.PLAIN, 12));
         insertUserButton.setActionCommand("InsertUser");
         deleteUserButton = new JButton("Delete User");
-        deleteUserButton.setFont(new Font("Arial", Font.PLAIN, 12));
         deleteUserButton.setActionCommand("DeleteUser");
         userButtonPanel.add(refreshTableButton);
         userButtonPanel.add(insertUserButton);
@@ -216,7 +208,9 @@ public class UserRecordViewer extends JPanel {
         
         tabbedPane.addTab("Users", userTablePanel);
         
+        // Tiers Table Tab
         JPanel tiersTablePanel = new JPanel(new BorderLayout(5, 5));
+        tiersTablePanel.setBackground(Color.decode("#bfbfb2"));
         String[] tierColumns = {"Tier ID", "Tier Name", "Min Points", "Max Points"};
         tiersTableModel = new DefaultTableModel(tierColumns, 0) {
             @Override
@@ -232,14 +226,12 @@ public class UserRecordViewer extends JPanel {
         tiersTablePanel.add(tiersScrollPane, BorderLayout.CENTER);
         
         JPanel tiersButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        tiersButtonPanel.setBackground(Color.decode("#bfbfb2"));
         refreshTiersButton = new JButton("Refresh");
-        refreshTiersButton.setFont(new Font("Arial", Font.PLAIN, 12));
         refreshTiersButton.setActionCommand("RefreshTiers");
         insertTierButton = new JButton("Insert Tier");
-        insertTierButton.setFont(new Font("Arial", Font.PLAIN, 12));
         insertTierButton.setActionCommand("InsertTier");
         deleteTierButton = new JButton("Delete Tier");
-        deleteTierButton.setFont(new Font("Arial", Font.PLAIN, 12));
         deleteTierButton.setActionCommand("DeleteTier");
         tiersButtonPanel.add(refreshTiersButton);
         tiersButtonPanel.add(insertTierButton);
@@ -248,8 +240,10 @@ public class UserRecordViewer extends JPanel {
         
         tabbedPane.addTab("Points Tiers", tiersTablePanel);
         
+        // Emails Table Tab - Updated with Date Added column
         JPanel emailsTablePanel = new JPanel(new BorderLayout(5, 5));
-        String[] emailColumns = {"Email ID", "User ID", "Email"};
+        emailsTablePanel.setBackground(Color.decode("#bfbfb2"));
+        String[] emailColumns = {"Email ID", "User ID", "Email", "Date Added"};
         emailsTableModel = new DefaultTableModel(emailColumns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -264,14 +258,12 @@ public class UserRecordViewer extends JPanel {
         emailsTablePanel.add(emailsScrollPane, BorderLayout.CENTER);
         
         JPanel emailsButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        emailsButtonPanel.setBackground(Color.decode("#bfbfb2"));
         refreshEmailsButton = new JButton("Refresh");
-        refreshEmailsButton.setFont(new Font("Arial", Font.PLAIN, 12));
         refreshEmailsButton.setActionCommand("RefreshEmails");
         insertEmailButton = new JButton("Insert Email");
-        insertEmailButton.setFont(new Font("Arial", Font.PLAIN, 12));
         insertEmailButton.setActionCommand("InsertEmail");
         deleteEmailButton = new JButton("Delete Email");
-        deleteEmailButton.setFont(new Font("Arial", Font.PLAIN, 12));
         deleteEmailButton.setActionCommand("DeleteEmail");
         emailsButtonPanel.add(refreshEmailsButton);
         emailsButtonPanel.add(insertEmailButton);
@@ -280,8 +272,10 @@ public class UserRecordViewer extends JPanel {
         
         tabbedPane.addTab("User Emails", emailsTablePanel);
         
+        // Phones Table Tab - Updated with Date Added column
         JPanel phonesTablePanel = new JPanel(new BorderLayout(5, 5));
-        String[] phoneColumns = {"Phone ID", "User ID", "Phone Number"};
+        phonesTablePanel.setBackground(Color.decode("#bfbfb2"));
+        String[] phoneColumns = {"Phone ID", "User ID", "Phone Number", "Date Added"};
         phonesTableModel = new DefaultTableModel(phoneColumns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -296,14 +290,12 @@ public class UserRecordViewer extends JPanel {
         phonesTablePanel.add(phonesScrollPane, BorderLayout.CENTER);
         
         JPanel phonesButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        phonesButtonPanel.setBackground(Color.decode("#bfbfb2"));
         refreshPhonesButton = new JButton("Refresh");
-        refreshPhonesButton.setFont(new Font("Arial", Font.PLAIN, 12));
         refreshPhonesButton.setActionCommand("RefreshPhones");
         insertPhoneButton = new JButton("Insert Phone");
-        insertPhoneButton.setFont(new Font("Arial", Font.PLAIN, 12));
         insertPhoneButton.setActionCommand("InsertPhone");
         deletePhoneButton = new JButton("Delete Phone");
-        deletePhoneButton.setFont(new Font("Arial", Font.PLAIN, 12));
         deletePhoneButton.setActionCommand("DeletePhone");
         phonesButtonPanel.add(refreshPhonesButton);
         phonesButtonPanel.add(insertPhoneButton);
@@ -319,6 +311,7 @@ public class UserRecordViewer extends JPanel {
 
     private JPanel createRecommendationsPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(Color.decode("#bfbfb2"));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel titleLabel = new JLabel("Recommendations Rating Report by Points Tier");
@@ -326,45 +319,9 @@ public class UserRecordViewer extends JPanel {
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(titleLabel, BorderLayout.NORTH);
 
-        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-        filterPanel.setBorder(BorderFactory.createTitledBorder("Filter by Date"));
-        
-        JLabel monthLabel = new JLabel("Month:");
-        monthLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        filterPanel.add(monthLabel);
-        
-        String[] months = {"01 - January", "02 - February", "03 - March", "04 - April", 
-                          "05 - May", "06 - June", "07 - July", "08 - August", 
-                          "09 - September", "10 - October", "11 - November", "12 - December"};
-        monthComboBox = new JComboBox<>(months);
-        monthComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
-        filterPanel.add(monthComboBox);
-        
-        JLabel yearLabel = new JLabel("Year:");
-        yearLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        filterPanel.add(yearLabel);
-        
-        String[] years = new String[10];
-        int currentYear = java.time.Year.now().getValue();
-        for (int i = 0; i < 10; i++) {
-            years[i] = String.valueOf(currentYear - i);
-        }
-        yearComboBox = new JComboBox<>(years);
-        yearComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
-        filterPanel.add(yearComboBox);
-        
-        filterRecommendationsButton = new JButton("Apply Filter");
-        filterRecommendationsButton.setFont(new Font("Arial", Font.BOLD, 14));
-        filterRecommendationsButton.setActionCommand("FilterRecommendations");
-        filterPanel.add(filterRecommendationsButton);
-        
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(titleLabel, BorderLayout.NORTH);
-        topPanel.add(filterPanel, BorderLayout.CENTER);
-        panel.add(topPanel, BorderLayout.NORTH);
-
+        // Updated columns to include Date and Time
         String[] columns = {"Location ID", "Spot Name", "City", "Region", "Country", 
-                           "Points Tier", "Recommendations Count"};
+                           "Points Tier", "Recommendations Count", "Date", "Time"};
         recommendationsTableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -381,8 +338,8 @@ public class UserRecordViewer extends JPanel {
         panel.add(recommendationsScrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(Color.decode("#bfbfb2"));
         refreshRecommendationsButton = new JButton("Refresh");
-        refreshRecommendationsButton.setFont(new Font("Arial", Font.PLAIN, 14));
         refreshRecommendationsButton.setActionCommand("RefreshRecommendations");
         buttonPanel.add(refreshRecommendationsButton);
         panel.add(buttonPanel, BorderLayout.SOUTH);
@@ -390,389 +347,548 @@ public class UserRecordViewer extends JPanel {
         return panel;
     }
 
-    private JPanel createEditPanelAdmin() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    // Replace createEditPanelAdmin() method with this:
+private JPanel createEditPanelAdmin() {
+    JPanel panel = new JPanel(new GridBagLayout());
+    panel.setBackground(Color.decode("#bfbfb2"));
+    
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(10, 10, 10, 10);
+    gbc.anchor = GridBagConstraints.WEST;
+    
+    int row = 0;
+    
+    // Title
+    gbc.gridx = 0; gbc.gridy = row++; gbc.gridwidth = 2;
+    gbc.anchor = GridBagConstraints.CENTER;
+    JLabel titleLabel = new JLabel("Edit User Information (Admin)");
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+    panel.add(titleLabel, gbc);
+    
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.gridwidth = 1;
+    
+    // User ID with Load Button
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel userIdLabel = new JLabel("User ID:");
+    userIdLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(userIdLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    JPanel userIdPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    userIdPanel.setBackground(Color.decode("#bfbfb2"));
+    userIdFieldAdmin = new JTextField(15);
+    loadUserButtonAdmin = new JButton("Load User");
+    loadUserButtonAdmin.setActionCommand("LoadUser");
+    userIdPanel.add(userIdFieldAdmin);
+    userIdPanel.add(loadUserButtonAdmin);
+    panel.add(userIdPanel, gbc);
+    
+    // First Name
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel firstNameLabel = new JLabel("First Name:");
+    firstNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(firstNameLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    firstNameFieldAdmin = new JTextField(20);
+    panel.add(firstNameFieldAdmin, gbc);
+    
+    // Last Name
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel lastNameLabel = new JLabel("Last Name:");
+    lastNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(lastNameLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    lastNameFieldAdmin = new JTextField(20);
+    panel.add(lastNameFieldAdmin, gbc);
+    
+    // Nationality
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel nationalityLabel = new JLabel("Nationality:");
+    nationalityLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(nationalityLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    nationalityFieldAdmin = new JTextField(20);
+    panel.add(nationalityFieldAdmin, gbc);
+    
+    // Points
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel pointsLabel = new JLabel("Points:");
+    pointsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(pointsLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    pointsFieldAdmin = new JTextField(20);
+    panel.add(pointsFieldAdmin, gbc);
+    
+    // Current Tier
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel tierTextLabel = new JLabel("Current Tier:");
+    tierTextLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(tierTextLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    tierLabelAdmin = new JLabel("N/A");
+    tierLabelAdmin.setFont(new Font("Arial", Font.BOLD, 14));
+    tierLabelAdmin.setForeground(Color.decode("#0066cc"));
+    panel.add(tierLabelAdmin, gbc);
+    
+    // New Password
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel passwordLabel = new JLabel("New Password:");
+    passwordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(passwordLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    passwordFieldAdmin = new JTextField(20);
+    panel.add(passwordFieldAdmin, gbc);
+    
+    // Emails Section
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel emailSectionLabel = new JLabel("Emails:");
+    emailSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(emailSectionLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    emailDisplayAreaAdmin = new JTextArea(3, 20);
+    emailDisplayAreaAdmin.setEditable(false);
+    emailDisplayAreaAdmin.setBackground(Color.WHITE);
+    JScrollPane emailScroll = new JScrollPane(emailDisplayAreaAdmin);
+    panel.add(emailScroll, gbc);
+    
+    // Add Email
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel newEmailLabel = new JLabel("New Email:");
+    newEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(newEmailLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    emailPanel.setBackground(Color.decode("#bfbfb2"));
+    emailFieldAdmin = new JTextField(15);
+    addEmailButtonAdmin = new JButton("Add");
+    addEmailButtonAdmin.setActionCommand("AddEmail");
+    emailPanel.add(emailFieldAdmin);
+    emailPanel.add(addEmailButtonAdmin);
+    panel.add(emailPanel, gbc);
+    
+    // Remove Email
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel removeEmailLabel = new JLabel("Email ID to Remove:");
+    removeEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(removeEmailLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    JPanel removeEmailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    removeEmailPanel.setBackground(Color.decode("#bfbfb2"));
+    emailIdToRemoveFieldAdmin = new JTextField(15);
+    removeEmailButtonAdmin = new JButton("Remove");
+    removeEmailButtonAdmin.setActionCommand("RemoveEmail");
+    removeEmailPanel.add(emailIdToRemoveFieldAdmin);
+    removeEmailPanel.add(removeEmailButtonAdmin);
+    panel.add(removeEmailPanel, gbc);
+    
+    // Phones Section
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel phoneSectionLabel = new JLabel("Phone Numbers:");
+    phoneSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(phoneSectionLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    phoneDisplayAreaAdmin = new JTextArea(3, 20);
+    phoneDisplayAreaAdmin.setEditable(false);
+    phoneDisplayAreaAdmin.setBackground(Color.WHITE);
+    JScrollPane phoneScroll = new JScrollPane(phoneDisplayAreaAdmin);
+    panel.add(phoneScroll, gbc);
+    
+    // Add Phone
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel newPhoneLabel = new JLabel("New Phone:");
+    newPhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(newPhoneLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    phonePanel.setBackground(Color.decode("#bfbfb2"));
+    phoneFieldAdmin = new JTextField(15);
+    addPhoneButtonAdmin = new JButton("Add");
+    addPhoneButtonAdmin.setActionCommand("AddPhone");
+    phonePanel.add(phoneFieldAdmin);
+    phonePanel.add(addPhoneButtonAdmin);
+    panel.add(phonePanel, gbc);
+    
+    // Remove Phone
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel removePhoneLabel = new JLabel("Phone ID to Remove:");
+    removePhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(removePhoneLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    JPanel removePhonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    removePhonePanel.setBackground(Color.decode("#bfbfb2"));
+    phoneIdToRemoveFieldAdmin = new JTextField(15);
+    removePhoneButtonAdmin = new JButton("Remove");
+    removePhoneButtonAdmin.setActionCommand("RemovePhone");
+    removePhonePanel.add(phoneIdToRemoveFieldAdmin);
+    removePhonePanel.add(removePhoneButtonAdmin);
+    panel.add(removePhonePanel, gbc);
+    
+    // Buttons at bottom
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.gridwidth = 2;
+    gbc.anchor = GridBagConstraints.CENTER;
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+    buttonPanel.setBackground(Color.decode("#bfbfb2"));
+    
+    updateUserButtonAdmin = new JButton("Update User");
+    updateUserButtonAdmin.setActionCommand("UpdateUser");
+    updateUserButtonAdmin.setFont(new Font("Arial", Font.PLAIN, 14));
+    
+    deleteAccountButtonAdmin = new JButton("Delete Account");
+    deleteAccountButtonAdmin.setActionCommand("DeleteAccount");
+    deleteAccountButtonAdmin.setFont(new Font("Arial", Font.PLAIN, 14));
+    deleteAccountButtonAdmin.setForeground(Color.RED);
+    
+    buttonPanel.add(updateUserButtonAdmin);
+    buttonPanel.add(deleteAccountButtonAdmin);
+    panel.add(buttonPanel, gbc);
+    
+    return panel;
+}
 
-        JLabel titleLabel = new JLabel("Edit User Information (Admin Mode)");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(titleLabel, BorderLayout.NORTH);
+// Replace createEditPanelUser() method with this:
+private JPanel createEditPanelUser() {
+    JPanel panel = new JPanel(new GridBagLayout());
+    panel.setBackground(Color.decode("#bfbfb2"));
+    
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(10, 10, 10, 10);
+    gbc.anchor = GridBagConstraints.WEST;
+    
+    int row = 0;
+    
+    // Title
+    gbc.gridx = 0; gbc.gridy = row++; gbc.gridwidth = 2;
+    gbc.anchor = GridBagConstraints.CENTER;
+    JLabel titleLabel = new JLabel("Edit My Information");
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+    panel.add(titleLabel, gbc);
+    
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.gridwidth = 1;
+    
+    // First Name
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel firstNameLabel = new JLabel("First Name:");
+    firstNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(firstNameLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    firstNameFieldUser = new JTextField(20);
+    panel.add(firstNameFieldUser, gbc);
+    
+    // Last Name
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel lastNameLabel = new JLabel("Last Name:");
+    lastNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(lastNameLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    lastNameFieldUser = new JTextField(20);
+    panel.add(lastNameFieldUser, gbc);
+    
+    // Nationality
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel nationalityLabel = new JLabel("Nationality:");
+    nationalityLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(nationalityLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    nationalityFieldUser = new JTextField(20);
+    panel.add(nationalityFieldUser, gbc);
+    
+    // Points (read-only)
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel pointsLabel = new JLabel("Points:");
+    pointsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(pointsLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    pointsFieldUser = new JTextField(20);
+    pointsFieldUser.setEditable(false);
+    pointsFieldUser.setBackground(Color.LIGHT_GRAY);
+    panel.add(pointsFieldUser, gbc);
+    
+    // Current Tier
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel tierTextLabel = new JLabel("Current Tier:");
+    tierTextLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(tierTextLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    tierLabelUser = new JLabel("N/A");
+    tierLabelUser.setFont(new Font("Arial", Font.BOLD, 14));
+    tierLabelUser.setForeground(Color.decode("#0066cc"));
+    panel.add(tierLabelUser, gbc);
+    
+    // New Password
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel passwordLabel = new JLabel("New Password:");
+    passwordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(passwordLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    passwordFieldUser = new JTextField(20);
+    panel.add(passwordFieldUser, gbc);
+    
+    // Emails Section
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel emailSectionLabel = new JLabel("Emails:");
+    emailSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(emailSectionLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    emailDisplayAreaUser = new JTextArea(3, 20);
+    emailDisplayAreaUser.setEditable(false);
+    emailDisplayAreaUser.setBackground(Color.WHITE);
+    JScrollPane emailScroll = new JScrollPane(emailDisplayAreaUser);
+    panel.add(emailScroll, gbc);
+    
+    // Add Email
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel newEmailLabel = new JLabel("New Email:");
+    newEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(newEmailLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    emailPanel.setBackground(Color.decode("#bfbfb2"));
+    emailFieldUser = new JTextField(15);
+    addEmailButtonUser = new JButton("Add");
+    addEmailButtonUser.setActionCommand("AddEmail");
+    emailPanel.add(emailFieldUser);
+    emailPanel.add(addEmailButtonUser);
+    panel.add(emailPanel, gbc);
+    
+    // Remove Email
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel removeEmailLabel = new JLabel("Email ID to Remove:");
+    removeEmailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(removeEmailLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    JPanel removeEmailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    removeEmailPanel.setBackground(Color.decode("#bfbfb2"));
+    emailIdToRemoveFieldUser = new JTextField(15);
+    removeEmailButtonUser = new JButton("Remove");
+    removeEmailButtonUser.setActionCommand("RemoveEmail");
+    removeEmailPanel.add(emailIdToRemoveFieldUser);
+    removeEmailPanel.add(removeEmailButtonUser);
+    panel.add(removeEmailPanel, gbc);
+    
+    // Phones Section
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel phoneSectionLabel = new JLabel("Phone Numbers:");
+    phoneSectionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(phoneSectionLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    phoneDisplayAreaUser = new JTextArea(3, 20);
+    phoneDisplayAreaUser.setEditable(false);
+    phoneDisplayAreaUser.setBackground(Color.WHITE);
+    JScrollPane phoneScroll = new JScrollPane(phoneDisplayAreaUser);
+    panel.add(phoneScroll, gbc);
+    
+    // Add Phone
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel newPhoneLabel = new JLabel("New Phone:");
+    newPhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(newPhoneLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    phonePanel.setBackground(Color.decode("#bfbfb2"));
+    phoneFieldUser = new JTextField(15);
+    addPhoneButtonUser = new JButton("Add");
+    addPhoneButtonUser.setActionCommand("AddPhone");
+    phonePanel.add(phoneFieldUser);
+    phonePanel.add(addPhoneButtonUser);
+    panel.add(phonePanel, gbc);
+    
+    // Remove Phone
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    JLabel removePhoneLabel = new JLabel("Phone ID to Remove:");
+    removePhoneLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    panel.add(removePhoneLabel, gbc);
+    
+    gbc.gridx = 1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    JPanel removePhonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    removePhonePanel.setBackground(Color.decode("#bfbfb2"));
+    phoneIdToRemoveFieldUser = new JTextField(15);
+    removePhoneButtonUser = new JButton("Remove");
+    removePhoneButtonUser.setActionCommand("RemovePhone");
+    removePhonePanel.add(phoneIdToRemoveFieldUser);
+    removePhonePanel.add(removePhoneButtonUser);
+    panel.add(removePhonePanel, gbc);
+    
+    // Buttons at bottom
+    gbc.gridy = row++;
+    gbc.gridx = 0;
+    gbc.gridwidth = 2;
+    gbc.anchor = GridBagConstraints.CENTER;
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+    buttonPanel.setBackground(Color.decode("#bfbfb2"));
+    
+    updateUserButtonUser = new JButton("Update User");
+    updateUserButtonUser.setActionCommand("UpdateUser");
+    updateUserButtonUser.setFont(new Font("Arial", Font.PLAIN, 14));
+    
+    deleteAccountButtonUser = new JButton("Delete Account");
+    deleteAccountButtonUser.setActionCommand("DeleteAccount");
+    deleteAccountButtonUser.setFont(new Font("Arial", Font.PLAIN, 14));
+    deleteAccountButtonUser.setForeground(Color.RED);
+    
+    buttonPanel.add(updateUserButtonUser);
+    buttonPanel.add(deleteAccountButtonUser);
+    panel.add(buttonPanel, gbc);
+    
+    return panel;
+}  
 
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        int currentRow = 0;
-
-        gbc.gridx = 0; gbc.gridy = currentRow;
-        JLabel userIdLabel = new JLabel("Enter User ID:");
-        userIdLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        formPanel.add(userIdLabel, gbc);
-        
-        gbc.gridx = 1;
-        userIdFieldAdmin = new JTextField(15);
-        formPanel.add(userIdFieldAdmin, gbc);
-        
-        gbc.gridx = 2;
-        loadUserButtonAdmin = new JButton("Load User");
-        loadUserButtonAdmin.setActionCommand("LoadUser");
-        loadUserButtonAdmin.setFont(new Font("Arial", Font.PLAIN, 14));
-        formPanel.add(loadUserButtonAdmin, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 3;
-        formPanel.add(new JSeparator(), gbc);
-        currentRow++;
-        gbc.gridwidth = 1;
-
-        gbc.gridx = 0; gbc.gridy = currentRow;
-        formPanel.add(new JLabel("First Name:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        firstNameFieldAdmin = new JTextField(20);
-        formPanel.add(firstNameFieldAdmin, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Last Name:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        lastNameFieldAdmin = new JTextField(20);
-        formPanel.add(lastNameFieldAdmin, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Nationality:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        nationalityFieldAdmin = new JTextField(20);
-        formPanel.add(nationalityFieldAdmin, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Points:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        pointsFieldAdmin = new JTextField(20);
-        formPanel.add(pointsFieldAdmin, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Current Tier:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        tierLabelAdmin = new JLabel("N/A");
-        tierLabelAdmin.setFont(new Font("Arial", Font.BOLD, 14));
-        tierLabelAdmin.setForeground(Color.decode("#0066cc"));
-        formPanel.add(tierLabelAdmin, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("New Password:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        passwordFieldAdmin = new JTextField(20);
-        formPanel.add(passwordFieldAdmin, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 3;
-        JLabel passwordHint = new JLabel("(Leave blank to keep current password)");
-        passwordHint.setFont(new Font("Arial", Font.ITALIC, 11));
-        passwordHint.setForeground(Color.GRAY);
-        formPanel.add(passwordHint, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 3;
-        formPanel.add(new JSeparator(), gbc);
-        currentRow++;
-
-        gbc.gridy = currentRow;
-        JLabel emailSectionLabel = new JLabel("Emails:");
-        emailSectionLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        formPanel.add(emailSectionLabel, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow;
-        emailDisplayAreaAdmin = new JTextArea(3, 30);
-        emailDisplayAreaAdmin.setEditable(false);
-        emailDisplayAreaAdmin.setBackground(Color.WHITE);
-        JScrollPane emailScroll = new JScrollPane(emailDisplayAreaAdmin);
-        formPanel.add(emailScroll, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow; gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        formPanel.add(new JLabel("New Email:"), gbc);
-        gbc.gridx = 1;
-        emailFieldAdmin = new JTextField(15);
-        formPanel.add(emailFieldAdmin, gbc);
-        gbc.gridx = 2;
-        addEmailButtonAdmin = new JButton("Add");
-        addEmailButtonAdmin.setActionCommand("AddEmail");
-        formPanel.add(addEmailButtonAdmin, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow;
-        gbc.gridx = 0;
-        formPanel.add(new JLabel("Email ID to Remove:"), gbc);
-        gbc.gridx = 1;
-        emailIdToRemoveFieldAdmin = new JTextField(15);
-        formPanel.add(emailIdToRemoveFieldAdmin, gbc);
-        gbc.gridx = 2;
-        removeEmailButtonAdmin = new JButton("Remove");
-        removeEmailButtonAdmin.setActionCommand("RemoveEmail");
-        formPanel.add(removeEmailButtonAdmin, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 3;
-        formPanel.add(new JSeparator(), gbc);
-        currentRow++;
-
-        gbc.gridy = currentRow;
-        JLabel phoneSectionLabel = new JLabel("Phone Numbers:");
-        phoneSectionLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        formPanel.add(phoneSectionLabel, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow;
-        phoneDisplayAreaAdmin = new JTextArea(3, 30);
-        phoneDisplayAreaAdmin.setEditable(false);
-        phoneDisplayAreaAdmin.setBackground(Color.WHITE);
-        JScrollPane phoneScroll = new JScrollPane(phoneDisplayAreaAdmin);
-        formPanel.add(phoneScroll, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow; gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        formPanel.add(new JLabel("New Phone:"), gbc);
-        gbc.gridx = 1;
-        phoneFieldAdmin = new JTextField(15);
-        formPanel.add(phoneFieldAdmin, gbc);
-        gbc.gridx = 2;
-        addPhoneButtonAdmin = new JButton("Add");
-        addPhoneButtonAdmin.setActionCommand("AddPhone");
-        formPanel.add(addPhoneButtonAdmin, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow;
-        gbc.gridx = 0;
-        formPanel.add(new JLabel("Phone ID to Remove:"), gbc);
-        gbc.gridx = 1;
-        phoneIdToRemoveFieldAdmin = new JTextField(15);
-        formPanel.add(phoneIdToRemoveFieldAdmin, gbc);
-        gbc.gridx = 2;
-        removePhoneButtonAdmin = new JButton("Remove");
-        removePhoneButtonAdmin.setActionCommand("RemovePhone");
-        formPanel.add(removePhoneButtonAdmin, gbc);
-
-        JScrollPane formScroll = new JScrollPane(formPanel);
-        panel.add(formScroll, BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        updateUserButtonAdmin = new JButton("Update User");
-        updateUserButtonAdmin.setFont(new Font("Arial", Font.BOLD, 16));
-        updateUserButtonAdmin.setActionCommand("UpdateUser");
-        buttonPanel.add(updateUserButtonAdmin);
-        
-        deleteAccountButtonAdmin = new JButton("Delete Account");
-        deleteAccountButtonAdmin.setFont(new Font("Arial", Font.BOLD, 16));
-        deleteAccountButtonAdmin.setForeground(Color.RED);
-        deleteAccountButtonAdmin.setActionCommand("DeleteAccount");
-        buttonPanel.add(deleteAccountButtonAdmin);
-        
-        panel.add(buttonPanel, BorderLayout.SOUTH);
-
-        return panel;
-    }
-
-    private JPanel createEditPanelUser() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        JLabel titleLabel = new JLabel("Edit My Information");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(titleLabel, BorderLayout.NORTH);
-
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        int currentRow = 0;
-
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 3;
-        JLabel infoLabel = new JLabel("Editing your own information");
-        infoLabel.setFont(new Font("Arial", Font.ITALIC, 14));
-        infoLabel.setForeground(Color.decode("#0066cc"));
-        formPanel.add(infoLabel, gbc);
-        currentRow++;
-        gbc.gridwidth = 1;
-
-        gbc.gridx = 0; gbc.gridy = currentRow;
-        formPanel.add(new JLabel("First Name:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        firstNameFieldUser = new JTextField(20);
-        formPanel.add(firstNameFieldUser, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Last Name:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        lastNameFieldUser = new JTextField(20);
-        formPanel.add(lastNameFieldUser, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Nationality:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        nationalityFieldUser = new JTextField(20);
-        formPanel.add(nationalityFieldUser, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Points:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        pointsFieldUser = new JTextField(20);
-        pointsFieldUser.setEditable(false);
-        pointsFieldUser.setBackground(Color.LIGHT_GRAY);
-        formPanel.add(pointsFieldUser, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 3;
-        JLabel pointsHint = new JLabel("(Points are automatically awarded and cannot be manually edited)");
-        pointsHint.setFont(new Font("Arial", Font.ITALIC, 11));
-        pointsHint.setForeground(Color.GRAY);
-        formPanel.add(pointsHint, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Current Tier:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        tierLabelUser = new JLabel("N/A");
-        tierLabelUser.setFont(new Font("Arial", Font.BOLD, 14));
-        tierLabelUser.setForeground(Color.decode("#0066cc"));
-        formPanel.add(tierLabelUser, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 1;
-        formPanel.add(new JLabel("New Password:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 2;
-        passwordFieldUser = new JTextField(20);
-        formPanel.add(passwordFieldUser, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 3;
-        JLabel passwordHint = new JLabel("(Leave blank to keep current password)");
-        passwordHint.setFont(new Font("Arial", Font.ITALIC, 11));
-        passwordHint.setForeground(Color.GRAY);
-        formPanel.add(passwordHint, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 3;
-        formPanel.add(new JSeparator(), gbc);
-        currentRow++;
-
-        gbc.gridy = currentRow;
-        JLabel emailSectionLabel = new JLabel("Emails:");
-        emailSectionLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        formPanel.add(emailSectionLabel, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow;
-        emailDisplayAreaUser = new JTextArea(3, 30);
-        emailDisplayAreaUser.setEditable(false);
-        emailDisplayAreaUser.setBackground(Color.WHITE);
-        JScrollPane emailScroll = new JScrollPane(emailDisplayAreaUser);
-        formPanel.add(emailScroll, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow; gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        formPanel.add(new JLabel("New Email:"), gbc);
-        gbc.gridx = 1;
-        emailFieldUser = new JTextField(15);
-        formPanel.add(emailFieldUser, gbc);
-        gbc.gridx = 2;
-        addEmailButtonUser = new JButton("Add");
-        addEmailButtonUser.setActionCommand("AddEmail");
-        formPanel.add(addEmailButtonUser, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow;
-        gbc.gridx = 0;
-        formPanel.add(new JLabel("Email ID to Remove:"), gbc);
-        gbc.gridx = 1;
-        emailIdToRemoveFieldUser = new JTextField(15);
-        formPanel.add(emailIdToRemoveFieldUser, gbc);
-        gbc.gridx = 2;
-        removeEmailButtonUser = new JButton("Remove");
-        removeEmailButtonUser.setActionCommand("RemoveEmail");
-        formPanel.add(removeEmailButtonUser, gbc);
-
-        currentRow++;
-        gbc.gridx = 0; gbc.gridy = currentRow; gbc.gridwidth = 3;
-        formPanel.add(new JSeparator(), gbc);
-        currentRow++;
-
-        gbc.gridy = currentRow;
-        JLabel phoneSectionLabel = new JLabel("Phone Numbers:");
-        phoneSectionLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        formPanel.add(phoneSectionLabel, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow;
-        phoneDisplayAreaUser = new JTextArea(3, 30);
-        phoneDisplayAreaUser.setEditable(false);
-        phoneDisplayAreaUser.setBackground(Color.WHITE);
-        JScrollPane phoneScroll = new JScrollPane(phoneDisplayAreaUser);
-        formPanel.add(phoneScroll, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow; gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        formPanel.add(new JLabel("New Phone:"), gbc);
-        gbc.gridx = 1;
-        phoneFieldUser = new JTextField(15);
-        formPanel.add(phoneFieldUser, gbc);
-        gbc.gridx = 2;
-        addPhoneButtonUser = new JButton("Add");
-        addPhoneButtonUser.setActionCommand("AddPhone");
-        formPanel.add(addPhoneButtonUser, gbc);
-
-        currentRow++;
-        gbc.gridy = currentRow;
-        gbc.gridx = 0;
-        formPanel.add(new JLabel("Phone ID to Remove:"), gbc);
-        gbc.gridx = 1;
-        phoneIdToRemoveFieldUser = new JTextField(15);
-        formPanel.add(phoneIdToRemoveFieldUser, gbc);
-        gbc.gridx = 2;
-        removePhoneButtonUser = new JButton("Remove");
-        removePhoneButtonUser.setActionCommand("RemovePhone");
-        formPanel.add(removePhoneButtonUser, gbc);
-
-        JScrollPane formScroll = new JScrollPane(formPanel);
-        panel.add(formScroll, BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        updateUserButtonUser = new JButton("Update User");
-        updateUserButtonUser.setFont(new Font("Arial", Font.BOLD, 16));
-        updateUserButtonUser.setActionCommand("UpdateUser");
-        buttonPanel.add(updateUserButtonUser);
-        
-        deleteAccountButtonUser = new JButton("Delete Account");
-        deleteAccountButtonUser.setFont(new Font("Arial", Font.BOLD, 16));
-        deleteAccountButtonUser.setForeground(Color.RED);
-        deleteAccountButtonUser.setActionCommand("DeleteAccount");
-        buttonPanel.add(deleteAccountButtonUser);
-        
-        panel.add(buttonPanel, BorderLayout.SOUTH);
-
-        return panel;
-    }  
-
+    // Getter methods
     public JButton getViewUserButton() { return viewUserButton; }
     public JButton getViewRecommendedButton() { return viewRecommendedButton; }
-    public JButton getFilterRecommendationsButton() { return filterRecommendationsButton; }
     public JButton getEditInfoButton() { return editInfoButton; }
     public JButton getBackButton() { return backButton; }
     public JButton getRefreshTableButton() { return refreshTableButton; }
@@ -831,9 +947,6 @@ public class UserRecordViewer extends JPanel {
     public JTextField getPhoneIdToRemoveFieldUser() { return phoneIdToRemoveFieldUser; }
     public JTextArea getEmailDisplayAreaUser() { return emailDisplayAreaUser; }
     public JTextArea getPhoneDisplayAreaUser() { return phoneDisplayAreaUser; }
-    
-    public JComboBox<String> getMonthComboBox() { return monthComboBox; }
-    public JComboBox<String> getYearComboBox() { return yearComboBox; }
 
     public void updateUserTable(List<User> users) {
         userTableModel.setRowCount(0);
@@ -870,11 +983,13 @@ public class UserRecordViewer extends JPanel {
     
     public void updateEmailsTable(List<UserEmail> emails) {
         emailsTableModel.setRowCount(0);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (UserEmail email : emails) {
             Object[] row = {
                 email.getEmailId(),
                 email.getUserId(),
-                email.getEmail()
+                email.getEmail(),
+                email.getDateAdded() != null ? dateFormat.format(email.getDateAdded()) : "N/A"
             };
             emailsTableModel.addRow(row);
         }
@@ -882,11 +997,13 @@ public class UserRecordViewer extends JPanel {
     
     public void updatePhonesTable(List<UserPhone> phones) {
         phonesTableModel.setRowCount(0);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (UserPhone phone : phones) {
             Object[] row = {
                 phone.getPhoneId(),
                 phone.getUserId(),
-                phone.getPhoneNumber()
+                phone.getPhoneNumber(),
+                phone.getDateAdded() != null ? dateFormat.format(phone.getDateAdded()) : "N/A"
             };
             phonesTableModel.addRow(row);
         }

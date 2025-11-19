@@ -69,90 +69,94 @@ public class UserRecordModel {
     }
 
     public List<UserEmail> getUserEmails(int userId) {
-        List<UserEmail> emails = new ArrayList<>();
-        String query = "SELECT Email_ID, User_ID, Email FROM User_Email WHERE User_ID = ?";
+    List<UserEmail> emails = new ArrayList<>();
+    String query = "SELECT Email_ID, User_ID, Email, Date_Added FROM User_Email WHERE User_ID = ? ORDER BY Date_Added DESC";
 
-        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, userId);
-            ResultSet rs = pstmt.executeQuery();
+    try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+        pstmt.setInt(1, userId);
+        ResultSet rs = pstmt.executeQuery();
 
-            while (rs.next()) {
-                emails.add(new UserEmail(
-                    rs.getInt("Email_ID"),
-                    rs.getInt("User_ID"),
-                    rs.getString("Email")
-                ));
-            }
-        } catch (SQLException e) {
-            System.out.printf("Error fetching emails.\n");
+        while (rs.next()) {
+            emails.add(new UserEmail(
+                rs.getInt("Email_ID"),
+                rs.getInt("User_ID"),
+                rs.getString("Email"),
+                rs.getTimestamp("Date_Added")
+            ));
         }
-
-        return emails;
+    } catch (SQLException e) {
+        System.out.printf("Error fetching emails.\n");
     }
 
-    public List<UserPhone> getUserPhones(int userId) {
-        List<UserPhone> phones = new ArrayList<>();
-        String query = "SELECT Phone_ID, User_ID, Phone_Number FROM User_Phone WHERE User_ID = ?";
+    return emails;
+}
 
-        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, userId);
-            ResultSet rs = pstmt.executeQuery();
+public List<UserPhone> getUserPhones(int userId) {
+    List<UserPhone> phones = new ArrayList<>();
+    String query = "SELECT Phone_ID, User_ID, Phone_Number, Date_Added FROM User_Phone WHERE User_ID = ? ORDER BY Date_Added DESC";
 
-            while (rs.next()) {
-                phones.add(new UserPhone(
-                    rs.getInt("Phone_ID"),
-                    rs.getInt("User_ID"),
-                    rs.getString("Phone_Number")
-                ));
-            }
-        } catch (SQLException e) {
-            System.out.printf("Error fetching phones.\n");
+    try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+        pstmt.setInt(1, userId);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            phones.add(new UserPhone(
+                rs.getInt("Phone_ID"),
+                rs.getInt("User_ID"),
+                rs.getString("Phone_Number"),
+                rs.getTimestamp("Date_Added")
+            ));
         }
-
-        return phones;
-    }
-    
-    public List<UserEmail> getAllEmails() {
-        List<UserEmail> emails = new ArrayList<>();
-        String query = "SELECT Email_ID, User_ID, Email FROM User_Email ORDER BY User_ID, Email_ID";
-
-        try (PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
-
-            while (rs.next()) {
-                emails.add(new UserEmail(
-                    rs.getInt("Email_ID"),
-                    rs.getInt("User_ID"),
-                    rs.getString("Email")
-                ));
-            }
-        } catch (SQLException e) {
-            System.out.printf("Error fetching all emails.\n");
-        }
-
-        return emails;
+    } catch (SQLException e) {
+        System.out.printf("Error fetching phones.\n");
     }
 
-    public List<UserPhone> getAllPhones() {
-        List<UserPhone> phones = new ArrayList<>();
-        String query = "SELECT Phone_ID, User_ID, Phone_Number FROM User_Phone ORDER BY User_ID, Phone_ID";
+    return phones;
+}
 
-        try (PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
+public List<UserEmail> getAllEmails() {
+    List<UserEmail> emails = new ArrayList<>();
+    String query = "SELECT Email_ID, User_ID, Email, Date_Added FROM User_Email ORDER BY User_ID, Date_Added DESC";
 
-            while (rs.next()) {
-                phones.add(new UserPhone(
-                    rs.getInt("Phone_ID"),
-                    rs.getInt("User_ID"),
-                    rs.getString("Phone_Number")
-                ));
-            }
-        } catch (SQLException e) {
-            System.out.printf("Error fetching all phones.\n");
+    try (PreparedStatement pstmt = conn.prepareStatement(query);
+         ResultSet rs = pstmt.executeQuery()) {
+
+        while (rs.next()) {
+            emails.add(new UserEmail(
+                rs.getInt("Email_ID"),
+                rs.getInt("User_ID"),
+                rs.getString("Email"),
+                rs.getTimestamp("Date_Added")
+            ));
         }
-
-        return phones;
+    } catch (SQLException e) {
+        System.out.printf("Error fetching all emails.\n");
     }
+
+    return emails;
+}
+
+public List<UserPhone> getAllPhones() {
+    List<UserPhone> phones = new ArrayList<>();
+    String query = "SELECT Phone_ID, User_ID, Phone_Number, Date_Added FROM User_Phone ORDER BY User_ID, Date_Added DESC";
+
+    try (PreparedStatement pstmt = conn.prepareStatement(query);
+         ResultSet rs = pstmt.executeQuery()) {
+
+        while (rs.next()) {
+            phones.add(new UserPhone(
+                rs.getInt("Phone_ID"),
+                rs.getInt("User_ID"),
+                rs.getString("Phone_Number"),
+                rs.getTimestamp("Date_Added")
+            ));
+        }
+    } catch (SQLException e) {
+        System.out.printf("Error fetching all phones.\n");
+    }
+
+    return phones;
+}
 
     public User getUserById(int userId) {
         String query = "SELECT u.User_ID, u.First_Name, u.Last_Name, u.Nationality, u.Points, u.Is_Admin, " +
@@ -386,55 +390,55 @@ public class UserRecordModel {
         return tiers;
     }
 
-    public List<Object[]> getRecommendationsByTierAndDate(int month, int year) {
-        List<Object[]> recommendations = new ArrayList<>();
-        String query = "SELECT ts.location_id, ts.spotname, c.city_name, r.region_name, co.country_name, " +
-                        "pt.Tier_Name as tier_name, " +
-                        "COUNT(DISTINCT uf.Review_ID) as recommendation_count " +
-                        "FROM User_Feedback uf " +
-                        "JOIN Travel_Spot ts ON uf.Location_ID = ts.location_id " +
-                        "JOIN City c ON ts.city_id = c.city_id " +
-                        "JOIN Region r ON c.region_id = r.region_id " +
-                        "JOIN Country co ON r.country_id = co.country_id " +
-                        "JOIN User u ON uf.User_ID = u.User_ID " +
-                        "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
-                        "WHERE uf.is_recommendation = TRUE " +
-                        "AND MONTH(uf.Review_Date) = ? " +
-                        "AND YEAR(uf.Review_Date) = ? " +
-                        "AND u.Is_Admin = FALSE " +
-                        "GROUP BY ts.location_id, ts.spotname, c.city_name, r.region_name, co.country_name, pt.Tier_Name " +
-                        "ORDER BY recommendation_count DESC, ts.location_id, tier_name";
+    public List<Object[]> getRecommendationsByTierAndDate() {
+    List<Object[]> recommendations = new ArrayList<>();
+    String query = "SELECT ts.location_id, ts.spotname, c.city_name, r.region_name, co.country_name, " +
+                    "pt.Tier_Name as tier_name, " +
+                    "COUNT(DISTINCT uf.Review_ID) as recommendation_count, " +
+                    "DATE(uf.Review_Date) as review_date, " +
+                    "TIME(uf.Review_Date) as review_time " +
+                    "FROM User_Feedback uf " +
+                    "JOIN Travel_Spot ts ON uf.Location_ID = ts.location_id " +
+                    "JOIN City c ON ts.city_id = c.city_id " +
+                    "JOIN Region r ON c.region_id = r.region_id " +
+                    "JOIN Country co ON r.country_id = co.country_id " +
+                    "JOIN User u ON uf.User_ID = u.User_ID " +
+                    "LEFT JOIN Points_Tier pt ON u.Tier_ID = pt.Tier_ID " +
+                    "WHERE uf.is_recommendation = TRUE " +
+                    "AND u.Is_Admin = FALSE " +
+                    "GROUP BY ts.location_id, ts.spotname, c.city_name, r.region_name, co.country_name, pt.Tier_Name, review_date, review_time " +
+                    "ORDER BY recommendation_count DESC, ts.location_id, tier_name";
 
-        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, month);
-            pstmt.setInt(2, year);
-            ResultSet rs = pstmt.executeQuery();
+    try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+        ResultSet rs = pstmt.executeQuery();
 
-            while (rs.next()) {
-                Object[] rec = new Object[7];
-                rec[0] = rs.getInt("location_id");
-                rec[1] = rs.getString("spotname");
-                rec[2] = rs.getString("city_name");
-                rec[3] = rs.getString("region_name");
-                rec[4] = rs.getString("country_name");
-            
-                String tier = rs.getString("tier_name");
-                if (tier != null) {
-                    rec[5] = tier;
-                } else {
-                    rec[5] = "No Tier";
-                }
-                
-                rec[6] = rs.getInt("recommendation_count");
-                recommendations.add(rec);
+        while (rs.next()) {
+            Object[] rec = new Object[9];
+            rec[0] = rs.getInt("location_id");
+            rec[1] = rs.getString("spotname");
+            rec[2] = rs.getString("city_name");
+            rec[3] = rs.getString("region_name");
+            rec[4] = rs.getString("country_name");
+        
+            String tier = rs.getString("tier_name");
+            if (tier != null) {
+                rec[5] = tier;
+            } else {
+                rec[5] = "No Tier";
             }
-        } catch (SQLException e) {
-            System.out.printf("Error fetching recommendations by tier and date.\n");
-            e.printStackTrace();
+            
+            rec[6] = rs.getInt("recommendation_count");
+            rec[7] = rs.getDate("review_date");
+            rec[8] = rs.getTime("review_time");
+            recommendations.add(rec);
         }
-
-        return recommendations;
+    } catch (SQLException e) {
+        System.out.printf("Error fetching recommendations.\n");
+        e.printStackTrace();
     }
+
+    return recommendations;
+}
 
     public boolean addPointsToUser(int userId, int pointsToAdd) {
 
