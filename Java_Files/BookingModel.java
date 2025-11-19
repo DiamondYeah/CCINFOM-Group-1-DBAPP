@@ -524,53 +524,94 @@ public class BookingModel {
         }
     }
 
-    /** Delete a booking by ID - now deletes related User_Booking entries first */
-    public boolean deleteBooking(int bookingID) {
-        try {
-            // Start transaction
-            conn.setAutoCommit(false);
-            
-            // First delete all User_Booking entries for this booking
-            String deleteUserBookingsSql = "DELETE FROM User_Booking WHERE Booking_ID = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(deleteUserBookingsSql)) {
-                stmt.setInt(1, bookingID);
-                stmt.executeUpdate();
+/** Delete a booking by ID - now deletes related User_Booking entries first */
+public boolean deleteBooking(int bookingID) {
+    int locationId = -1;
+
+    try {
+        // Get location ID first
+        String getLocSql = "SELECT Location_ID FROM Booking WHERE Booking_ID = ?";
+        try (PreparedStatement getStmt = conn.prepareStatement(getLocSql)) {
+            getStmt.setInt(1, bookingID);
+            ResultSet rs = getStmt.executeQuery();
+            if (rs.next()) {
+                locationId = rs.getInt("Location_ID");
             }
+        }
+
+        // Start transaction
+        conn.setAutoCommit(false);
+        
+        // First delete all User_Booking entries for this booking
+        String deleteUserBookingsSql = "DELETE FROM User_Booking WHERE Booking_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(deleteUserBookingsSql)) {
+            stmt.setInt(1, bookingID);
+            stmt.executeUpdate();
+        }
+        
+        // Then delete the booking itself
+        String deleteBookingSql = "DELETE FROM Booking WHERE Booking_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(deleteBookingSql)) {
+            stmt.setInt(1, bookingID);
+            int rowsAffected = stmt.executeUpdate();
             
-            // Then delete the booking itself
-            String deleteBookingSql = "DELETE FROM Booking WHERE Booking_ID = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(deleteBookingSql)) {
-                stmt.setInt(1, bookingID);
-                int rowsAffected = stmt.executeUpdate();
-                
-                if (rowsAffected > 0) {
-                    conn.commit();
-                    conn.setAutoCommit(true);
-                    return true;
-                } else {
-                    conn.rollback();
-                    conn.setAutoCommit(true);
-                    return false;
+            if (rowsAffected > 0) {
+                conn.commit();
+                conn.setAutoCommit(true);
+
+                // Update availability after deletion
+                if (locationId != -1) {
+                    try {
+                        travelModel.updateAvailability(locationId);
+                    } catch (SQLException ex) {
+                        System.err.println("Warning: Failed to update availability: " + ex.getMessage());
+                    }
                 }
-            }
-        } catch (SQLException ex) {
-            try {
+                return true;
+            } else {
                 conn.rollback();
                 conn.setAutoCommit(true);
-            } catch (SQLException e) {
-                e.printStackTrace();
+                return false;
             }
-            ex.printStackTrace();
-            return false;
         }
+    } catch (SQLException ex) {
+        try {
+            conn.rollback();
+            conn.setAutoCommit(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        ex.printStackTrace();
+        return false;
     }
+}
 
     /** Cancel a booking by ID */
     public boolean cancelBooking(int bookingID) {
+    int locationId = -1;
+    String getLocSql = "SELECT Location_ID FROM Booking WHERE Booking_ID = ?";
+    try (PreparedStatement getStmt = conn.prepareStatement(getLocSql)) {
+        getStmt.setInt(1, bookingID);
+        ResultSet rs = getStmt.executeQuery();
+        if (rs.next()) {
+            locationId = rs.getInt("Location_ID");
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+    }
+
         String sql = "UPDATE Booking SET Status = 'Cancelled' WHERE Booking_ID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, bookingID);
             int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0 && locationId != -1) {
+            try {
+                travelModel.updateAvailability(locationId);
+            } catch (SQLException ex) {
+                System.err.println("Warning: Failed to update availability: " + ex.getMessage());
+            }
+        }
             return rowsAffected > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
