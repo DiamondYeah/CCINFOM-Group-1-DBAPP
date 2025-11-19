@@ -145,6 +145,7 @@ CREATE TABLE Reaction(
 
 	ReactionType_ID 	INT AUTO_INCREMENT NOT NULL,
 	Reaction_Name		VARCHAR(50) NOT NULL,
+    Is_Positive         BOOLEAN DEFAULT FALSE,
     
     CONSTRAINT Reaction_pk PRIMARY KEY (ReactionType_ID)
         
@@ -158,7 +159,8 @@ CREATE TABLE User_Feedback(
     Location_ID 		INT NOT NULL,
     Rating 		        DECIMAL(2, 1) CHECK(Rating BETWEEN 1 AND 5),
     is_recommendation   BOOLEAN DEFAULT FALSE,
-    Reaction_Count 		INT DEFAULT 0,
+    Positive_Reactions 		INT DEFAULT 0,
+    Negative_Reactions 		INT DEFAULT 0,
     Comment_Count 		INT DEFAULT 0,
     Review_Date 		DATETIME DEFAULT CURRENT_TIMESTAMP,
     
@@ -357,17 +359,17 @@ INSERT INTO Travel_Spot (user_id, spotname, date_shared, city_id, base_price, ma
 
 INSERT INTO TS_Category (location_id, category_id) VALUES
 
-INSERT INTO Reaction (Reaction_Name) VALUES
-('Like'),
-('Dislike'),
-('Happy'),
-('Laugh'),
-('Sad'),
-('Angry'),
-('Love'),
-('Crying'),
-('Kiss'),
-('Fire');
+INSERT INTO Reaction (Reaction_Name, Is_Positive) VALUES
+('Like', TRUE),
+('Dislike', FALSE),
+('Happy', TRUE),
+('Laugh', TRUE),
+('Sad', FALSE),
+('Angry', FALSE),
+('Love', TRUE),
+('Crying', FALSE),
+('Kiss', TRUE),
+('Fire', TRUE);
 
 INSERT INTO User_Feedback (User_ID, Location_ID, Rating, is_recommendation, Comment_Count, Review_Date) VALUES
 (1, 1, 4.6, TRUE, 0, CURRENT_TIMESTAMP),
