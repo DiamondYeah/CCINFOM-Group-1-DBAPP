@@ -58,15 +58,7 @@ public class BookingRecordController implements ActionListener {
             handlePartyAssignment();
 
         } else if (src == view.getViewPartiesButton()) {
-            // Admin check with password verification
-            if (mainController.isCurrentUserAdmin()) {
-                if (verifyAdminPassword()) {
-                    view.showViewParties();
-                    view.setTableModel(model.getUserBookingTableModel());
-                }
-            } else {
-                view.showMessage("This function is for admins only.");
-            }
+            handleViewAllParties();
 
         } else if (src == view.getViewYourPartiesButton()) {
             handleViewYourParties();
@@ -78,47 +70,16 @@ public class BookingRecordController implements ActionListener {
             handleMostVisitedLocations();
 
         } else if (src == view.getViewBookingRecordsButton()) {
-            // Admin check with password verification
-            if (mainController.isCurrentUserAdmin()) {
-                if (verifyAdminPassword()) {
-                    String dateInput = view.promptBookingRecordsDate();
-                    if (dateInput != null) {
-                        view.showViewBooking();
-                        view.setTableModel(model.getBookingRecords(dateInput));
-                    }
-                }
-            } else {
-                view.showMessage("This function is for admins only.");
-            }
+            handleViewBookingRecords();
 
         } else if (src == view.getDeleteBookingButton()) {
-            String input = view.promptBookingID();
-            if (input == null || input.isEmpty()) return;
+            handleDeleteBooking();
 
-            int bookingID;
-            try {
-                bookingID = Integer.parseInt(input.trim());
-            } catch (NumberFormatException ex) {
-                view.showMessage("Invalid Booking ID.");
-                return;
-            }
+        } else if (src == view.getCancelBookingButton()) {
+            handleCancelBooking();
 
-            int confirm = JOptionPane.showConfirmDialog(
-                null,
-                "Are you sure you want to delete Booking ID " + bookingID + "?",
-                "Confirm Deletion",
-                JOptionPane.YES_NO_OPTION
-            );
-
-            if (confirm == JOptionPane.YES_OPTION) {
-                boolean success = model.deleteBooking(bookingID);
-                if (success) {
-                    view.showMessage("Booking deleted successfully!");
-                    loadBookingsForCurrentUser();
-                } else {
-                    view.showMessage("Failed to delete booking. It may not exist or has assigned users.");
-                }
-            }
+        } else if (src == view.getEditPartyRecordButton()) {
+            handleEditPartyRecord();
         }
     }
 
@@ -151,6 +112,283 @@ public class BookingRecordController implements ActionListener {
             // Show all
             view.showViewBooking();
             view.setTableModel(model.getAllMostVisitedLocations());
+        }
+    }
+
+    /**
+     * Handle View All Parties with admin verification and location filter
+     */
+    private void handleViewAllParties() {
+        if (mainController.isCurrentUserAdmin()) {
+            if (verifyAdminPassword()) {
+                // Ask if user wants to filter by location
+                String[] options = {"View All Parties", "Filter by Location ID"};
+                int choice = JOptionPane.showOptionDialog(
+                    null,
+                    "How would you like to view parties?",
+                    "View Parties",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+                );
+
+                if (choice == 0) {
+                    // View all parties
+                    view.showViewParties();
+                    view.setTableModel(model.getUserBookingTableModel());
+                } else if (choice == 1) {
+                    // Filter by location
+                    String locationInput = JOptionPane.showInputDialog(null,
+                        "Enter Location ID:",
+                        "Filter Parties by Location", JOptionPane.QUESTION_MESSAGE);
+                    
+                    if (locationInput != null && !locationInput.trim().isEmpty()) {
+                        try {
+                            int locationId = Integer.parseInt(locationInput.trim());
+                            view.showViewParties();
+                            view.setTableModel(model.getPartiesByLocation(locationId));
+                        } catch (NumberFormatException ex) {
+                            view.showMessage("Invalid Location ID. Please enter a valid number.");
+                        }
+                    }
+                }
+            }
+        } else {
+            view.showMessage("This function is for admins only.");
+        }
+    }
+
+    /**
+     * Handle View Booking Records with admin verification and filters
+     */
+    private void handleViewBookingRecords() {
+        if (mainController.isCurrentUserAdmin()) {
+            if (verifyAdminPassword()) {
+                // Ask for date filter
+                String[] dateOptions = {"Enter Year/Month", "Show All"};
+                int dateChoice = JOptionPane.showOptionDialog(
+                    null, 
+                    "Filter bookings by date or show all?", 
+                    "Booking Records Date Filter",
+                    JOptionPane.DEFAULT_OPTION, 
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, 
+                    dateOptions, 
+                    dateOptions[0]
+                );
+
+                String dateInput = "ALL";
+                if (dateChoice == 0) {
+                    while (true) {
+                        String input = JOptionPane.showInputDialog(null, "Enter Year (YYYY) or Month (YYYY-MM):");
+                        if (input == null) return; // User cancelled
+                        if (input.matches("\\d{4}") || input.matches("\\d{4}-\\d{2}")) {
+                            dateInput = input;
+                            break;
+                        }
+                        JOptionPane.showMessageDialog(null, "Invalid format. Enter YYYY or YYYY-MM.");
+                    }
+                }
+
+                // Ask for additional filter
+                String[] filterOptions = {"No Additional Filter", "Filter by Location ID", "Filter by User ID"};
+                int filterChoice = JOptionPane.showOptionDialog(
+                    null,
+                    "Apply additional filter?",
+                    "Additional Filter",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    filterOptions,
+                    filterOptions[0]
+                );
+
+                String filterType = null;
+                String filterValue = null;
+
+                if (filterChoice == 1) {
+                    // Filter by location
+                    filterType = "LOCATION";
+                    filterValue = JOptionPane.showInputDialog(null, "Enter Location ID:");
+                } else if (filterChoice == 2) {
+                    // Filter by user
+                    filterType = "USER";
+                    filterValue = JOptionPane.showInputDialog(null, "Enter User ID:");
+                }
+
+                if (filterValue != null && filterValue.trim().isEmpty()) {
+                    filterType = null;
+                    filterValue = null;
+                }
+
+                view.showViewBooking();
+                view.setTableModel(model.getBookingRecords(dateInput, filterType, filterValue));
+            }
+        } else {
+            view.showMessage("This function is for admins only.");
+        }
+    }
+
+    /**
+     * Handle Delete Booking with admin verification
+     */
+    private void handleDeleteBooking() {
+        if (!mainController.isCurrentUserAdmin()) {
+            view.showMessage("This function is for admins only.");
+            return;
+        }
+
+        if (!verifyAdminPassword()) {
+            return;
+        }
+
+        String input = view.promptBookingID();
+        if (input == null || input.isEmpty()) return;
+
+        int bookingID;
+        try {
+            bookingID = Integer.parseInt(input.trim());
+        } catch (NumberFormatException ex) {
+            view.showMessage("Invalid Booking ID.");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+            null,
+            "Are you sure you want to delete Booking ID " + bookingID + "?\nThis will also delete all associated party records.",
+            "Confirm Deletion",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean success = model.deleteBooking(bookingID);
+            if (success) {
+                view.showMessage("Booking and all associated party records deleted successfully!");
+                loadBookingsForCurrentUser();
+            } else {
+                view.showMessage("Failed to delete booking. It may not exist.");
+            }
+        }
+    }
+
+    /**
+     * Handle Cancel Booking
+     */
+    private void handleCancelBooking() {
+        String bookingIdInput = JOptionPane.showInputDialog(
+            null,
+            "Enter Booking ID to cancel:",
+            "Cancel Booking",
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (bookingIdInput == null || bookingIdInput.trim().isEmpty()) {
+            return;
+        }
+
+        int bookingId;
+        try {
+            bookingId = Integer.parseInt(bookingIdInput.trim());
+        } catch (NumberFormatException ex) {
+            view.showMessage("Invalid Booking ID.");
+            return;
+        }
+
+        // Get organizer ID for this booking
+        int organizerId = model.getOrganizerIdByBookingId(bookingId);
+        
+        if (organizerId == -1) {
+            view.showMessage("Booking not found.");
+            return;
+        }
+
+        // Prompt for organizer's password
+        String password = view.promptPassword();
+        
+        if (password == null || password.isEmpty()) {
+            view.showMessage("Password verification cancelled.");
+            return;
+        }
+
+        // Verify the password
+        if (!model.verifyUserPassword(organizerId, password)) {
+            view.showMessage("Incorrect Password. Cancellation failed.");
+            return;
+        }
+
+        // Cancel the booking
+        boolean success = model.cancelBooking(bookingId);
+        
+        if (success) {
+            view.showMessage("Booking cancelled successfully!");
+            loadBookingsForCurrentUser();
+        } else {
+            view.showMessage("Failed to cancel booking.");
+        }
+    }
+
+    /**
+     * Handle Edit Party Record (Admin only)
+     */
+    private void handleEditPartyRecord() {
+        if (!mainController.isCurrentUserAdmin()) {
+            view.showMessage("This function is for admins only.");
+            return;
+        }
+
+        if (!verifyAdminPassword()) {
+            return;
+        }
+
+        // Create input panel
+        JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
+        JTextField userBookingIdField = new JTextField();
+        JTextField bookingIdField = new JTextField();
+        JTextField userIdField = new JTextField();
+        JTextField roleField = new JTextField();
+
+        panel.add(new JLabel("User Booking ID:"));
+        panel.add(userBookingIdField);
+        panel.add(new JLabel("New Booking ID:"));
+        panel.add(bookingIdField);
+        panel.add(new JLabel("New User ID:"));
+        panel.add(userIdField);
+        panel.add(new JLabel("New Role:"));
+        panel.add(roleField);
+
+        int result = JOptionPane.showConfirmDialog(
+            null,
+            panel,
+            "Edit Party Record",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                int userBookingId = Integer.parseInt(userBookingIdField.getText().trim());
+                int bookingId = Integer.parseInt(bookingIdField.getText().trim());
+                int userId = Integer.parseInt(userIdField.getText().trim());
+                String role = roleField.getText().trim();
+
+                if (role.isEmpty()) {
+                    view.showMessage("Role cannot be empty.");
+                    return;
+                }
+
+                boolean success = model.updatePartyRecord(userBookingId, bookingId, userId, role);
+                
+                if (success) {
+                    view.showMessage("Party record updated successfully!");
+                    view.setTableModel(model.getUserBookingTableModel());
+                } else {
+                    view.showMessage("Failed to update party record. Check if values are valid and that there isn't already an organizer for this booking.");
+                }
+            } catch (NumberFormatException ex) {
+                view.showMessage("All ID fields must be valid numbers.");
+            }
         }
     }
 
@@ -205,7 +443,7 @@ public class BookingRecordController implements ActionListener {
         view.setTableModel(model.getPartiesForUser(currentUserId));
     }
 
-    /** Create new booking with automatic price calculation */
+    /** Create new booking with automatic price calculation and points reward */
     private void saveNewBooking() {
         try {
             int organizerID = mainController.getCurrentUser().getUserId();
@@ -268,12 +506,17 @@ public class BookingRecordController implements ActionListener {
                 int bookingID = model.getLastInsertedBookingID();
                 model.assignUserToBooking(organizerID, bookingID, "Organizer");
 
+                // Add 50 points to user for creating booking
+                boolean pointsAdded = mainController.getUserRecord().getUserRecordModel().addPointsToUser(organizerID, 50);
+                
                 // Calculate price info for display
                 long diffInMillis = endDate.getTime() - startDate.getTime();
                 int numberOfDays = (int) (diffInMillis / (1000 * 60 * 60 * 24));
                 double gemPrice = spotDetails.getBasePrice() * numberOfDays;
                 double tax = gemPrice * 0.10;
                 double totalPrice = gemPrice + tax;
+
+                String pointsMessage = pointsAdded ? "\n\n+50 Points Added!" : "";
 
                 view.showMessage(String.format(
                     "Booking created successfully!\n\n" +
@@ -283,8 +526,8 @@ public class BookingRecordController implements ActionListener {
                     "Gem Price: %.2f\n" +
                     "Tax (10%%): %.2f\n" +
                     "Total Price: %.2f\n" +
-                    "Max Capacity: %d",
-                    bookingID, numberOfDays, spotDetails.getBasePrice(), gemPrice, tax, totalPrice, spotDetails.getMaxCapacity()
+                    "Max Capacity: %d%s",
+                    bookingID, numberOfDays, spotDetails.getBasePrice(), gemPrice, tax, totalPrice, spotDetails.getMaxCapacity(), pointsMessage
                 ));
 
                 clearCreateFields();

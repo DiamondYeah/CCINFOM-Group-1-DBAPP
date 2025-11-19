@@ -64,4 +64,5 @@ public class Book {
     public void setGemPrice(double gemPrice) { this.gemPrice = gemPrice; }
     public void setTax(double tax) { this.tax = tax; }
     public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
+    public void setStatus(String status) { this.status = status; }
 }
