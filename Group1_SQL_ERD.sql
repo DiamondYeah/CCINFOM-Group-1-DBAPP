@@ -256,18 +256,18 @@ INSERT INTO Points_Tier (Tier_Name, Min_Points, Max_Points) VALUES
 
 INSERT INTO User (First_Name, Last_Name, Nationality, Points, Tier_ID, Password, Is_Admin) VALUES
 ('Admin', 'User', NULL, NULL, NULL, 'admin123', TRUE),
-('Joreve', 'De Jesus', 'Filipino', 50, 1, 'joreve123', FALSE),
-('Martin', 'Gamilla', 'Filipino', 199, 2, 'password1234PogzLi', FALSE),
-('Jhiro', 'Lirio', 'Filipino', 459, 3, '12413224JL', FALSE),
-('Aaron', 'Romero', 'Filipino', 999, 4, 'aaroncool', FALSE),
-('Frederick Voltair', 'Garcia', 'Filipino', 1234, 5, 'thunder1515', FALSE),
-('Stefan Manuel', 'Domingo', 'Filipino', 2001, 6, 'uh}>aCyWt?tY95Y', FALSE),
-('Ejreen', 'Del Mundo', 'Filipino', 6998, 7, '15Th15Th@Kru5TyKr4B?', FALSE),
-('Ethan', 'Franco', 'Filipino', 8000, 8, '#$21yeSyeS@', FALSE),
-('Neil Jr.', 'Gutang', 'Filipino', 10000, 9, 'TheSh4DowNeverB3trays!!!', FALSE),
-('Jakov Benedict', 'Santos', 'Filipino', 23000, 10, 'Cisco123', FALSE),
-('Mariel', 'Yasamuro', 'Japanese', 765, 4, 'ilovefeet', FALSE),
-('Dustine Gian', 'Rivera', 'Puerto Rican', 1999, 5, 'root', FALSE);
+('Joreve', 'De Jesus', 'Filipino', 50, 1, 'joreve123', FALSE), -- 2
+('Martin', 'Gamilla', 'Filipino', 199, 2, 'password1234PogzLi', FALSE), -- 3
+('Jhiro', 'Lirio', 'Filipino', 459, 3, '12413224JL', FALSE), -- 4
+('Aaron', 'Romero', 'Filipino', 999, 4, 'aaroncool', FALSE), -- 5
+('Frederick Voltair', 'Garcia', 'Filipino', 1234, 5, 'thunder1515', FALSE), -- 6
+('Stefan Manuel', 'Domingo', 'Filipino', 2001, 6, 'uh}>aCyWt?tY95Y', FALSE), -- 7
+('Ejreen', 'Del Mundo', 'Filipino', 6998, 7, '15Th15Th@Kru5TyKr4B?', FALSE), -- 8
+('Ethan', 'Franco', 'Filipino', 8000, 8, '#$21yeSyeS@', FALSE), -- 9
+('Neil Jr.', 'Gutang', 'Filipino', 10000, 9, 'TheSh4DowNeverB3trays!!!', FALSE), -- 10
+('Jakov Benedict', 'Santos', 'Filipino', 23000, 10, 'Cisco123', FALSE), -- 1
+('Mariel', 'Yasamuro', 'Japanese', 765, 4, 'ilovefeet', FALSE), -- 12
+('Dustine Gian', 'Rivera', 'Puerto Rican', 1999, 5, 'root', FALSE); -- 13
 
 INSERT INTO User_Email (User_ID, Email) VALUES
 (2, 'jorevepangandejesus@gmail.com'),
@@ -332,11 +332,30 @@ INSERT INTO City (city_name, region_id) VALUES
 ('Los Angeles', 5),
 ('Siena', 6);
 
--- INSERT INTO Category (category_name) VALUES
+INSERT INTO Category (category_name) VALUES
+('Museum'),
+('Beach'),
+('Food'),
+('Accommodation'),
+('Entertainment'),
+('Service'),
+('Leisure'),
+('Historical Landmark'),
+('Religion'),
 
--- INSERT INTO Travel_Spot (user_id, spotname, availability, date_shared, city_id, base_price, max_capacity) VALUES
+INSERT INTO Travel_Spot (user_id, spotname, date_shared, city_id, base_price, max_capacity, availability,) VALUES
+(6, 'Urdaneta Church', '2024-06-29', 2, 100.00, 50, 'Available'),       -- Location 1
+(6, 'Calle Cafe Taft', '2025-04-18', 3, 0.0, 50, 'Available'),           -- Location 2
+(8, 'HalfHalf Malabon', '2025-11-19', 4, 200.00, 25, 'Available'),    -- Location 3
+(8, 'Afternoon Cafe Malabon', '2025-11-19', 4, 150.00, 20, 'Available'),         -- Location 4
+(8, 'Studio 819 Self-Photo Studio', '2025-11-19', 4, 300.00, 15, 'Available'),      -- Location 5
+(5, 'Hakone Open Air Museum', '2024-12-17', 1, 0.0, 150, 'Available'), -- Location 6
+(11, 'Paya St. Coffee', '2025-03-05', 5, 150.00, 25, 'Available'),    -- Location 7
+--(9, 'Tokyo Anime Experience', 'Available', '2024-12-22', 8, 3000.00, 50),        -- Location 8
+--(10, 'Sapporo Snow Festival Grounds', 'Available', '2024-12-25', 9, 5000.00, 60),-- Location 9
+--(11, 'Los Angeles Film Studio Tour', 'Available', '2024-12-28', 10, 7000.00, 25);-- Location 10
 
--- INSERT INTO TS_Category (location_id, category_id) VALUES
+INSERT INTO TS_Category (location_id, category_id) VALUES
 
 INSERT INTO Reaction (Reaction_Name) VALUES
 ('Like'),
@@ -395,6 +414,48 @@ INSERT INTO User_Reaction (Review_ID, User_ID, ReactionType_ID, Reaction_Date) V
 (7, 4, 9, '2022-02-21 13:21:01');
 
 
--- INSERT INTO Booking (Location_ID, Status, Start_date, End_date, Tax, Gem_price, Organizer_ID, Current_Capacity, Max_Capacity) VALUES
+INSERT INTO Booking (Location_ID, Status, Start_date, End_date, Tax, Gem_price, Organizer_ID, Current_Capacity, Max_Capacity) VALUES
+(1, 'Completed', '2025-02-10', '2025-02-12', 50.00, 500.00, 2, 10, 30),
+(2, 'Completed', '2025-03-01', '2025-03-04', 35.00, 350.00, 3, 5, 50),
+(3, 'Completed', '2025-04-15', '2025-04-18', 120.00, 1200.00, 4, 20, 100),
+(4, 'Cancelled', '2025-05-05', '2025-05-06', 80.00, 800.00, 5, 0, 40),
+(5, 'Completed', '2025-02-20', '2025-02-22', 150.00, 1500.00, 6, 35, 70),
+(6, 'Completed', '2025-06-12', '2025-06-15', 90.00, 900.00, 7, 10, 80),
+(7, 'Completed', '2025-07-01', '2025-07-02', 65.00, 650.00, 8, 15, 45),
+(8, 'Completed', '2025-03-10', '2025-03-11', 70.00, 700.00, 9, 25, 50),
+(9, 'Booked', '2025-11-25', '2025-11-26', 55.00, 550.00, 10, 40, 60),
+(10, 'Booked', '2025-08-15', '2025-11-16', 30.00, 300.00, 11, 22, 25);
 
--- INSERT INTO User_Booking (Booking_ID, User_ID, Role) VALUES
+INSERT INTO User_Booking (Booking_ID, User_ID, Role) VALUES
+(1, 3, 'Organizer'),
+(1, 4, 'Participant'),
+(1, 5, 'Participant'),
+
+(2, 4, 'Organizer'),
+(2, 5, 'Participant'),
+
+(3, 5, 'Organizer'),
+(3, 6, 'Participant'),
+(3, 7, 'Participant'),
+
+(4, 7, 'Organizer'),
+
+(5, 8, 'Organizer'),
+(5, 9, 'Participant'),
+(5, 10, 'Participant'),
+
+(6, 8, 'Organizer'),
+(6, 9, 'Participant'),
+
+(7, 9, 'Organizer'),
+(7, 10, 'Participant'),
+
+(8, 10, 'Organizer'),
+(8, 11, 'Participant'),
+
+(9, 2, 'Organizer'),
+(9, 3, 'Participant'),
+
+(10, 2, 'Organizer'),
+(10, 3, 'Participant'),
+(10, 4, 'Participant');
