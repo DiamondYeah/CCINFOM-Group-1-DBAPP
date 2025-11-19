@@ -125,7 +125,8 @@ public class TravelRecordController {
             int cityId = city.getId();
             double basePrice = Double.parseDouble(view.getBasePrice());
             int maxCap = Integer.parseInt(view.getMaxCap());
-            String availability = view.getAvailability();
+
+            String availability = "Available";
 
             TravelRecord tr = new TravelRecord(userId, spotname, dateShared, cityId, basePrice, maxCap, availability);
 
@@ -165,7 +166,8 @@ public class TravelRecordController {
             int cityId = city.getId();
             double basePrice = Double.parseDouble(view.getBasePrice());
             int maxCap = Integer.parseInt(view.getMaxCap());
-            String availability = view.getAvailability();
+
+            String availability = exists.getAvailability();
 
             TravelRecord tr = new TravelRecord(locationId, userId, spotname, dateShared, cityId, basePrice, maxCap, availability);
             model.updTravelSpot(tr);
@@ -177,6 +179,7 @@ public class TravelRecordController {
                 catIds.add(c.getId());
             model.updTravelSpotCategories(locationId, catIds);
 
+            model.updateAvailability(locationId);
             JOptionPane.showMessageDialog(null, "Travel spot updated.");
             refreshTable();
 

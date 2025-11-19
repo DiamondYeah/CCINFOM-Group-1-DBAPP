@@ -4,9 +4,11 @@ import javax.swing.table.DefaultTableModel;
 public class BookingModel {
 
     private Connection conn;
+    private TravelRecordModel travelModel;
 
     public BookingModel(Connection conn) {
         this.conn = conn;
+        this.travelModel = new TravelRecordModel(conn);
     }
 
     /** Fetch all bookings as table model */
@@ -157,6 +159,12 @@ public class BookingModel {
             stmt.setString(9, "Booked");
             
             stmt.executeUpdate();
+
+            try {
+                travelModel.updateAvailability(locationId);
+            } catch (SQLException ex) {
+                System.err.println("Warning: Failed to update availability: " + ex.getMessage());
+            }
             return true;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -173,6 +181,13 @@ public class BookingModel {
             stmt.setDate(3, b.getEndDate());
             stmt.setInt(4, b.getBookingID());
             stmt.executeUpdate();
+
+            try {
+                travelModel.updateAvailability(b.getLocationID());
+            } catch (SQLException ex) {
+                System.err.println("Warning: Failed to update availability: " + ex.getMessage());
+            }
+
             return true;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -399,12 +414,33 @@ public class BookingModel {
             }
         }
 
+        int locationId = -1;
+        String getLocSql = "SELECT Location_ID FROM Booking WHERE Booking_ID = ?";
+        try (PreparedStatement getStmt = conn.prepareStatement(getLocSql)) {
+            getStmt.setInt(1, bookingID);
+            ResultSet rs = getStmt.executeQuery();
+            if (rs.next())
+                locationId = rs.getInt("Location_ID");
+
+        }
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
         String insertSql = "INSERT INTO User_Booking (Booking_ID, User_ID, Role) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(insertSql)) {
             stmt.setInt(1, bookingID);
             stmt.setInt(2, userID);
             stmt.setString(3, role);
             stmt.executeUpdate();
+
+            if (locationId != -1) {
+                try {
+                    travelModel.updateAvailability(locationId);
+                } catch (SQLException ex) {
+                    System.err.println("Warning: Failed to update availability");
+                }
+            }
             return true;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -414,6 +450,19 @@ public class BookingModel {
 
     /** Delete a booking by ID */
     public boolean deleteBooking(int bookingID) {
+        int locationId = -1;
+        String getLocSql = "SELECT Location_ID FROM Booking WHERE Booking_ID = ?";
+        try (PreparedStatement getStmt = conn.prepareStatement(getLocSql)) {
+            getStmt.setInt(1, bookingID);
+            ResultSet rs = getStmt.executeQuery();
+            if (rs.next())
+                locationId = rs.getInt("Location_ID");
+
+        }
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
         String checkSql = "SELECT COUNT(*) FROM User_Booking WHERE Booking_ID = ?";
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
             checkStmt.setInt(1, bookingID);
@@ -430,6 +479,15 @@ public class BookingModel {
         try (PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
             deleteStmt.setInt(1, bookingID);
             int rowsAffected = deleteStmt.executeUpdate();
+
+            if (rowsAffected > 0 && locationId != -1) {
+                try {
+                    travelModel.updateAvailability(locationId);
+                } catch (SQLException ex) {
+                    System.err.println("Warning: Failed to update availability: " + ex.getMessage());
+                }
+            }
+
             return rowsAffected > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -453,11 +511,32 @@ public class BookingModel {
     }
 
     public boolean removeUserFromBooking(int userId, int bookingId) {
+        int locationId = -1;
+        String getLocSql = "SELECT b.Location_ID FROM Booking b JOIN User_Booking ub ON b.Booking_ID = ub.Booking_ID WHERE ub.User_ID = ? AND ub.Booking_ID = ?";
+        try (PreparedStatement getStmt = conn.prepareStatement(getLocSql)) {
+            getStmt.setInt(1, userId);
+            getStmt.setInt(2, bookingId);
+            ResultSet rs = getStmt.executeQuery();
+            if (rs.next()) {
+                locationId = rs.getInt("Location_ID");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
         String sql = "DELETE FROM User_Booking WHERE User_ID = ? AND Booking_ID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             stmt.setInt(2, bookingId);
             int affected = stmt.executeUpdate();
+
+            if(affected > 0 && locationId != -1) {
+                try {
+                    travelModel.updateAvailability(locationId);
+                } catch (SQLException ex) {
+                    System.err.println("Warning: Failed to update availability: " + ex.getMessage());
+                }
+            }
             return affected > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
