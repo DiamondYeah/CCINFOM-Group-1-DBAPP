@@ -275,11 +275,45 @@ public class TravelRecordModel {
         return out;
     }
 
-    /* 
-    public void updateAvailability(int locationId) throws SQLException {
-        String sql = 
-            "UPDATE Travel_Spot ts " +
-            "SET availability = "
+    // helper for getting the number booked in a spot
+    public int getTotalBooked(int locationId) throws SQLException {
+        String sql = "SELECT COALESCE(SUM(Current_Capacity), 0) AS total FROM Booking WHERE Location_ID=? AND Status IN ('Booked', 'Confirmed')";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, locationId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt("total");
+            }
+        }
+        return 0;
+    }
 
-    }*/
+    // helper to get the max capacity of a travel spot
+    public int getMaxCapacity(int locationId) throws SQLException {
+        String sql = "SELECT max_capacity FROM Travel_Spot WHERE location_id=?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, locationId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt("max_capacity");
+            }
+        }
+        return 0;
+    }
+
+    // helper to compare the number of people booked and maxCapacity to automatically update status
+    public void updateAvailability(int locationId) throws SQLException {
+        int totalBooked = getTotalBooked(locationId);
+        int maxCap = getMaxCapacity(locationId);
+
+        String newStatus = (totalBooked >= maxCap) ? "Unavailable" : "Available";
+
+        String sql = "UPDATE Travel_Spot SET availability = ? WHERE location_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, locationId);
+            ps.executeUpdate();
+        }
+    }
 }
