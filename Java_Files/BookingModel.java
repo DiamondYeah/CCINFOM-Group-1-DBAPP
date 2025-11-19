@@ -16,16 +16,20 @@ public class BookingModel {
     public DefaultTableModel getBookingTableModel() {
         String[] columns = {
             "Booking ID", "Organizer ID", "Location ID", "Price",
-            "Current Capacity", "Max Capacity", "Start Date", "End Date", "Status"
+            "Current Capacity", "Max Capacity", "Start Date", "End Date", "Status", "Date of Book", "Time of Book"
         };
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
-        String sql = "SELECT Booking_ID, Organizer_ID, Location_ID, Price, Current_Capacity, Max_Capacity, Start_date, End_date, Status FROM Booking";
+        String sql = "SELECT Booking_ID, Organizer_ID, Location_ID, Price, Current_Capacity, Max_Capacity, Start_date, End_date, Status, Date_Book FROM Booking";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
+                Timestamp dateBook = rs.getTimestamp("Date_Book");
+                String dateOfBook = dateBook != null ? new java.sql.Date(dateBook.getTime()).toString() : "";
+                String timeOfBook = dateBook != null ? new java.sql.Time(dateBook.getTime()).toString() : "";
+                
                 model.addRow(new Object[] {
                     rs.getInt("Booking_ID"),
                     rs.getInt("Organizer_ID"),
@@ -35,7 +39,9 @@ public class BookingModel {
                     rs.getInt("Max_Capacity"),
                     rs.getDate("Start_date"),
                     rs.getDate("End_date"),
-                    rs.getString("Status")
+                    rs.getString("Status"),
+                    dateOfBook,
+                    timeOfBook
                 });
             }
 
@@ -63,7 +69,8 @@ public class BookingModel {
                     rs.getString("Status"),
                     rs.getDouble("Gem_price"),
                     rs.getDouble("Tax"),
-                    rs.getDouble("Gem_price") + rs.getDouble("Tax")
+                    rs.getDouble("Gem_price") + rs.getDouble("Tax"),
+                    rs.getTimestamp("Date_Book")
                 );
             }
         } catch (SQLException ex) {
@@ -116,7 +123,7 @@ public class BookingModel {
         return false;
     }
 
-    /** Create a new booking with automatic price calculation */
+    /** Create a new booking with automatic price calculation - Date_Book auto-set by database */
     public boolean createBooking(int organizerId, int locationId, int currentCapacity, 
                                  Date startDate, Date endDate) {
         // Get travel spot details
@@ -145,6 +152,7 @@ public class BookingModel {
         double gemPrice = spotDetails.getBasePrice() * numberOfDays;
         double tax = gemPrice * 0.10; // 10% tax
 
+        // Date_Book will be automatically set by database (CURRENT_TIMESTAMP)
         String sql = "INSERT INTO Booking (Organizer_ID, Location_ID, Current_Capacity, Max_Capacity, " +
                      "Start_date, End_date, Gem_price, Tax, Status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
@@ -256,10 +264,10 @@ public class BookingModel {
         
         DefaultTableModel model = new DefaultTableModel();
         model.setColumnIdentifiers(new String[]{"Booking ID", "Location ID", "Start Date", "End Date", 
-                                                "Pax", "Base Price", "Tax", "Total Price", "Status"});
+                                                "Pax", "Base Price", "Tax", "Total Price", "Status", "Date of Book", "Time of Book"});
 
         String query = "SELECT Booking_ID, Location_ID, Start_Date, End_Date, Current_Capacity, " +
-                       "Gem_price, Tax, (Gem_price + Tax) as Total_Price, Status " +
+                       "Gem_price, Tax, (Gem_price + Tax) as Total_Price, Status, Date_Book " +
                        "FROM Booking WHERE Organizer_ID = ?";
 
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -267,6 +275,10 @@ public class BookingModel {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
+                Timestamp dateBook = rs.getTimestamp("Date_Book");
+                String dateOfBook = dateBook != null ? new java.sql.Date(dateBook.getTime()).toString() : "";
+                String timeOfBook = dateBook != null ? new java.sql.Time(dateBook.getTime()).toString() : "";
+                
                 model.addRow(new Object[]{
                     rs.getInt("Booking_ID"),
                     rs.getInt("Location_ID"),
@@ -276,7 +288,9 @@ public class BookingModel {
                     rs.getDouble("Gem_price"),
                     rs.getDouble("Tax"),
                     rs.getDouble("Total_Price"),
-                    rs.getString("Status")
+                    rs.getString("Status"),
+                    dateOfBook,
+                    timeOfBook
                 });
             }
         } catch (SQLException e) {
@@ -380,11 +394,12 @@ public class BookingModel {
     public DefaultTableModel getBookingRecords(String dateInput, String filterType, String filterValue) {
         updateBookingStatuses(); // Auto-update statuses first
         
-        String[] columns = { "Booking ID", "Organizer ID", "Location ID", "Price", "Current Capacity", "Max Capacity", "Start Date", "End Date", "Status" };
+        String[] columns = { "Booking ID", "Organizer ID", "Location ID", "Price", "Current Capacity", 
+                            "Max Capacity", "Start Date", "End Date", "Status", "Date of Book", "Time of Book" };
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
         StringBuilder sqlBuilder = new StringBuilder(
-            "SELECT Booking_ID, Organizer_ID, Location_ID, Price, Current_Capacity, Max_Capacity, Start_date, End_date, Status FROM Booking WHERE 1=1"
+            "SELECT Booking_ID, Organizer_ID, Location_ID, Price, Current_Capacity, Max_Capacity, Start_date, End_date, Status, Date_Book FROM Booking WHERE 1=1"
         );
 
         // Add date filter
@@ -423,6 +438,10 @@ public class BookingModel {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Timestamp dateBook = rs.getTimestamp("Date_Book");
+                String dateOfBook = dateBook != null ? new java.sql.Date(dateBook.getTime()).toString() : "";
+                String timeOfBook = dateBook != null ? new java.sql.Time(dateBook.getTime()).toString() : "";
+                
                 model.addRow(new Object[] {
                     rs.getInt("Booking_ID"),
                     rs.getInt("Organizer_ID"),
@@ -432,7 +451,9 @@ public class BookingModel {
                     rs.getInt("Max_Capacity"),
                     rs.getDate("Start_date"),
                     rs.getDate("End_date"),
-                    rs.getString("Status")
+                    rs.getString("Status"),
+                    dateOfBook,
+                    timeOfBook
                 });
             }
         } catch (SQLException ex) {
@@ -524,12 +545,71 @@ public class BookingModel {
         }
     }
 
-/** Delete a booking by ID - now deletes related User_Booking entries first */
-public boolean deleteBooking(int bookingID) {
-    int locationId = -1;
+    /** Delete a booking by ID - now deletes related User_Booking entries first */
+    public boolean deleteBooking(int bookingID) {
+        int locationId = -1;
 
-    try {
-        // Get location ID first
+        try {
+            // Get location ID first
+            String getLocSql = "SELECT Location_ID FROM Booking WHERE Booking_ID = ?";
+            try (PreparedStatement getStmt = conn.prepareStatement(getLocSql)) {
+                getStmt.setInt(1, bookingID);
+                ResultSet rs = getStmt.executeQuery();
+                if (rs.next()) {
+                    locationId = rs.getInt("Location_ID");
+                }
+            }
+
+            // Start transaction
+            conn.setAutoCommit(false);
+            
+            // First delete all User_Booking entries for this booking
+            String deleteUserBookingsSql = "DELETE FROM User_Booking WHERE Booking_ID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteUserBookingsSql)) {
+                stmt.setInt(1, bookingID);
+                stmt.executeUpdate();
+            }
+            
+            // Then delete the booking itself
+            String deleteBookingSql = "DELETE FROM Booking WHERE Booking_ID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteBookingSql)) {
+                stmt.setInt(1, bookingID);
+                int rowsAffected = stmt.executeUpdate();
+                
+                if (rowsAffected > 0) {
+                    conn.commit();
+                    conn.setAutoCommit(true);
+
+                    // Update availability after deletion
+                    if (locationId != -1) {
+                        try {
+                            travelModel.updateAvailability(locationId);
+                        } catch (SQLException ex) {
+                            System.err.println("Warning: Failed to update availability: " + ex.getMessage());
+                        }
+                    }
+                    return true;
+                } else {
+                    conn.rollback();
+                    conn.setAutoCommit(true);
+                    return false;
+                }
+            }
+        } catch (SQLException ex) {
+            try {
+                conn.rollback();
+                conn.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    /** Cancel a booking by ID */
+    public boolean cancelBooking(int bookingID) {
+        int locationId = -1;
         String getLocSql = "SELECT Location_ID FROM Booking WHERE Booking_ID = ?";
         try (PreparedStatement getStmt = conn.prepareStatement(getLocSql)) {
             getStmt.setInt(1, bookingID);
@@ -537,68 +617,9 @@ public boolean deleteBooking(int bookingID) {
             if (rs.next()) {
                 locationId = rs.getInt("Location_ID");
             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-
-        // Start transaction
-        conn.setAutoCommit(false);
-        
-        // First delete all User_Booking entries for this booking
-        String deleteUserBookingsSql = "DELETE FROM User_Booking WHERE Booking_ID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(deleteUserBookingsSql)) {
-            stmt.setInt(1, bookingID);
-            stmt.executeUpdate();
-        }
-        
-        // Then delete the booking itself
-        String deleteBookingSql = "DELETE FROM Booking WHERE Booking_ID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(deleteBookingSql)) {
-            stmt.setInt(1, bookingID);
-            int rowsAffected = stmt.executeUpdate();
-            
-            if (rowsAffected > 0) {
-                conn.commit();
-                conn.setAutoCommit(true);
-
-                // Update availability after deletion
-                if (locationId != -1) {
-                    try {
-                        travelModel.updateAvailability(locationId);
-                    } catch (SQLException ex) {
-                        System.err.println("Warning: Failed to update availability: " + ex.getMessage());
-                    }
-                }
-                return true;
-            } else {
-                conn.rollback();
-                conn.setAutoCommit(true);
-                return false;
-            }
-        }
-    } catch (SQLException ex) {
-        try {
-            conn.rollback();
-            conn.setAutoCommit(true);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        ex.printStackTrace();
-        return false;
-    }
-}
-
-    /** Cancel a booking by ID */
-    public boolean cancelBooking(int bookingID) {
-    int locationId = -1;
-    String getLocSql = "SELECT Location_ID FROM Booking WHERE Booking_ID = ?";
-    try (PreparedStatement getStmt = conn.prepareStatement(getLocSql)) {
-        getStmt.setInt(1, bookingID);
-        ResultSet rs = getStmt.executeQuery();
-        if (rs.next()) {
-            locationId = rs.getInt("Location_ID");
-        }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-    }
 
         String sql = "UPDATE Booking SET Status = 'Cancelled' WHERE Booking_ID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -606,12 +627,12 @@ public boolean deleteBooking(int bookingID) {
             int rowsAffected = stmt.executeUpdate();
 
             if (rowsAffected > 0 && locationId != -1) {
-            try {
-                travelModel.updateAvailability(locationId);
-            } catch (SQLException ex) {
-                System.err.println("Warning: Failed to update availability: " + ex.getMessage());
+                try {
+                    travelModel.updateAvailability(locationId);
+                } catch (SQLException ex) {
+                    System.err.println("Warning: Failed to update availability: " + ex.getMessage());
+                }
             }
-        }
             return rowsAffected > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();

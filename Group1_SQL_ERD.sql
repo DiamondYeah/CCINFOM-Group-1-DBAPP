@@ -197,11 +197,11 @@ CREATE TABLE User_Reaction(
                 
 );
 
-
 CREATE TABLE Booking(
     Booking_ID INT AUTO_INCREMENT PRIMARY KEY,
     Location_ID INT NOT NULL,
     Status VARCHAR(50) NOT NULL,
+    Date_Book DATETIME DEFAULT CURRENT_TIMESTAMP,
     Start_date DATE NOT NULL,
     End_date DATE NOT NULL,
     Booking_Dates VARCHAR(100) AS (CONCAT(Start_date, ' to ', End_date)) STORED,
@@ -211,16 +211,10 @@ CREATE TABLE Booking(
     Organizer_ID INT NOT NULL,
     Current_Capacity INT NOT NULL DEFAULT 0,
     Max_Capacity INT NOT NULL,
-    
-    CONSTRAINT fk_booking_location
-        FOREIGN KEY (Location_ID)
-        REFERENCES travel_spot(Location_ID)
+    FOREIGN KEY (Location_ID) REFERENCES Travel_Spot(Location_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    
-    CONSTRAINT fk_booking_organizer
-        FOREIGN KEY (Organizer_ID)
-        REFERENCES User(User_ID)
+    FOREIGN KEY (Organizer_ID) REFERENCES User(User_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
