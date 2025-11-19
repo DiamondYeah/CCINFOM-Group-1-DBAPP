@@ -265,19 +265,22 @@ INSERT INTO User (First_Name, Last_Name, Nationality, Points, Tier_ID, Password,
 ('Ejreen', 'Del Mundo', 'Filipino', 6998, 7, '15Th15Th@Kru5TyKr4B?', FALSE),
 ('Ethan', 'Franco', 'Filipino', 8000, 8, '#$21yeSyeS@', FALSE),
 ('Neil Jr.', 'Gutang', 'Filipino', 10000, 9, 'TheSh4DowNeverB3trays!!!', FALSE),
-('Jakov Benedict', 'Santos', 'Filipino', 23000, 10, 'Cisco123', FALSE);
+('Jakov Benedict', 'Santos', 'Filipino', 23000, 10, 'Cisco123', FALSE),
+('Mariel', 'Yasamuro', 'Japanese', 765, 10, 'ilovefeet', FALSE),
+('Dustine Gian', 'Rivera', 'Puerto Rican', 1999, 10, 'root', FALSE);
 
 INSERT INTO User_Email (User_ID, Email) VALUES
 (2, 'jorevepangandejesus@gmail.com'),
 (3, 'martin_gamilla@dlsu.edu.ph'),
-(4, 'lirio@email.com'),
 (4, 'jhiro_lirio@dlsu.edu.ph'),
 (5, 'aaronzrom@gmail.com'),
 (6, 'derickgarcia1212@gmail.com'),
 (7, 'stefan_manuel_domingo@dlsu.edu.ph'),
 (8, 'ejreen_delmundo@dlsu.edu.ph'),
 (10, 'darkgamer17298@gmail.com'),
-(11, 'santosjakov@gmail.com');
+(11, 'santosjakov@gmail.com'),
+(12, 'mariel_yasumuro@dlsu.edu.ph'),
+(13, 'aaron@gmail.com');
 
 INSERT INTO User_Phone (User_ID, Phone_Number) VALUES
 (2, '09287232389'),
@@ -289,7 +292,7 @@ INSERT INTO User_Phone (User_ID, Phone_Number) VALUES
 (7, '09279109865'),
 (8, '09175119762'),
 (11, '09493339430'),
-(11, '09214223377');
+(13, '09391809204');
 
 INSERT INTO Country (country_name) VALUES
 ('Philippines'),
