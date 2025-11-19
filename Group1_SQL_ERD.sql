@@ -332,18 +332,6 @@ INSERT INTO City (city_name, region_id) VALUES
 ('Los Angeles', 5),
 ('Siena', 6);
 
-INSERT INTO Reaction (Reaction_Name) VALUES
-('Like'),
-('Dislike'),
-('Happy'),
-('Laugh'),
-('Sad'),
-('Angry'),
-('Love'),
-('Crying'),
-('Kiss'),
-('Fire');
-
 -- INSERT INTO Category (category_name) VALUES
 
 -- INSERT INTO Travel_Spot (user_id, spotname, availability, date_shared, city_id, base_price, max_capacity) VALUES
@@ -362,33 +350,49 @@ INSERT INTO Reaction (Reaction_Name) VALUES
 ('Kiss'),
 ('Fire');
 
--INSERT INTO User_Feedback (User_ID, Location_ID, Rating, is_recommendation, Reaction_Count, Comment_Count, Review_Date) VALUES
-(),
-(),
-(),
-(),
-(),
-(),
-(),
-(),
-(),
-(),
-(),
-();
+INSERT INTO User_Feedback (User_ID, Location_ID, Rating, Comment_Count, Review_Date) VALUES
+(1, 1, 4.6, 0, CURRENT_TIMESTAMP),
+(2, 2, 4.2, 2, CURRENT_TIMESTAMP),
+(2, 5, 3.8, 0, CURRENT_TIMESTAMP),
+(3, 7, 3.1, 4, '2025-07-20 19:04:00'),
+(4, 9, 4.6, 1, '2025-07-21 09:25:30'),
+(5, 10, 3.2, 1, '2025-05-29 08:18:00'),
+(6, 2, 2.5, 0, '2025-05-08 22:15:02'),
+(7, 3, 3.9, 1, '2024-11-20 09:18:00'),
+(8, 5, 2.9, 1, '2024-11-20 11:21:00'),
+(9, 1, 4.7, 3, '2024-10-20 20:19:00'),
+(10, 2, 4.1, 0, '2024-10-21 09:45:00'),
+(11, 3, 4.6, 0, '2023-05-27 09:27:57'),
+(2, 8, 5.0, 1, '2023-05-16 08:15:56'),
+(7, 8, 4.4, 1, '2022-09-24 09:18:42'),
+(8, 3, 4.2, 0, '2022-09-27 15:17:12'),
+(10, 10, 4.3, 0, '2021-01-03 12:15:02'),
+(10, 4, 5.0, 0, '2021-01-20 13:21:01');
 
 INSERT INTO User_Reaction (Review_ID, User_ID, ReactionType_ID, Reaction_Date) VALUES
-(),
-(),
-(),
-(),
-(),
-(),
-(),
-(),
-(),
-(),
-(),
-();
+(1, 2, 1, CURRENT_TIMESTAMP),
+(1, 3, 1, CURRENT_TIMESTAMP),
+(1, 4, 1, CURRENT_TIMESTAMP),
+(1, 5, 2, CURRENT_TIMESTAMP),
+(1, 6, 2, CURRENT_TIMESTAMP),
+(1, 7, 1, CURRENT_TIMESTAMP),
+(1, 8, 1, CURRENT_TIMESTAMP),
+(1, 9, 1, CURRENT_TIMESTAMP),
+(1, 10, 2, CURRENT_TIMESTAMP),
+(1, 11, 2, CURRENT_TIMESTAMP),
+(2, 2, 1, '2025-05-08 22:15:02'),
+(2, 3, 1, '2025-05-20 09:18:00'),
+(2, 7, 3, '2024-10-20 20:19:00'),
+(2, 4, 8, '2024-05-20 09:18:00'),
+(2, 8, 9, '2024-05-08 22:15:02'),
+(3, 2, 1, '2024-10-21 12:45:00'),
+(3, 4, 1, '2024-10-21 09:45:00'),
+(3, 3, 3, '2023-05-27 09:27:57'),
+(4, 8, 3, '2023-05-16 05:15:56'),
+(4, 8, 4, '2022-11-24 09:18:42'),
+(5, 3, 6, '2022-11-27 15:17:12'),
+(6, 10, 7, '2022-02-03 12:17:02'),
+(7, 4, 9, '2022-02-21 13:21:01');
 
 
 -- INSERT INTO Booking (Location_ID, Status, Start_date, End_date, Tax, Gem_price, Organizer_ID, Current_Capacity, Max_Capacity) VALUES
