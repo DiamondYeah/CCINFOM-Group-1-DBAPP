@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -154,30 +155,32 @@ public class ReactionPanelViewer {
         // Create create feedback panel
         viewReactionsPanel = new JPanel();
         viewReactionsPanel.setLayout(new BoxLayout(viewReactionsPanel, BoxLayout.Y_AXIS));
+        viewReactionsPanel.setBackground(new Color(191, 191, 178));
 
         // Create title label
         JLabel reactionTitle = new JLabel("Reaction Table");
-        reactionTitle.setFont(new Font("Arial", Font.BOLD, 50));
+        reactionTitle.setFont(new Font("Arial", Font.BOLD, 25));
         reactionTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Create panel wrapper to combine all 3 buttons together
-        JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 20));
+        JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         buttonWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         buttonWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        buttonWrapper.setBackground(new Color(191, 191, 178));
 
         // Create Enter Button and add components
         createReactionLinkButton = new JButton("Add");
-        createReactionLinkButton.setPreferredSize(new Dimension(250, 50));
-        createReactionLinkButton.setMaximumSize(new Dimension(250, 50));
-        createReactionLinkButton.setFont(new Font("Arial", Font.BOLD, 30));
+        createReactionLinkButton.setPreferredSize(new Dimension(200, 25));
+        createReactionLinkButton.setMaximumSize(new Dimension(200, 25));
+        createReactionLinkButton.setFont(new Font("Arial", Font.BOLD, 15));
         createReactionLinkButton.setFocusPainted(false);
         createReactionLinkButton.setActionCommand(REACTION_CREATE_LINK);
 
         // Create edit Button and add components
         editReactionLinkButton = new JButton("Edit and Delete");
-        editReactionLinkButton.setPreferredSize(new Dimension(250, 50));
-        editReactionLinkButton.setMaximumSize(new Dimension(250, 50));
-        editReactionLinkButton.setFont(new Font("Arial", Font.BOLD, 20));
+        editReactionLinkButton.setPreferredSize(new Dimension(200, 25));
+        editReactionLinkButton.setMaximumSize(new Dimension(200, 25));
+        editReactionLinkButton.setFont(new Font("Arial", Font.BOLD, 15));
         editReactionLinkButton.setFocusPainted(false);
         editReactionLinkButton.setActionCommand(REACTION_EDIT_LINK);
 
@@ -199,14 +202,18 @@ public class ReactionPanelViewer {
         reactionModel.addColumn("Reaction_Name");
         
         // Create actual visual studio and change its components
-        JTable reactionTable =  new JTable(reactionModel);
+        JTable reactionTable = new JTable(reactionModel);
         reactionTable.setFont(new Font("Arial", Font.PLAIN, 20));
         reactionTable.setRowHeight(30);
+
         JScrollPane scroll = new JScrollPane(reactionTable); // Scroll to allow navigation vertically
 
-        scroll.setPreferredSize(new Dimension(400, 600));
-        scroll.setMaximumSize(new Dimension(400, 600));
-        scroll.setMinimumSize(new Dimension(400, 600));
+        scroll.setBorder(null);
+        scroll.setPreferredSize(new Dimension(400, Integer.MAX_VALUE));
+        scroll.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
+        scroll.setMinimumSize(new Dimension(400, Integer.MAX_VALUE));
+        scroll.setBackground(new Color(191, 191, 178));
+        scroll.getViewport().setBackground(new Color(191, 191, 178));
 
         // Adjusts the column sizes of the fields in default table model
         TableColumnModel columnModel = reactionTable.getColumnModel();
@@ -221,15 +228,15 @@ public class ReactionPanelViewer {
         for(int i = 0; i < reactionTable.getColumnCount(); i++)
             reactionTable.getColumnModel().getColumn(i).setCellRenderer(cellCenter);
 
+        buttonWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add componenets to panelLeft including Structs to add padding between buttons
-        viewReactionsPanel.add(Box.createVerticalStrut(40));
-        viewReactionsPanel.add(buttonWrapper);
-        viewReactionsPanel.add(Box.createVerticalStrut(40));
+        viewReactionsPanel.add(Box.createVerticalStrut(10));
         viewReactionsPanel.add(reactionTitle);
-        viewReactionsPanel.add(Box.createVerticalStrut(20));
+        viewReactionsPanel.add(Box.createVerticalStrut(10));
+        viewReactionsPanel.add(buttonWrapper);
+        viewReactionsPanel.add(Box.createVerticalStrut(10));
         viewReactionsPanel.add(scroll);
-
 
         // Add createFeedbackPanel to panelRight
         mainPanel.add(viewReactionsPanel, REACTION_VIEW_LINK);
@@ -244,6 +251,7 @@ public class ReactionPanelViewer {
         // Create create feedback panel
         createReactionPanel = new JPanel();
         createReactionPanel.setLayout(new BoxLayout(createReactionPanel, BoxLayout.Y_AXIS));
+        createReactionPanel.setBackground(new Color(191, 191, 178));
 
         // Create title label
         JLabel reactionTitle = new JLabel("Create Reaction");
@@ -295,7 +303,7 @@ public class ReactionPanelViewer {
 
         editAndDeleteReactionPanel = new JPanel();
         editAndDeleteReactionPanel.setLayout(new BoxLayout(editAndDeleteReactionPanel, BoxLayout.Y_AXIS));
-
+        editAndDeleteReactionPanel.setBackground(new Color(191, 191, 178));
 
         JLabel editUserReactionTitle = new JLabel("Edit Reaction Table");
         editUserReactionTitle.setFont(new Font("Arial", Font.BOLD, 50));
@@ -315,6 +323,7 @@ public class ReactionPanelViewer {
         JPanel selectWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         selectWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         selectWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        selectWrapper.setBackground(new Color(191, 191, 178));
 
         selectWrapper.add(reactionSelectComboBox);
         selectWrapper.add(loadReactionButton);
@@ -333,6 +342,7 @@ public class ReactionPanelViewer {
         JPanel currentReactionWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         currentReactionWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         currentReactionWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        currentReactionWrapper.setBackground(new Color(191, 191, 178));
 
         currentReactionWrapper.add(currentReactionLabel);
         currentReactionWrapper.add(currentReactionNameField);
@@ -351,6 +361,7 @@ public class ReactionPanelViewer {
         JPanel newReactionWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         newReactionWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         newReactionWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        newReactionWrapper.setBackground(new Color(191, 191, 178));
 
         newReactionWrapper.add(newReactionLabel);
         newReactionWrapper.add(newReactionNameField);
@@ -375,6 +386,7 @@ public class ReactionPanelViewer {
         JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 20 , 20));
         buttonWrapper.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         buttonWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        buttonWrapper.setBackground(new Color(191, 191, 178));
 
         buttonWrapper.add(reactionConfirmEditButton);
         buttonWrapper.add(reactionConfirmDeleteButton);
@@ -395,7 +407,6 @@ public class ReactionPanelViewer {
         editAndDeleteReactionPanel.add(currentReactionWrapper);
         editAndDeleteReactionPanel.add(Box.createVerticalStrut(15));
         editAndDeleteReactionPanel.add(newReactionWrapper);
-        editAndDeleteReactionPanel.add(Box.createVerticalStrut(15));
         editAndDeleteReactionPanel.add(Box.createVerticalGlue());
         editAndDeleteReactionPanel.add(buttonWrapper);
         editAndDeleteReactionPanel.add(Box.createVerticalStrut(40));
