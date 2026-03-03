@@ -10,7 +10,7 @@ STEPS:
 2. Run the SQL script in MYSQL to create the Database
 3. Download Java Connector for SQL (https://dev.mysql.com/downloads/connector/j/)
 4. Watch instructions on how to connect the connector to Java. 2 Videos are provided depending on which approach you want (VSCODE -> https://www.youtube.com/watch?v=MtME-ERufu0) (Class-Path -> https://www.youtube.com/watch?v=8aTpDfsYTNQ)
-5. Add your password in the Java Program to your local host so that DriverManager can connect to MYSQL
+5. Create <b> db.properties  and add db.url, db.user, db.password in the directory. Fill out each with the database name, user, and password of your local MYSQL </b>.
 6. Check if the connection works by running the program. The message will display whether the connection was successful or unsuccessful
 7. Implement your MVC with tables, transactions, and reports.
 
